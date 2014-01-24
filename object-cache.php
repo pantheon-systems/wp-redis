@@ -220,8 +220,9 @@ function wp_cache_add_global_groups( $groups ) {
  * @param string|array $groups A group or an array of groups to add
  */
 function wp_cache_add_non_persistent_groups( $groups ) {
-	// Default cache doesn't persist so nothing to do here.
-	return;
+	global $wp_object_cache;
+
+	$wp_object_cache->add_non_persistent_groups( $groups );
 }
 
 /**
@@ -341,6 +342,18 @@ class WP_Object_Cache {
 
 		$groups = array_fill_keys( $groups, true );
 		$this->global_groups = array_merge( $this->global_groups, $groups );
+	}
+
+	/**
+	 * Sets the list of non-persistent groups.
+	 *
+	 * @param array $groups List of groups that are non-persistent.
+	 */
+	function add_non_persistent_groups( $groups ) {
+		$groups = (array) $groups;
+
+		$groups = array_fill_keys( $groups, true );
+		$this->non_persistent_groups = array_merge( $this->non_persistent_groups, $groups );
 	}
 
 	/**
@@ -628,10 +641,11 @@ class WP_Object_Cache {
 			$group = 'default';
 		}
 
-		if ( false !== array_search( $group, $this->global_groups ) )
+		if ( ! empty( $this->global_groups[ $group ] ) ) {
 			$prefix = $this->global_prefix;
-		else
+		} else {
 			$prefix = $this->blog_prefix;
+		}
 
 		return preg_replace( '/\s+/', '', WP_CACHE_KEY_SALT . "$prefix$group:$key" );
 	}
@@ -643,7 +657,7 @@ class WP_Object_Cache {
 	 * @return bool        true if the group is persistent, false if not.
 	 */
 	protected function _should_persist( $group ) {
-		return ( ! in_array( $group, $this->non_persistent_groups ) );
+		return empty( $this->non_persistent_groups[ $group ] );
 	}
 
 	/**
