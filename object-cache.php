@@ -427,13 +427,22 @@ class WP_Object_Cache {
 	}
 
 	/**
-	 * Clears the object cache of all data
+	 * Clears the object cache of all data.
 	 *
+	 * By default, this will flush the session cache as well as Redis, but we
+	 * can leave the redis cache intact if we want. This is helpful when, for
+	 * instance, you're running a batch process and want to clear the session
+	 * store to reduce the memory footprint, but you don't want to have to
+	 * re-fetch all the values from the database.
+	 *
+	 * @param  bool $redis Should we flush redis as well as the session cache?
 	 * @return bool Always returns true
 	 */
-	function flush() {
-		$this->redis->flushAll();
+	function flush( $redis = true ) {
 		$this->cache = array();
+		if ( $redis ) {
+			$this->redis->flushAll();
+		}
 
 		return true;
 	}
