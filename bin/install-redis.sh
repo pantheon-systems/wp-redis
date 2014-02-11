@@ -27,5 +27,4 @@ install_phpredis() {
 install_redis
 install_phpredis
 
-# Travis uses `phpenv` to manage PHP versions
-phpenv rehash
+service php5-fpm restart
