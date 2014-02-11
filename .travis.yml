@@ -6,7 +6,6 @@ php:
 
 env:
     - WP_VERSION=latest WP_MULTISITE=0
-    - WP_VERSION=3.6 WP_MULTISITE=0
 
 before_script:
     - sudo bash bin/install-redis.sh
