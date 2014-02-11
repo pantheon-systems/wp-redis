@@ -275,7 +275,8 @@ class CacheTest extends WP_UnitTestCase {
 		wp_cache_init();
 
 		global $wp_object_cache;
-		$this->assertEquals( $wp_object_cache, $new_blank_cache_object );
+		// Differs from core tests because we'll have two different Redis sockets 
+		$this->assertEquals( $wp_object_cache->cache, $new_blank_cache_object->cache );
 	}
 
 	function test_wp_cache_replace() {
