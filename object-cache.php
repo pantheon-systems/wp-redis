@@ -369,6 +369,11 @@ class WP_Object_Cache {
 
 		$offset = (int) $offset;
 
+		// The key needs to exist in order to be decremented
+		if ( ! $this->_exists( $id ) ) {
+			return false;
+		}
+
 		# If this isn't a persistant group, we have to sort this out ourselves, grumble grumble
 		if ( ! $this->_should_persist( $group ) ) {
 			if ( empty( $this->cache[ $id ] ) || ! is_numeric( $this->cache[ $id ] ) ) {
@@ -499,6 +504,11 @@ class WP_Object_Cache {
 		$id = $this->_key( $key, $group );
 
 		$offset = (int) $offset;
+
+		// The key needs to exist in order to be incremented
+		if ( ! $this->_exists( $id ) ) {
+			return false;
+		}
 
 		# If this isn't a persistant group, we have to sort this out ourselves, grumble grumble
 		if ( ! $this->_should_persist( $group ) ) {
