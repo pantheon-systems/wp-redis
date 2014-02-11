@@ -394,6 +394,11 @@ class WP_Object_Cache {
 			$result = $this->redis->decr( $id );
 		}
 
+		if ( $result < 0 ) {
+			$result = 0;
+			$this->redis->set( $id, $result );
+		}
+
 		if ( is_int( $result ) ) {
 			$this->cache[ $id ] = $result;
 		}
