@@ -1,7 +1,7 @@
 wp-redis
 ========
 
-WordPress Object Cache using Redis.
+WordPress Object Cache using Redis. By Alley Interactive.
 
 
 Pre-requisites
