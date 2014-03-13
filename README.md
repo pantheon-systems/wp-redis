@@ -1,5 +1,4 @@
-wp-redis
-========
+# WP Redis <img align="right" src="https://travis-ci.org/alleyinteractive/wp-redis.png?branch=master" />
 
 WordPress Object Cache using Redis. By Alley Interactive.
 
