@@ -310,6 +310,14 @@ class WP_Object_Cache {
 	var $blog_prefix;
 
 	/**
+	 * Record if we have a live redis connection or not.
+	 *
+	 * @var boolean
+	 * @access protected
+	 */
+	var $is_connected = false;
+
+	/**
 	 * Adds data to the cache if it doesn't already exist.
 	 *
 	 * @uses WP_Object_Cache::_exists Checks to see if the cache already has data.
@@ -374,8 +382,9 @@ class WP_Object_Cache {
 			return false;
 		}
 
-		# If this isn't a persistant group, we have to sort this out ourselves, grumble grumble
-		if ( ! $this->_should_persist( $group ) ) {
+		# If this isn't a persistant group, or if redis isn't connected
+		# we have to sort this out ourselves, grumble grumble
+		if ( ! $this->is_connected || ! $this->_should_persist( $group ) ) {
 			if ( empty( $this->cache[ $id ] ) || ! is_numeric( $this->cache[ $id ] ) ) {
 				$this->cache[ $id ] = 0;
 			} else {
@@ -388,16 +397,19 @@ class WP_Object_Cache {
 			return $this->cache[ $id ];
 		}
 
-		if ( $offset > 1 ) {
-			$result = $this->redis->decrBy( $id, $offset );
-		} else {
-			$result = $this->redis->decr( $id );
+		if ( $this->is_connected ) {
+			if ( $offset > 1 ) {
+				$result = $this->redis->decrBy( $id, $offset );
+			} else {
+				$result = $this->redis->decr( $id );
+			}
+
+			if ( $result < 0 ) {
+				$result = 0;
+				$this->redis->set( $id, $result );
+			}
 		}
 
-		if ( $result < 0 ) {
-			$result = 0;
-			$this->redis->set( $id, $result );
-		}
 
 		if ( is_int( $result ) ) {
 			$this->cache[ $id ] = $result;
@@ -425,7 +437,7 @@ class WP_Object_Cache {
 		if ( ! $force && ! $this->_exists( $id ) )
 			return false;
 
-		if ( $this->_should_persist( $group ) ) {
+		if ( $this->is_connected && $this->_should_persist( $group ) ) {
 			$result = $this->redis->delete( $id );
 			if ( 1 != $result ) {
 				return false;
@@ -450,7 +462,7 @@ class WP_Object_Cache {
 	 */
 	function flush( $redis = true ) {
 		$this->cache = array();
-		if ( $redis ) {
+		if ( $redis && $this->is_connected ) {
 			$this->redis->flushAll();
 		}
 
@@ -479,7 +491,7 @@ class WP_Object_Cache {
 			$found = true;
 			$this->cache_hits += 1;
 
-			if ( $this->_should_persist( $group ) && ! isset( $this->cache[ $id ] ) && ! array_key_exists( $id, $this->cache ) ) {
+			if ( $this->is_connected && $this->_should_persist( $group ) && ! isset( $this->cache[ $id ] ) && ! array_key_exists( $id, $this->cache ) ) {
 				$this->cache[ $id ] = $this->redis->get( $id );
 				if ( ! is_numeric( $this->cache[ $id ] ) ) {
 					$this->cache[ $id ] = unserialize( $this->cache[ $id ] );
@@ -515,8 +527,9 @@ class WP_Object_Cache {
 			return false;
 		}
 
-		# If this isn't a persistant group, we have to sort this out ourselves, grumble grumble
-		if ( ! $this->_should_persist( $group ) ) {
+		# If this isn't a persistant group, or redis isn't connected,
+		# we have to sort this out ourselves, grumble grumble
+		if ( ! $this->is_connected || ! $this->_should_persist( $group ) ) {
 			if ( empty( $this->cache[ $id ] ) || ! is_numeric( $this->cache[ $id ] ) ) {
 				$this->cache[ $id ] = 0;
 			} else {
@@ -529,10 +542,12 @@ class WP_Object_Cache {
 			return $this->cache[ $id ];
 		}
 
-		if ( $offset > 1 ) {
-			$result = $this->redis->incrBy( $id, $offset );
-		} else {
-			$result = $this->redis->incr( $id );
+		if ( $this->is_connected ) {
+			if ( $offset > 1 ) {
+				$result = $this->redis->incrBy( $id, $offset );
+			} else {
+				$result = $this->redis->incr( $id );
+			}
 		}
 
 		if ( is_int( $result ) ) {
@@ -594,7 +609,7 @@ class WP_Object_Cache {
 
 		$this->cache[ $id ] = $data;
 
-		if ( $this->_should_persist( $group ) ) {
+		if ( $this->is_connected && $this->_should_persist( $group ) ) {
 			# If this is an integer, store it as such. Otherwise, serialize it.
 			if ( ! is_numeric( $data ) || intval( $data ) != $data ) {
 				$data = serialize( $data );
@@ -648,9 +663,11 @@ class WP_Object_Cache {
 	protected function _exists( $id ) {
 		if ( isset( $this->cache[ $id ] ) || array_key_exists( $id, $this->cache ) ) {
 			return true;
-		} else {
+		} elseif ( $this->is_connected ) {
 			return $this->redis->exists( $id );
 		}
+
+		return false;
 	}
 
 	/**
@@ -700,8 +717,8 @@ class WP_Object_Cache {
 		}
 
 		$this->redis = new Redis();
-		$this->redis->connect( $redis_server['host'], $redis_server['port'], 1, NULL, 100 ); # 1s timeout, 100ms delay between reconnections
-		if ( ! empty( $redis_server['auth'] ) ) {
+		$this->is_connected = $this->redis->connect( $redis_server['host'], $redis_server['port'], 2 ); # 2s timeout
+		if ( $this->is_connected && ! empty( $redis_server['auth'] ) ) {
 			$this->redis->auth( $redis_server['auth'] );
 		}
 
