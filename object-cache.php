@@ -479,7 +479,7 @@ class WP_Object_Cache {
 			$found = true;
 			$this->cache_hits += 1;
 
-			if ( $this->_should_persist( $group ) && ! isset( $this->cache[ $id ] ) && ! array_key_exists( $id, $this->cache ) ) {
+			if ( $this->_should_persist( $group ) && ( $force || ( ! isset( $this->cache[ $id ] ) && ! array_key_exists( $id, $this->cache ) ) ) ) {
 				$this->cache[ $id ] = $this->redis->get( $id );
 				if ( ! is_numeric( $this->cache[ $id ] ) ) {
 					$this->cache[ $id ] = unserialize( $this->cache[ $id ] );
