@@ -696,7 +696,14 @@ class WP_Object_Cache {
 		$this->blog_prefix =  $this->multisite ? $blog_id . ':' : '';
 
 		if ( empty( $redis_server ) ) {
-			$redis_server = array( 'host' => '127.0.0.1', 'port' => 6379 );
+			# Attempt to automatically load Pantheon's Redis config from the env.
+			if ( isset( $_SERVER['CACHE_HOST'] ) ) {
+				$redis_server = array( 'host' => $_SERVER['CACHE_HOST'],
+				                       'port' => $_SERVER['CACHE_PORT'],
+				                       'auth' => $_SERVER['CACHE_PASSWORD'] );
+			}
+			else {
+				$redis_server = array( 'host' => '127.0.0.1', 'port' => 6379 );
 		}
 
 		$this->redis = new Redis();
