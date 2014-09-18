@@ -2,7 +2,8 @@
 Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh
 Tags: cache, plugin
 Requires at least: 3.0.1
-Tested up to: 3.0
+Tested up to: 3.8
+Compatible up to: 4.0
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -11,21 +12,22 @@ Back your WP Object cache with Redis, a high-performance in-memory cache.
 
 == Description ==
 
-This is the long description.  No limit, and you can use Markdown (as well as in the following sections).
+For sites concerned with high traffic and speed for logged in users or dynamic pageloads, a performant object cache is a must. You also need something that can scale across multiple instances of your application, so a local file cache and APC are out.
 
-For backwards compatibility, if this section is missing, the full length of the short description will be used, and
-Markdown parsed.
+Redis is a great answer, and one we bundle on the Pantheon platform. This is our plugin for integrating with the cache, but you can use it on any self-hosted WordPress site if you have Redis.
+
+Go forth and make awesome!
 
 == Installation ==
 
-This section describes how to install the plugin and get it working.
-
-e.g.
+This assumes you have a PHP environment with the required Redis library and a working Redis server (e.g. Pantheon).
 
 1. Install `object-cache.php` to the `wp-content/object-cache.php`.
 2. If you're not running on Pantheon, edit wp-config to add your cache credentials:
 
-        $redis_server = array( 'host' => '127.0.0.1', 'port' => 6379, 'auth' => '12345' );
+        $redis_server = array( 'host' => '127.0.0.1',
+                               'port' => 6379,
+                               'auth' => '12345' );
 
 3. Engage thrusters: you are now backing WP's object cache with Redis.
 
@@ -41,7 +43,7 @@ This plugin is for the internal application object cache. It doesn't have anythi
 
 == Screenshots ==
 
-1. Cool Pantheon logo for fun and profit.(png|jpg|jpeg|gif).
+Coming soon.
 
 == Changelog ==
 
