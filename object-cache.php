@@ -704,6 +704,7 @@ class WP_Object_Cache {
 			}
 			else {
 				$redis_server = array( 'host' => '127.0.0.1', 'port' => 6379 );
+			}
 		}
 
 		$this->redis = new Redis();
