@@ -2,6 +2,8 @@
 
 set -ex
 
+cd "$(dirname $0)"
+
 # Install redis
 install_redis() {
 
