@@ -5,14 +5,14 @@ set -ex
 # Install redis
 install_redis() {
 
-	apt-get install redis-server
+	apt-get install -y redis-server
 
 }
 
 # Install phpredis
 install_phpredis() {
 
-	apt-get install php5-dev
+	apt-get install -y php5-dev
 
 	git clone https://github.com/nicolasff/phpredis.git
 
