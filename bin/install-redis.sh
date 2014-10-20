@@ -16,7 +16,9 @@ install_phpredis() {
 
 	apt-get install -y php5-dev
 
-	git clone https://github.com/nicolasff/phpredis.git
+	if [ ! -d phpredis ]; then
+		git clone https://github.com/nicolasff/phpredis.git
+	fi
 
 	cd phpredis
 
