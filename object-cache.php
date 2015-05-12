@@ -263,6 +263,22 @@ function wp_cache_reset() {
 class WP_Object_Cache {
 
 	/**
+	 * Holds the primary Redis instance
+	 *
+	 * @var Redis
+	 * @access private
+	 */
+	var $redis = null;
+
+	/**
+	 * Holds the alternate Redis instances
+	 *
+	 * @var array|false
+	 * @access private
+	 */
+	var $alt_redis = array();
+
+	/**
 	 * Holds the cached objects
 	 *
 	 * @var array
@@ -393,13 +409,22 @@ class WP_Object_Cache {
 
 		if ( $offset > 1 ) {
 			$result = $this->redis->decrBy( $id, $offset );
+			foreach ( $this->alt_redis as $redis ) {
+				$redis->decrBy( $id, $offset );
+			}
 		} else {
 			$result = $this->redis->decr( $id );
+			foreach ( $this->alt_redis as $redis ) {
+				$redis->decr( $id );
+			}
 		}
 
 		if ( $result < 0 ) {
 			$result = 0;
 			$this->redis->set( $id, $result );
+			foreach ( $this->alt_redis as $redis ) {
+				$redis->set( $id, $result );
+			}
 		}
 
 		if ( is_int( $result ) ) {
@@ -431,6 +456,9 @@ class WP_Object_Cache {
 
 		if ( $this->_should_persist( $group ) ) {
 			$result = $this->redis->delete( $id );
+			foreach ( $this->alt_redis as $redis ) {
+				$redis->delete( $id );
+			}
 			if ( 1 != $result ) {
 				return false;
 			}
@@ -456,6 +484,9 @@ class WP_Object_Cache {
 		$this->cache = array();
 		if ( $redis ) {
 			$this->redis->flushAll();
+			foreach ( $this->alt_redis as $redis ) {
+				$redis->flushAll();
+			}
 		}
 
 		return true;
@@ -536,8 +567,14 @@ class WP_Object_Cache {
 
 		if ( $offset > 1 ) {
 			$result = $this->redis->incrBy( $id, $offset );
+			foreach ( $this->alt_redis as $redis ) {
+				$redis->incrBy( $id, $offset );
+			}
 		} else {
 			$result = $this->redis->incr( $id );
+			foreach ( $this->alt_redis as $redis ) {
+				$redis->incr( $id );
+			}
 		}
 
 		if ( is_int( $result ) ) {
@@ -609,8 +646,14 @@ class WP_Object_Cache {
 
 			if ( empty( $expire ) ) {
 				$this->redis->set( $id, $data );
+				foreach ( $this->alt_redis as $redis ) {
+					$redis->set( $id, $data );
+				}
 			} else {
 				$this->redis->setex( $id, $expire, $data );
+				foreach ( $this->alt_redis as $redis ) {
+					$redis->setex( $id, $expire, $data );
+				}
 			}
 		}
 
@@ -697,19 +740,40 @@ class WP_Object_Cache {
 	 * @return null|WP_Object_Cache If cache is disabled, returns null.
 	 */
 	function __construct() {
-		global $blog_id, $redis_server, $table_prefix;
+		global $blog_id, $redis_server, $redis_servers, $table_prefix;
 
 		$this->multisite = is_multisite();
 		$this->blog_prefix = $this->multisite ? $blog_id . ':' : '';
 
-		if ( empty( $redis_server ) ) {
-			$redis_server = array( 'host' => '127.0.0.1', 'port' => 6379 );
+		if ( empty( $redis_servers ) && ! empty( $redis_server ) ) {
+			$redis_servers = array( $redis_server );
 		}
 
+		if ( empty( $redis_servers ) ) {
+			$redis_servers = array( array( 'host' => '127.0.0.1', 'port' => 6379 ) );
+		}
+
+		$main_redis_server = array_shift( $redis_servers );
+
 		$this->redis = new Redis();
-		$this->redis->connect( $redis_server['host'], $redis_server['port'], 1, null, 100 ); # 1s timeout, 100ms delay between reconnections
-		if ( ! empty( $redis_server['auth'] ) ) {
-			$this->redis->auth( $redis_server['auth'] );
+		$this->redis->connect( $main_redis_server['host'], $main_redis_server['port'], 1, null, 100 ); # 1s timeout, 100ms delay between reconnections
+		if ( ! empty( $main_redis_server['auth'] ) ) {
+			$this->redis->auth( $main_redis_server['auth'] );
+		}
+
+		/*
+		 * Possible @todo, during a request, track all the $alt_redis_instance
+		 * requests and fire them off during WP's shutdown hook in order to be non-blocking.
+		 */
+
+		foreach ( $redis_servers as $alt_redis_server ) {
+			$alt_redis_instance = new Redis();
+			$alt_redis_instance->connect( $alt_redis_server['host'], $alt_redis_server['port'], 1, null, 100 ); # 1s timeout, 100ms delay between reconnections
+			if ( ! empty( $alt_redis_server['auth'] ) ) {
+				$alt_redis_instance->auth( $alt_redis_server['auth'] );
+			}
+
+			$this->alt_redis[] = $alt_redis_instance;
 		}
 
 		$this->global_prefix = '';
