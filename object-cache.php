@@ -813,7 +813,7 @@ class WP_Object_Cache {
 	}
 
 	/**
-	 * Retrieve Redis instances for each registered server
+	 * Retrieve Redis instances for each of the registered alternate servers
 	 *
 	 * @since  0.2.0
 	 *
