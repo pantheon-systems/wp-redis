@@ -3,7 +3,7 @@
 	Plugin Name: WP Redis
 	Plugin URI: http://github.com/alleyinteractive/wp-redis/
 	Description: WordPress Object Cache using Redis. Requires phpredis (https://github.com/nicolasff/phpredis).
-	Version: 0.1
+	Version: 0.2.0
 	Author: Matthew Boynes, Alley Interactive
 	Author URI: http://www.alleyinteractive.com/
 
@@ -153,6 +153,7 @@ function wp_cache_incr( $key, $offset = 1, $group = '' ) {
  */
 function wp_cache_init() {
 	$GLOBALS['wp_object_cache'] = new WP_Object_Cache();
+	add_action( 'shutdown', array( $GLOBALS['wp_object_cache'], 'sync_alt_servers' ), 99 );
 }
 
 /**
@@ -271,12 +272,21 @@ class WP_Object_Cache {
 	var $redis = null;
 
 	/**
-	 * Holds the alternate Redis instances
+	 * Holds the alternate Redis configurations
 	 *
 	 * @var array|false
 	 * @access private
 	 */
-	var $alt_redis = array();
+	var $alt_redis_servers = false;
+
+	/**
+	 * Holds the actions/data needing to be synced to
+	 * the alternate Redis servers
+	 *
+	 * @var array
+	 * @access private
+	 */
+	var $data_to_sync = array();
 
 	/**
 	 * Holds the cached objects
@@ -409,22 +419,16 @@ class WP_Object_Cache {
 
 		if ( $offset > 1 ) {
 			$result = $this->redis->decrBy( $id, $offset );
-			foreach ( $this->alt_redis as $redis ) {
-				$redis->decrBy( $id, $offset );
-			}
+			$this->add_data_to_sync( 'decrBy', array( $id, $offset ) );
 		} else {
 			$result = $this->redis->decr( $id );
-			foreach ( $this->alt_redis as $redis ) {
-				$redis->decr( $id );
-			}
+			$this->add_data_to_sync( 'decr', array( $id ) );
 		}
 
 		if ( $result < 0 ) {
 			$result = 0;
 			$this->redis->set( $id, $result );
-			foreach ( $this->alt_redis as $redis ) {
-				$redis->set( $id, $result );
-			}
+			$this->add_data_to_sync( 'set', array( $id, $result ) );
 		}
 
 		if ( is_int( $result ) ) {
@@ -456,9 +460,7 @@ class WP_Object_Cache {
 
 		if ( $this->_should_persist( $group ) ) {
 			$result = $this->redis->delete( $id );
-			foreach ( $this->alt_redis as $redis ) {
-				$redis->delete( $id );
-			}
+			$this->add_data_to_sync( 'delete', array( $id ) );
 			if ( 1 != $result ) {
 				return false;
 			}
@@ -484,9 +486,7 @@ class WP_Object_Cache {
 		$this->cache = array();
 		if ( $redis ) {
 			$this->redis->flushAll();
-			foreach ( $this->alt_redis as $redis ) {
-				$redis->flushAll();
-			}
+			$this->add_data_to_sync( 'flushAll' );
 		}
 
 		return true;
@@ -567,14 +567,10 @@ class WP_Object_Cache {
 
 		if ( $offset > 1 ) {
 			$result = $this->redis->incrBy( $id, $offset );
-			foreach ( $this->alt_redis as $redis ) {
-				$redis->incrBy( $id, $offset );
-			}
+			$this->add_data_to_sync( 'incrBy', array( $id, $offset ) );
 		} else {
 			$result = $this->redis->incr( $id );
-			foreach ( $this->alt_redis as $redis ) {
-				$redis->incr( $id );
-			}
+			$this->add_data_to_sync( 'incr', array( $id ) );
 		}
 
 		if ( is_int( $result ) ) {
@@ -646,14 +642,10 @@ class WP_Object_Cache {
 
 			if ( empty( $expire ) ) {
 				$this->redis->set( $id, $data );
-				foreach ( $this->alt_redis as $redis ) {
-					$redis->set( $id, $data );
-				}
+				$this->add_data_to_sync( 'set', array( $id, $data ) );
 			} else {
 				$this->redis->setex( $id, $expire, $data );
-				foreach ( $this->alt_redis as $redis ) {
-					$redis->setex( $id, $expire, $data );
-				}
+				$this->add_data_to_sync( 'setex', array( $id, $expire, $data ) );
 			}
 		}
 
@@ -753,28 +745,16 @@ class WP_Object_Cache {
 			$redis_servers = array( array( 'host' => '127.0.0.1', 'port' => 6379 ) );
 		}
 
-		$main_redis_server = array_shift( $redis_servers );
+		$primary_redis_server = array_shift( $redis_servers );
 
 		$this->redis = new Redis();
-		$this->redis->connect( $main_redis_server['host'], $main_redis_server['port'], 1, null, 100 ); # 1s timeout, 100ms delay between reconnections
-		if ( ! empty( $main_redis_server['auth'] ) ) {
-			$this->redis->auth( $main_redis_server['auth'] );
+		$this->redis->connect( $primary_redis_server['host'], $primary_redis_server['port'], 1, null, 100 ); # 1s timeout, 100ms delay between reconnections
+		if ( ! empty( $primary_redis_server['auth'] ) ) {
+			$this->redis->auth( $primary_redis_server['auth'] );
 		}
 
-		/*
-		 * Possible @todo, during a request, track all the $alt_redis_instance
-		 * requests and fire them off during WP's shutdown hook in order to be non-blocking.
-		 */
-
-		foreach ( $redis_servers as $alt_redis_server ) {
-			$alt_redis_instance = new Redis();
-			$alt_redis_instance->connect( $alt_redis_server['host'], $alt_redis_server['port'], 1, null, 100 ); # 1s timeout, 100ms delay between reconnections
-			if ( ! empty( $alt_redis_server['auth'] ) ) {
-				$alt_redis_instance->auth( $alt_redis_server['auth'] );
-			}
-
-			$this->alt_redis[] = $alt_redis_instance;
-		}
+		// If we have alternate redis servers registered, store them
+		$this->alt_redis_servers = ! empty( $redis_servers ) ? $redis_servers : false;
 
 		$this->global_prefix = '';
 		if ( function_exists( 'is_multisite' ) ) {
@@ -786,6 +766,73 @@ class WP_Object_Cache {
 		 * already calls __destruct()
 		 */
 		register_shutdown_function( array( $this, '__destruct' ) );
+	}
+
+	/**
+	 * Adds actions/data to be synced to the alternate Redis servers
+	 *
+	 * @since 0.2.0
+	 *
+	 * @param string        $method The Redis method to call
+	 * @param boolean|array $args   An array of args to pass tot he method
+	 */
+	public function add_data_to_sync( $method, $args = false ) {
+		if ( $this->alt_redis_servers ) {
+			$this->data_to_sync[] = array( 'method' => $method, 'args' => $args );
+		}
+	}
+
+	/**
+	 * If we have alternate Redis servers to sync,
+	 * this sync will happen on the shutdown hook
+	 *
+	 * @since  0.2.0
+	 */
+	public function sync_alt_servers() {
+		static $hooked = null;
+
+		if ( ! $this->alt_redis_servers || $hooked || empty( $this->data_to_sync ) ) {
+			return;
+		}
+
+		// Only want to ever perform this hook one time
+		$hooked = true;
+
+		// Loop through Redis server instances
+		foreach ( $this->get_alt_redis_instances() as $redis_instance ) {
+			// Then loop through the data to sync
+			foreach ( $this->data_to_sync as $data ) {
+				// And perform the actions
+				if ( is_array( $data['args'] ) ) {
+					call_user_func_array( array( $redis_instance, $data['method'] ), $data['args'] );
+				} else {
+					call_user_func( array( $redis_instance, $data['method'] ) );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Retrieve Redis instances for each registered server
+	 *
+	 * @since  0.2.0
+	 *
+	 * @return array  Array of Redis instances
+	 */
+	public function get_alt_redis_instances() {
+		$redis_instances = array();
+
+		foreach ( $this->alt_redis_servers as $key => $redis_server ) {
+			$redis_instance = new Redis();
+			$redis_instance->connect( $redis_server['host'], $redis_server['port'], 1, null, 100 ); # 1s timeout, 100ms delay between reconnections
+			if ( ! empty( $redis_server['auth'] ) ) {
+				$redis_instance->auth( $redis_server['auth'] );
+			}
+
+			$redis_instances[] = $redis_instance;
+		}
+
+		return $redis_instances;
 	}
 
 	/**
