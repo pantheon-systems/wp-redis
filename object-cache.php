@@ -350,7 +350,7 @@ class WP_Object_Cache {
 	 * @return bool False if cache key and group already exist, true on success
 	 */
 	function add( $key, $data, $group = 'default', $expire = 0 ) {
-		if ( wp_suspend_cache_addition() ) {
+		if ( function_exists( 'wp_suspend_cache_addition' ) && wp_suspend_cache_addition() ) {
 			return false;
 		}
 
@@ -737,12 +737,22 @@ class WP_Object_Cache {
 		$this->multisite = is_multisite();
 		$this->blog_prefix = $this->multisite ? $blog_id . ':' : '';
 
-		if ( empty( $redis_servers ) && ! empty( $redis_server ) ) {
-			$redis_servers = array( $redis_server );
+		if ( empty( $redis_server ) ) {
+
+			$redis_server = array( 'host' => '127.0.0.1', 'port' => 6379 );
+
+			// Attempt to automatically load Pantheon's Redis config from the env.
+			if ( isset( $_SERVER['CACHE_HOST'] ) ) {
+				$redis_server = array(
+					'host' => $_SERVER['CACHE_HOST'],
+					'port' => $_SERVER['CACHE_PORT'],
+					'auth' => $_SERVER['CACHE_PASSWORD'],
+				);
+			}
 		}
 
 		if ( empty( $redis_servers ) ) {
-			$redis_servers = array( array( 'host' => '127.0.0.1', 'port' => 6379 ) );
+			$redis_servers = array( $redis_server );
 		}
 
 		$primary_redis_server = array_shift( $redis_servers );

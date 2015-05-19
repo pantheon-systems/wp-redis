@@ -1,7 +1,6 @@
-# WP Redis <img align="right" src="https://travis-ci.org/alleyinteractive/wp-redis.png?branch=master" />
+# WP Redis <img align="right" src="https://travis-ci.org/pantheon-systems/wp-redis.png?branch=master" />
 
-WordPress Object Cache using Redis. By Alley Interactive.
-
+WordPress Object Cache using Redis. By Pantheon and Alley Interactive.
 
 Pre-requisites
 --------------
@@ -9,6 +8,9 @@ Pre-requisites
 * [redis](http://redis.io/)
 * [phpredis](https://github.com/nicolasff/phpredis)
 
+or
+
+* [pantheon](https://www.getpantheon.com)
 
 Setup
 -----
@@ -18,10 +20,7 @@ Setup
 
         $redis_server = array( 'host' => '127.0.0.1', 'port' => 6379, 'auth' => '12345' );
 
-3. Optionally, add a unique salt for the keys:
-
-        define( 'WP_CACHE_KEY_SALT', 'my-unique-phrase' );
-
-4. Engage thrusters.
+   On Pantheon this setting is not necessary.
+3. Engage thrusters: you are now backing WP's object cache with Redis.
 
 
