@@ -732,28 +732,12 @@ class WP_Object_Cache {
 	 * @return null|WP_Object_Cache If cache is disabled, returns null.
 	 */
 	function __construct() {
-		global $blog_id, $redis_server, $redis_servers, $table_prefix;
+		global $blog_id, $table_prefix;
 
 		$this->multisite = is_multisite();
 		$this->blog_prefix = $this->multisite ? $blog_id . ':' : '';
 
-		if ( empty( $redis_server ) ) {
-
-			$redis_server = array( 'host' => '127.0.0.1', 'port' => 6379 );
-
-			// Attempt to automatically load Pantheon's Redis config from the env.
-			if ( isset( $_SERVER['CACHE_HOST'] ) ) {
-				$redis_server = array(
-					'host' => $_SERVER['CACHE_HOST'],
-					'port' => $_SERVER['CACHE_PORT'],
-					'auth' => $_SERVER['CACHE_PASSWORD'],
-				);
-			}
-		}
-
-		if ( empty( $redis_servers ) ) {
-			$redis_servers = array( $redis_server );
-		}
+		$redis_servers = $this->get_redis_servers();
 
 		$primary_redis_server = array_shift( $redis_servers );
 
@@ -776,6 +760,38 @@ class WP_Object_Cache {
 		 * already calls __destruct()
 		 */
 		register_shutdown_function( array( $this, '__destruct' ) );
+	}
+
+	/**
+	 * Get array of Redis server configs from globals (likely registered in wp-config)
+	 *
+	 * @since  0.2.0
+	 *
+	 * @return array  Array of Redis server configs
+	 */
+	public function get_redis_servers() {
+		global $redis_server, $redis_servers;
+
+		if ( empty( $redis_servers ) ) {
+
+			if ( empty( $redis_server ) ) {
+
+				$redis_server = array( 'host' => '127.0.0.1', 'port' => 6379 );
+
+				// Attempt to automatically load Pantheon's Redis config from the env.
+				if ( isset( $_SERVER['CACHE_HOST'] ) ) {
+					$redis_server = array(
+						'host' => $_SERVER['CACHE_HOST'],
+						'port' => $_SERVER['CACHE_PORT'],
+						'auth' => $_SERVER['CACHE_PASSWORD'],
+					);
+				}
+			}
+
+			$redis_servers = array( $redis_server );
+		}
+
+		return $redis_servers;
 	}
 
 	/**
