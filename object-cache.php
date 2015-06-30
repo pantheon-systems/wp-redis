@@ -745,8 +745,12 @@ class WP_Object_Cache {
 	 */
 	public function redis_action( $method, $arguments = null, $failcase = false ) {
 		try {
-			$arguments = is_array( $arguments ) ? $arguments : array( $arguments );
-			return call_user_func_array( array( $this->redis, $method ), $arguments );
+			if ( is_null( $arguments ) ) {
+				return call_user_func( array( $this->redis, $method ) );
+			} else {
+				$arguments = is_array( $arguments ) ? $arguments : array( $arguments );
+				return call_user_func_array( array( $this->redis, $method ), $arguments );
+			}
 		} catch ( RedisException $err ) {
 			$this->error_log( $err->getMessage() );
 			return $failcase;
