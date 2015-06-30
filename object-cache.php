@@ -389,14 +389,14 @@ class WP_Object_Cache {
 		}
 
 		if ( $offset > 1 ) {
-			$result = $this->redis->decrBy( $id, $offset );
+			$result = $this->redis_action( 'decrBy', array( $id, $offset ) );
 		} else {
-			$result = $this->redis->decr( $id );
+			$result = $this->redis_action( 'decr', $id );
 		}
 
 		if ( $result < 0 ) {
 			$result = 0;
-			$this->redis->set( $id, $result );
+			$result = $this->redis_action( 'set', array( $id, $result ) );
 		}
 
 		if ( is_int( $result ) ) {
@@ -426,7 +426,7 @@ class WP_Object_Cache {
 			return false;
 
 		if ( $this->_should_persist( $group ) ) {
-			$result = $this->redis->delete( $id );
+			$result = $this->redis_action( 'delete', $id );
 			if ( 1 != $result ) {
 				return false;
 			}
@@ -451,7 +451,7 @@ class WP_Object_Cache {
 	function flush( $redis = true ) {
 		$this->cache = array();
 		if ( $redis ) {
-			$this->redis->flushAll();
+			$result = $this->redis_action( 'flushAll', null, true );
 		}
 
 		return true;
@@ -480,7 +480,7 @@ class WP_Object_Cache {
 			$this->cache_hits += 1;
 
 			if ( $this->_should_persist( $group ) && ( $force || ( ! isset( $this->cache[ $id ] ) && ! array_key_exists( $id, $this->cache ) ) ) ) {
-				$this->cache[ $id ] = $this->redis->get( $id );
+				$this->cache[ $id ] = $this->redis_action( 'get', $id );
 				if ( ! is_numeric( $this->cache[ $id ] ) ) {
 					$this->cache[ $id ] = unserialize( $this->cache[ $id ] );
 				}
@@ -530,9 +530,9 @@ class WP_Object_Cache {
 		}
 
 		if ( $offset > 1 ) {
-			$result = $this->redis->incrBy( $id, $offset );
+			$result = $this->redis_action( 'incrBy', array( $id, $offset ) );
 		} else {
-			$result = $this->redis->incr( $id );
+			$result = $this->redis_action( 'incr', $id );
 		}
 
 		if ( is_int( $result ) ) {
@@ -601,9 +601,9 @@ class WP_Object_Cache {
 			}
 
 			if ( empty( $expire ) ) {
-				$this->redis->set( $id, $data );
+				$this->redis_action( 'set', array( $id, $data ) );
 			} else {
-				$this->redis->setex( $id, $expire, $data );
+				$this->redis_action( 'setex', array( $id, $expire, $data ) );
 			}
 		}
 
@@ -649,7 +649,7 @@ class WP_Object_Cache {
 		if ( isset( $this->cache[ $id ] ) || array_key_exists( $id, $this->cache ) ) {
 			return true;
 		} else {
-			return $this->redis->exists( $id );
+			return $this->redis_action( 'exists', $id );
 		}
 	}
 
@@ -707,10 +707,16 @@ class WP_Object_Cache {
 			}
 		}
 
-		$this->redis = new Redis();
-		$this->redis->connect( $redis_server['host'], $redis_server['port'], 1, NULL, 100 ); # 1s timeout, 100ms delay between reconnections
-		if ( ! empty( $redis_server['auth'] ) ) {
-			$this->redis->auth( $redis_server['auth'] );
+		try {
+
+			$this->redis = new Redis();
+			$this->redis->connect( $redis_server['host'], $redis_server['port'], 1, NULL, 100 ); # 1s timeout, 100ms delay between reconnections
+			if ( ! empty( $redis_server['auth'] ) ) {
+				$this->redis->auth( $redis_server['auth'] );
+			}
+
+		} catch ( RedisException $err ) {
+			$this->error_log( $err->getMessage() );
 		}
 
 		$this->global_prefix = '';
@@ -723,6 +729,41 @@ class WP_Object_Cache {
 		 * already calls __destruct()
 		 */
 		register_shutdown_function( array( $this, '__destruct' ) );
+	}
+
+	/**
+	 * A Redis proxy method which wraps its calls in a try/catch block
+	 * to keep RedisExceptions from causing fatal errors
+	 *
+	 * @since  0.1.1
+	 *
+	 * @param  string  $method    Method to call on Redis object
+	 * @param  mixed   $arguments Arguments to pass to the method
+	 * @param  boolean $failcase  The value to return if an exception is caught
+	 *
+	 * @return mixed              Result of method call or failcase value
+	 */
+	public function redis_action( $method, $arguments = null, $failcase = false ) {
+		try {
+			$arguments = is_array( $arguments ) ? $arguments : array( $arguments );
+			return call_user_func_array( array( $this->redis, $method ), $arguments );
+		} catch ( RedisException $err ) {
+			$this->error_log( $err->getMessage() );
+			return $failcase;
+		}
+	}
+
+	/**
+	 * Error handler. Can be disabled or overridden with the wpredis_error_log filter
+	 *
+	 * @since  0.1.1
+	 *
+	 * @param  string  $msg Message to log
+	 */
+	public function error_log( $msg = '' ) {
+		if ( apply_filters( 'wpredis_error_log', true, $msg ) ) {
+			error_log( 'RedisException: '. print_r( $msg, true ) );
+		}
 	}
 
 	/**
