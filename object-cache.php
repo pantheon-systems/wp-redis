@@ -748,11 +748,16 @@ if ( class_exists( 'Redis' ) ) {
 			global $wp_object_cache;
 			switch ( $name ) {
 				case 'incr':
-					$wp_object_cache->cache[ $arguments['id'] ]++;
-					return $wp_object_cache->cache[ $arguments['id'] ];
+				case 'incrBy':
+					$val = $wp_object_cache->cache[ $arguments[0] ];
+					$offset = isset( $arguments[1] ) && 'incrBy' === $name ? $arguments[1] : 1;
+					$val = $val + $offset;
+					return $val;
 				case 'decr':
-					$wp_object_cache->cache[ $arguments['id'] ]++;
-					return $wp_object_cache->cache[ $arguments['id'] ];
+					$val = $wp_object_cache->cache[ $arguments[0] ];
+					$offset = isset( $arguments[1] ) && 'decrBy' === $name ? $arguments[1] : 1;
+					$val = $val - $offset;
+					return $val;
 				case 'delete':
 					return 1;
 			}
