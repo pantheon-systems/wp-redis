@@ -745,7 +745,14 @@ if ( class_exists( 'Redis' ) ) {
 	class WP_Redis {
 
 		public function __call( $name, $arguments ) {
+			global $wp_object_cache;
 			switch ( $name ) {
+				case 'incr':
+					$wp_object_cache->cache[ $arguments['id'] ]++;
+					return $wp_object_cache->cache[ $arguments['id'] ];
+				case 'decr':
+					$wp_object_cache->cache[ $arguments['id'] ]++;
+					return $wp_object_cache->cache[ $arguments['id'] ];
 				case 'delete':
 					return 1;
 			}
