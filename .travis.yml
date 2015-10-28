@@ -11,7 +11,9 @@ services:
     - redis-server
 
 before_script:
-    - echo 'extension = "redis.so"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
     - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION 
 
-script: phpunit
+script:
+	- phpunit
+	- echo 'extension = "redis.so"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+	- phpunit
