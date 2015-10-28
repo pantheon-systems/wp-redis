@@ -761,6 +761,8 @@ if ( class_exists( 'Redis' ) ) {
 					return $val;
 				case 'delete':
 					return 1;
+				case 'exists':
+					return false;
 			}
 		}
 
