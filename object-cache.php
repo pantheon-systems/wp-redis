@@ -745,6 +745,10 @@ if ( class_exists( 'Redis' ) ) {
 	class WP_Redis {
 
 		public function __call( $name, $arguments ) {
+			switch ( $name ) {
+				case 'delete':
+					return 1;
+			}
 		}
 
 		public function __construct() {
