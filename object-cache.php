@@ -707,7 +707,7 @@ class WP_Object_Cache {
 			}
 		}
 
-		$this->redis = new Redis();
+		$this->redis = new WP_Redis();
 		$this->redis->connect( $redis_server['host'], $redis_server['port'], 1, NULL, 100 ); # 1s timeout, 100ms delay between reconnections
 		if ( ! empty( $redis_server['auth'] ) ) {
 			$this->redis->auth( $redis_server['auth'] );
@@ -734,5 +734,29 @@ class WP_Object_Cache {
 	 */
 	function __destruct() {
 		return true;
+	}
+}
+
+if ( class_exists( 'Redis' ) ) {
+	class WP_Redis extends Redis {
+
+	}
+} else {
+	class WP_Redis {
+
+		public function __call( $name, $arguments ) {
+		}
+
+		public function __construct() {
+			add_action( 'admin_notices', array( $this, 'wp_action_admin_notices_warn_missing_redis' ) );
+		}
+
+		public function wp_action_admin_notices_warn_missing_redis() {
+			if ( ! current_user_can( 'manage_options' ) ) {
+				return;
+			}
+			echo '<div class="message error"><p>Alert! PHPRedis module is unavailable, which is required by WP Redis object cache.</p></div>';
+		}
+
 	}
 }
