@@ -753,6 +753,7 @@ if ( class_exists( 'Redis' ) ) {
 					$offset = isset( $arguments[1] ) && 'incrBy' === $name ? $arguments[1] : 1;
 					$val = $val + $offset;
 					return $val;
+				case 'decrBy':
 				case 'decr':
 					$val = $wp_object_cache->cache[ $arguments[0] ];
 					$offset = isset( $arguments[1] ) && 'decrBy' === $name ? $arguments[1] : 1;
