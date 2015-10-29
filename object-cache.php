@@ -708,6 +708,7 @@ class WP_Object_Cache {
 		}
 
 		$this->redis = new WP_Redis();
+		$this->redis->wp_object_cache = &$this;
 		$this->redis->connect( $redis_server['host'], $redis_server['port'], 1, NULL, 100 ); # 1s timeout, 100ms delay between reconnections
 		if ( ! empty( $redis_server['auth'] ) ) {
 			$this->redis->auth( $redis_server['auth'] );
@@ -745,23 +746,16 @@ if ( class_exists( 'Redis' ) ) {
 	class WP_Redis {
 
 		public function __call( $name, $arguments ) {
-			global $wp_object_cache;
 			switch ( $name ) {
 				case 'incr':
 				case 'incrBy':
-					if ( ! isset( $wp_object_cache->cache[ $arguments[0] ] ) ) {
-						return false;
-					}
-					$val = $wp_object_cache->cache[ $arguments[0] ];
+					$val = $this->wp_object_cache->cache[ $arguments[0] ];
 					$offset = isset( $arguments[1] ) && 'incrBy' === $name ? $arguments[1] : 1;
 					$val = $val + $offset;
 					return $val;
 				case 'decrBy':
 				case 'decr':
-					if ( ! isset( $wp_object_cache->cache[ $arguments[0] ] ) ) {
-						return false;
-					}
-					$val = $wp_object_cache->cache[ $arguments[0] ];
+					$val = $this->wp_object_cache->cache[ $arguments[0] ];
 					$offset = isset( $arguments[1] ) && 'decrBy' === $name ? $arguments[1] : 1;
 					$val = $val - $offset;
 					return $val;
