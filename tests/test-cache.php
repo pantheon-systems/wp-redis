@@ -5,6 +5,8 @@
  */
 class CacheTest extends WP_UnitTestCase {
 
+	private $cache;
+
 	function setUp() {
 		parent::setUp();
 		// create two cache objects with a shared cache dir
