@@ -749,8 +749,13 @@ class WP_Object_Cache {
 				$retval = call_user_func_array( array( $this->redis, $method ), $arguments );
 				return $retval;
 			} catch( RedisException $e ) {
-				if ( 'Redis server went away' === $e->getMessage() ) {
-					$this->is_redis_connected = false;
+				if ( in_array( $e->getMessage(), array( 'Connection closed', 'Redis server went away' ) ) ) {
+					// Attempt to refresh the connection if it was successfully established once
+					// $this->is_redis_connected will be set inside _connect_redis()
+					if ( $this->_connect_redis() ) {
+						return call_user_func_array( array( $this, '_call_redis' ), array_merge( array( $method ), $arguments ) );
+					}
+					// Fall through to fallback below
 				} else {
 					throw $e;
 				}
