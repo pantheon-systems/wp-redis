@@ -725,7 +725,7 @@ class WP_Object_Cache {
 		if ( ! empty( $redis_server['auth'] ) ) {
 			$this->redis->auth( $redis_server['auth'] );
 		}
-		$this->is_redis_connected = $this->_call_redis( 'isConnected' );
+		$this->is_redis_connected = $this->redis->isConnected();
 		if ( ! $this->is_redis_connected ) {
 			$this->missing_redis_message = 'Alert! WP Redis object cache cannot connect to Redis server.';
 		}
