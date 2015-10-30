@@ -746,7 +746,7 @@ class WP_Object_Cache {
 
 		if ( $this->is_redis_connected ) {
 			try {
-				$retval = call_user_func_array( array( $this->redis, 'method' ), $arguments );
+				$retval = call_user_func_array( array( $this->redis, $method ), $arguments );
 				return $retval;
 			} catch( RedisException $e ) {
 				if ( 'Redis server went away' === $e->getMessage() ) {
