@@ -30,6 +30,10 @@
 if ( !defined( 'WP_CACHE_KEY_SALT' ) )
 	define( 'WP_CACHE_KEY_SALT', '' );
 
+if ( ! defined( 'WP_REDIS_OBJECT_CACHE' ) ) {
+	define( 'WP_REDIS_OBJECT_CACHE', true );
+}
+
 /**
  * Adds data to the cache, if the cache key doesn't already exist.
  *
@@ -761,6 +765,7 @@ if ( class_exists( 'Redis' ) ) {
 					return $val;
 				case 'delete':
 					return 1;
+				case 'IsConnected':
 				case 'exists':
 					return false;
 			}

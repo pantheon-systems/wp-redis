@@ -20,6 +20,20 @@ class CacheTest extends WP_UnitTestCase {
 		return $cache;
 	}
 
+	public function test_loaded() {
+		$this->assertTrue( WP_REDIS_OBJECT_CACHE );
+		$this->assertTrue( class_exists( 'WP_Redis' ) );
+	}
+
+	public function test_redis_connected() {
+		$this->assertTrue( isset( $this->cache->redis ) );
+		if ( class_exists( 'Redis' ) ) {
+			$this->assertTrue( $this->cache->redis->IsConnected() );
+		} else {
+			$this->assertFalse( $this->cache->redis->IsConnected() );
+		}
+	}
+
 	function test_miss() {
 		$this->assertEquals(NULL, $this->cache->get(rand_str()));
 	}
