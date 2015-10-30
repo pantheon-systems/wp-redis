@@ -22,7 +22,6 @@ class CacheTest extends WP_UnitTestCase {
 
 	public function test_loaded() {
 		$this->assertTrue( WP_REDIS_OBJECT_CACHE );
-		$this->assertTrue( class_exists( 'WP_Redis' ) );
 	}
 
 	public function test_redis_connected() {
