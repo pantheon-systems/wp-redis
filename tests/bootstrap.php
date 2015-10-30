@@ -5,11 +5,11 @@ if ( !$_tests_dir ) $_tests_dir = '/tmp/wordpress-tests-lib';
 
 require_once $_tests_dir . '/includes/functions.php';
 
-$_core_dir = getenv( 'WP_CORE_DIR' );
-if ( ! $_core_dir ) {
+if ( getenv( 'WP_CORE_DIR' ) ) {
+	$_core_dir = getenv( 'WP_CORE_DIR' );
+} else if ( getenv( 'WP_DEVELOP_DIR' ) ) {
 	$_core_dir = getenv( 'WP_DEVELOP_DIR' ) . '/src/';
-}
-if ( ! $_core_dir ) {
+} else {
 	$_core_dir = '/tmp/wordpress';
 }
 
