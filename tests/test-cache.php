@@ -20,6 +20,10 @@ class CacheTest extends WP_UnitTestCase {
 		return $cache;
 	}
 
+	public function test_loaded() {
+		$this->assertTrue( WP_REDIS_OBJECT_CACHE );
+	}
+
 	function test_miss() {
 		$this->assertEquals(NULL, $this->cache->get(rand_str()));
 	}
