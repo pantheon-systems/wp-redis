@@ -25,12 +25,11 @@ class CacheTest extends WP_UnitTestCase {
 	}
 
 	public function test_redis_connected() {
-		$this->assertTrue( isset( $this->cache->redis ) );
-		if ( class_exists( 'Redis' ) ) {
-			$this->assertTrue( $this->cache->redis->IsConnected() );
-		} else {
-			$this->assertFalse( $this->cache->redis->IsConnected() );
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
 		}
+		$this->assertTrue( isset( $this->cache->redis ) );
+		$this->assertTrue( $this->cache->redis->IsConnected() );
 	}
 
 	function test_miss() {
