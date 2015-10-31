@@ -314,6 +314,14 @@ class WP_Object_Cache {
 	var $blog_prefix;
 
 	/**
+	 * Whether or not Redis is connected
+	 *
+	 * @var bool
+	 * @access private
+	 */
+	var $is_redis_connected = false;
+
+	/**
 	 * Adds data to the cache if it doesn't already exist.
 	 *
 	 * @uses WP_Object_Cache::_exists Checks to see if the cache already has data.
@@ -393,14 +401,14 @@ class WP_Object_Cache {
 		}
 
 		if ( $offset > 1 ) {
-			$result = $this->redis->decrBy( $id, $offset );
+			$result = $this->_call_redis( 'decrBy', $id, $offset );
 		} else {
-			$result = $this->redis->decr( $id );
+			$result = $this->_call_redis( 'decr', $id );
 		}
 
 		if ( $result < 0 ) {
 			$result = 0;
-			$this->redis->set( $id, $result );
+			$this->_call_redis( 'set', $id, $result );
 		}
 
 		if ( is_int( $result ) ) {
@@ -430,7 +438,7 @@ class WP_Object_Cache {
 			return false;
 
 		if ( $this->_should_persist( $group ) ) {
-			$result = $this->redis->delete( $id );
+			$result = $this->_call_redis( 'delete', $id );
 			if ( 1 != $result ) {
 				return false;
 			}
@@ -455,7 +463,7 @@ class WP_Object_Cache {
 	function flush( $redis = true ) {
 		$this->cache = array();
 		if ( $redis ) {
-			$this->redis->flushAll();
+			$this->_call_redis( 'flushAll' );
 		}
 
 		return true;
@@ -484,7 +492,7 @@ class WP_Object_Cache {
 			$this->cache_hits += 1;
 
 			if ( $this->_should_persist( $group ) && ( $force || ( ! isset( $this->cache[ $id ] ) && ! array_key_exists( $id, $this->cache ) ) ) ) {
-				$this->cache[ $id ] = $this->redis->get( $id );
+				$this->cache[ $id ] = $this->_call_redis( 'get', $id );
 				if ( ! is_numeric( $this->cache[ $id ] ) ) {
 					$this->cache[ $id ] = unserialize( $this->cache[ $id ] );
 				}
@@ -534,9 +542,9 @@ class WP_Object_Cache {
 		}
 
 		if ( $offset > 1 ) {
-			$result = $this->redis->incrBy( $id, $offset );
+			$result = $this->_call_redis( 'incrBy', $id, $offset );
 		} else {
-			$result = $this->redis->incr( $id );
+			$result = $this->_call_redis( 'incr', $id );
 		}
 
 		if ( is_int( $result ) ) {
@@ -605,9 +613,9 @@ class WP_Object_Cache {
 			}
 
 			if ( empty( $expire ) ) {
-				$this->redis->set( $id, $data );
+				$this->_call_redis( 'set', $id, $data );
 			} else {
-				$this->redis->setex( $id, $expire, $data );
+				$this->_call_redis( 'setex', $id, $expire, $data );
 			}
 		}
 
@@ -653,7 +661,7 @@ class WP_Object_Cache {
 		if ( isset( $this->cache[ $id ] ) || array_key_exists( $id, $this->cache ) ) {
 			return true;
 		} else {
-			return $this->redis->exists( $id );
+			return $this->_call_redis( 'exists', $id );
 		}
 	}
 
@@ -689,15 +697,16 @@ class WP_Object_Cache {
 	}
 
 	/**
-	 * Sets up object properties; PHP 5 style constructor
-	 *
-	 * @return null|WP_Object_Cache If cache is disabled, returns null.
+	 * Wrapper method for connecting to Redis, which lets us retry the connection
 	 */
-	function __construct() {
-		global $blog_id, $redis_server, $table_prefix;
+	protected function _connect_redis() {
+		global $redis_server;
 
-		$this->multisite = is_multisite();
-		$this->blog_prefix =  $this->multisite ? $blog_id . ':' : '';
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->is_redis_connected = false;
+			$this->missing_redis_message = 'Alert! PHPRedis module is unavailable, which is required by WP Redis object cache.';
+			return $this->is_redis_connected;
+		}
 
 		if ( empty( $redis_server ) ) {
 			# Attempt to automatically load Pantheon's Redis config from the env.
@@ -711,11 +720,94 @@ class WP_Object_Cache {
 			}
 		}
 
-		$this->redis = new WP_Redis();
-		$this->redis->wp_object_cache = &$this;
+		$this->redis = new Redis;
 		$this->redis->connect( $redis_server['host'], $redis_server['port'], 1, NULL, 100 ); # 1s timeout, 100ms delay between reconnections
 		if ( ! empty( $redis_server['auth'] ) ) {
 			$this->redis->auth( $redis_server['auth'] );
+		}
+		$this->is_redis_connected = $this->redis->isConnected();
+		if ( ! $this->is_redis_connected ) {
+			$this->missing_redis_message = 'Alert! WP Redis object cache cannot connect to Redis server.';
+		}
+		return $this->is_redis_connected;
+	}
+
+	/**
+	 * Wrapper method for calls to Redis, which fails gracefully when Redis is unavailable
+	 *
+	 * @param string $method
+	 * @param mixed $args
+	 * @return mixed
+	 */
+	protected function _call_redis( $method ) {
+
+		$arguments = func_get_args();
+		array_shift( $arguments ); // ignore $method
+
+		if ( $this->is_redis_connected ) {
+			try {
+				$retval = call_user_func_array( array( $this->redis, $method ), $arguments );
+				return $retval;
+			} catch( RedisException $e ) {
+				if ( in_array( $e->getMessage(), array( 'Connection closed', 'Redis server went away' ) ) ) {
+					// Attempt to refresh the connection if it was successfully established once
+					// $this->is_redis_connected will be set inside _connect_redis()
+					if ( $this->_connect_redis() ) {
+						return call_user_func_array( array( $this, '_call_redis' ), array_merge( array( $method ), $arguments ) );
+					}
+					// Fall through to fallback below
+				} else {
+					throw $e;
+				}
+			}
+		}
+
+		// Mock expected behavior from Redis for these methods
+		switch ( $method ) {
+				case 'incr':
+				case 'incrBy':
+					$val = $this->cache[ $arguments[0] ];
+					$offset = isset( $arguments[1] ) && 'incrBy' === $method ? $arguments[1] : 1;
+					$val = $val + $offset;
+					return $val;
+				case 'decrBy':
+				case 'decr':
+					$val = $this->cache[ $arguments[0] ];
+					$offset = isset( $arguments[1] ) && 'decrBy' === $method ? $arguments[1] : 1;
+					$val = $val - $offset;
+					return $val;
+				case 'delete':
+					return 1;
+				case 'IsConnected':
+				case 'exists':
+					return false;
+			}
+
+	}
+
+	/**
+	 * Admin UI to let the end user know something about the Redis connection isn't working.
+	 */
+	public function wp_action_admin_notices_warn_missing_redis() {
+		if ( ! current_user_can( 'manage_options' ) || empty( $this->missing_redis_message ) ) {
+			return;
+		}
+		echo '<div class="message error"><p>' . esc_html( $this->missing_redis_message ) . '</p></div>';
+	}
+
+	/**
+	 * Sets up object properties; PHP 5 style constructor
+	 *
+	 * @return null|WP_Object_Cache If cache is disabled, returns null.
+	 */
+	function __construct() {
+		global $blog_id, $table_prefix;
+
+		$this->multisite = is_multisite();
+		$this->blog_prefix =  $this->multisite ? $blog_id . ':' : '';
+
+		if ( ! $this->_connect_redis() ) {
+			add_action( 'admin_notices', array( $this, 'wp_action_admin_notices_warn_missing_redis' ) );
 		}
 
 		$this->global_prefix = '';
@@ -739,48 +831,5 @@ class WP_Object_Cache {
 	 */
 	function __destruct() {
 		return true;
-	}
-}
-
-if ( class_exists( 'Redis' ) ) {
-	class WP_Redis extends Redis {
-
-	}
-} else {
-	class WP_Redis {
-
-		public function __call( $name, $arguments ) {
-			switch ( $name ) {
-				case 'incr':
-				case 'incrBy':
-					$val = $this->wp_object_cache->cache[ $arguments[0] ];
-					$offset = isset( $arguments[1] ) && 'incrBy' === $name ? $arguments[1] : 1;
-					$val = $val + $offset;
-					return $val;
-				case 'decrBy':
-				case 'decr':
-					$val = $this->wp_object_cache->cache[ $arguments[0] ];
-					$offset = isset( $arguments[1] ) && 'decrBy' === $name ? $arguments[1] : 1;
-					$val = $val - $offset;
-					return $val;
-				case 'delete':
-					return 1;
-				case 'IsConnected':
-				case 'exists':
-					return false;
-			}
-		}
-
-		public function __construct() {
-			add_action( 'admin_notices', array( $this, 'wp_action_admin_notices_warn_missing_redis' ) );
-		}
-
-		public function wp_action_admin_notices_warn_missing_redis() {
-			if ( ! current_user_can( 'manage_options' ) ) {
-				return;
-			}
-			echo '<div class="message error"><p>Alert! PHPRedis module is unavailable, which is required by WP Redis object cache.</p></div>';
-		}
-
 	}
 }

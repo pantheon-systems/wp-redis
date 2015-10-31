@@ -22,16 +22,34 @@ class CacheTest extends WP_UnitTestCase {
 
 	public function test_loaded() {
 		$this->assertTrue( WP_REDIS_OBJECT_CACHE );
-		$this->assertTrue( class_exists( 'WP_Redis' ) );
 	}
 
 	public function test_redis_connected() {
-		$this->assertTrue( isset( $this->cache->redis ) );
-		if ( class_exists( 'Redis' ) ) {
-			$this->assertTrue( $this->cache->redis->IsConnected() );
-		} else {
-			$this->assertFalse( $this->cache->redis->IsConnected() );
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
 		}
+		$this->assertTrue( isset( $this->cache->redis ) );
+		$this->assertTrue( $this->cache->redis->IsConnected() );
+	}
+
+	public function test_redis_reload_connection_gone_away() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
+		// Connection is live
+		$this->cache->set( 'foo', 'bar' );
+		$this->assertTrue( $this->cache->redis->IsConnected() );
+		$this->assertTrue( $this->cache->is_redis_connected );
+		$this->assertEquals( 'bar', $this->cache->get( 'foo', 'default', true ) );
+		// Connection is closed, and refreshed the next time it's requested
+		$this->cache->redis->close();
+		$this->assertTrue( $this->cache->is_redis_connected );
+		$this->assertFalse( $this->cache->redis->IsConnected() );
+		// Reload occurs with set()
+		$this->cache->set( 'foo', 'banana' );
+		$this->assertEquals( 'banana', $this->cache->get( 'foo' ) );
+		$this->assertTrue( $this->cache->is_redis_connected );
+		$this->assertTrue( $this->cache->redis->IsConnected() );
 	}
 
 	function test_miss() {
