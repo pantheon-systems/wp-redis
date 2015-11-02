@@ -52,6 +52,27 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertTrue( $this->cache->redis->IsConnected() );
 	}
 
+	public function test_redis_reload_connection_timeout() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
+		// Connection is live
+		$this->cache->set( 'foo', 'bar' );
+		$this->assertTrue( $this->cache->redis->IsConnected() );
+		$this->assertTrue( $this->cache->is_redis_connected );
+		$this->assertEquals( 'bar', $this->cache->get( 'foo', 'default', true ) );
+		// Connection times out, and refreshed the next time it's requested
+		$this->cache->redis->config( 'SET', 'timeout', 1 );
+		sleep( 2 );
+		$this->assertTrue( $this->cache->is_redis_connected );
+		$this->assertFalse( $this->cache->redis->IsConnected() );
+		// Reload occurs with set()
+		$this->cache->set( 'foo', 'banana' );
+		$this->assertEquals( 'banana', $this->cache->get( 'foo' ) );
+		$this->assertTrue( $this->cache->is_redis_connected );
+		$this->assertTrue( $this->cache->redis->IsConnected() );
+	}
+
 	function test_miss() {
 		$this->assertEquals(NULL, $this->cache->get(rand_str()));
 	}
