@@ -37,6 +37,7 @@ class CacheTest extends WP_UnitTestCase {
 	 */
 	public function test_redis_reload_connection_closed() {
 		if ( ! class_exists( 'Redis' ) ) {
+			trigger_error( 'Mock error so PHPUnit still passes when this test is skipped.', E_WARNING );
 			$this->markTestSkipped( 'PHPRedis extension not available.' );
 		}
 		// Connection is live
