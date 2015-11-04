@@ -750,6 +750,7 @@ class WP_Object_Cache {
 				return $retval;
 			} catch( RedisException $e ) {
 				if ( in_array( $e->getMessage(), array( 'Connection closed', 'Redis server went away' ) ) ) {
+					trigger_error( 'WP Redis: ' . $e->getMessage(), E_WARNING );
 					// Attempt to refresh the connection if it was successfully established once
 					// $this->is_redis_connected will be set inside _connect_redis()
 					if ( $this->_connect_redis() ) {
