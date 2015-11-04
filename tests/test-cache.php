@@ -54,6 +54,9 @@ class CacheTest extends WP_UnitTestCase {
 
 	public function test_redis_reload_force_cache_flush() {
 		global $wpdb, $redis_server;
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
 		$this->assertFalse( (bool) $wpdb->get_results( "SELECT option_value FROM {$wpdb->options} WHERE option_name='wp_redis_wakeup_flush'" ) );
 		$this->cache->set( 'foo', 'burrito' );
 		// Force a bad connection
