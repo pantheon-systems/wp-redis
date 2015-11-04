@@ -327,7 +327,7 @@ class WP_Object_Cache {
 	 * @var bool
 	 * @access private
 	 */
-	var $redis_needs_flush = false;
+	var $do_redis_fallback_flush = false;
 
 	/**
 	 * Adds data to the cache if it doesn't already exist.
@@ -771,9 +771,9 @@ class WP_Object_Cache {
 			}
 		}
 
-		if ( $this->is_redis_wakeup_flush_enabled() && ! $this->redis_needs_flush ) {
-			$wpdb->insert( $wpdb->options, array( 'option_name' => 'wp_redis_wakeup_flush', 'option_value' => 1 ) );
-			$this->redis_needs_flush = true;
+		if ( $this->is_redis_fallback_flush_enabled() && ! $this->do_redis_fallback_flush ) {
+			$wpdb->insert( $wpdb->options, array( 'option_name' => 'wp_redis_do_redis_fallback_flush', 'option_value' => 1 ) );
+			$this->do_redis_fallback_flush = true;
 		}
 
 		// Mock expected behavior from Redis for these methods
@@ -815,8 +815,8 @@ class WP_Object_Cache {
 	 *
 	 * @return bool
 	 */
-	private function is_redis_wakeup_flush_enabled() {
-		return ! defined( 'WP_REDIS_DISABLE_WAKEUP_FLUSH' ) || ! WP_REDIS_DISABLE_WAKEUP_FLUSH;
+	private function is_redis_fallback_flush_enabled() {
+		return ! defined( 'WP_REDIS_DISABLE_FALLBACK_FLUSH' ) || ! WP_REDIS_DISABLE_FALLBACK_FLUSH;
 	}
 
 	/**
@@ -834,13 +834,13 @@ class WP_Object_Cache {
 			add_action( 'admin_notices', array( $this, 'wp_action_admin_notices_warn_missing_redis' ) );
 		}
 
-		if ( $this->is_redis_wakeup_flush_enabled() ) {
-			$this->redis_needs_flush = (bool) $wpdb->get_results( "SELECT option_value FROM {$wpdb->options} WHERE option_name='wp_redis_wakeup_flush'" );
-			if ( $this->is_redis_connected && $this->redis_needs_flush ) {
+		if ( $this->is_redis_fallback_flush_enabled() ) {
+			$this->do_redis_fallback_flush = (bool) $wpdb->get_results( "SELECT option_value FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_fallback_flush'" );
+			if ( $this->is_redis_connected && $this->do_redis_fallback_flush ) {
 				$ret = $this->_call_redis( 'flushAll' );
 				if ( $ret ) {
-					$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name='wp_redis_wakeup_flush'" );
-					$this->redis_needs_flush = false;
+					$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_fallback_flush'" );
+					$this->do_redis_fallback_flush = false;
 				}
 			}
 		}
