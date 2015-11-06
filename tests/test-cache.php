@@ -68,11 +68,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( "INSERT INTO `{$wpdb->options}` (`option_name`, `option_value`) VALUES ('wp_redis_do_redis_fallback_flush', '1')", $wpdb->last_query );
 		$this->assertTrue( (bool) $wpdb->get_results( "SELECT option_value FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_fallback_flush'" ) );
 		$this->assertTrue( $this->cache->do_redis_fallback_flush );
-		try {
-			$this->assertEquals( 'bar', $this->cache->get( 'foo' ) );
-		} catch( Exception $e ) {
-			$this->assertEmpty( $e->getTraceAsString() );
-		}
+		$this->assertEquals( 'bar', $this->cache->get( 'foo' ) );
 		// Cache load with bad connection
 		$this->cache = $this->init_cache();
 		$this->assertTrue( $this->cache->do_redis_fallback_flush );
