@@ -816,7 +816,12 @@ class WP_Object_Cache {
 	 * @return bool
 	 */
 	private function is_redis_fallback_flush_enabled() {
-		return ! defined( 'WP_REDIS_DISABLE_FALLBACK_FLUSH' ) || ! WP_REDIS_DISABLE_FALLBACK_FLUSH;
+		if ( defined( 'WP_INSTALLING' ) && WP_INSTALLING ) {
+			return false;
+		} else if ( defined( 'WP_REDIS_DISABLE_FALLBACK_FLUSH' ) && WP_REDIS_DISABLE_FALLBACK_FLUSH ) {
+			return false;
+		}
+		return true;
 	}
 
 	/**
