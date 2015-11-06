@@ -712,7 +712,7 @@ class WP_Object_Cache {
 
 		if ( ! class_exists( 'Redis' ) ) {
 			$this->is_redis_connected = false;
-			$this->missing_redis_message = 'Alert! PHPRedis module is unavailable, which is required by WP Redis object cache.';
+			$this->missing_redis_message = 'Warning! PHPRedis module is unavailable, which is required by WP Redis object cache.';
 			return $this->is_redis_connected;
 		}
 
@@ -735,7 +735,7 @@ class WP_Object_Cache {
 		}
 		$this->is_redis_connected = $this->redis->isConnected();
 		if ( ! $this->is_redis_connected ) {
-			$this->missing_redis_message = 'Alert! WP Redis object cache cannot connect to Redis server.';
+			$this->missing_redis_message = 'Warning! WP Redis object cache cannot connect to Redis server.';
 		}
 		return $this->is_redis_connected;
 	}
@@ -759,6 +759,7 @@ class WP_Object_Cache {
 				return $retval;
 			} catch( RedisException $e ) {
 				if ( in_array( $e->getMessage(), array( 'Connection closed', 'Redis server went away' ) ) ) {
+					trigger_error( 'WP Redis: ' . $e->getMessage(), E_WARNING );
 					// Attempt to refresh the connection if it was successfully established once
 					// $this->is_redis_connected will be set inside _connect_redis()
 					if ( $this->_connect_redis() ) {
