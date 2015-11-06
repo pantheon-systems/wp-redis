@@ -34,6 +34,7 @@ service php5-fpm restart
 
 set +x
 
+
 echo
 echo "Important: You may need to add the following to your php.ini file under 'Dynamic Extensions':"
 echo "extension=redis.so"
