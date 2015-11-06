@@ -56,9 +56,13 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertTrue( $this->cache->redis->IsConnected() );
 	}
 
+	/**
+	 * @expectedException PHPUnit_Framework_Error_Warning
+	 */
 	public function test_redis_reload_force_cache_flush() {
 		global $wpdb, $redis_server;
 		if ( ! class_exists( 'Redis' ) ) {
+			trigger_error( 'Mock error so PHPUnit still passes when this test is skipped.', E_WARNING );
 			$this->markTestSkipped( 'PHPRedis extension not available.' );
 		}
 		$this->assertFalse( (bool) $wpdb->get_results( "SELECT option_value FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_fallback_flush'" ) );
