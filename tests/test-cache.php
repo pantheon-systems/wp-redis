@@ -71,7 +71,7 @@ class CacheTest extends WP_UnitTestCase {
 		try {
 			$this->assertEquals( 'bar', $this->cache->get( 'foo' ) );
 		} catch( Exception $e ) {
-			$this->assertEmpty( $e->getMessage() );
+			$this->assertEmpty( $e->getTraceAsString() );
 		}
 		// Cache load with bad connection
 		$this->cache = $this->init_cache();
