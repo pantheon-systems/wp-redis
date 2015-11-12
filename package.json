@@ -1,0 +1,15 @@
+{
+  "name": "wp-redis",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pantheon-systems/wp-redis.git"
+  },
+  "main": "Gruntfile.js",
+  "author": "Pantheon <noreply@pantheon.io>",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-phpcs": "^0.4.0",
+    "grunt-wp-readme-to-markdown": "~1.0.0"
+  }
+}
