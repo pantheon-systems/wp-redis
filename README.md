@@ -41,10 +41,6 @@ If you are concerned with the speed of your site, backing it with a high-perform
 
 This plugin is for the internal application object cache. It doesn't have anything to do with page caches. On Pantheon you do not need attitional page cacheing, but if you are self-hosting you can use your favorite page cache plugins in conjunction with wp-redis.
 
-## Screenshots ##
-
-Coming soon.
-
 ## Changelog ##
 
 ### 0.1 ###
