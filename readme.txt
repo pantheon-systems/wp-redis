@@ -2,7 +2,7 @@
 Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh
 Tags: cache, plugin
 Requires at least: 3.0.1
-Tested up to: 4.1
+Tested up to: 4.4
 Compatible up to: 4.1
 Stable tag: 0.1
 License: GPLv2 or later
@@ -42,6 +42,13 @@ If you are concerned with the speed of your site, backing it with a high-perform
 This plugin is for the internal application object cache. It doesn't have anything to do with page caches. On Pantheon you do not need attitional page cacheing, but if you are self-hosting you can use your favorite page cache plugins in conjunction with wp-redis.
 
 == Changelog ==
+
+= 0.2.0 (November 12, 2015) =
+
+* Gracefully fails back to the WordPress object cache when Redis is unavailable or intermittent. Previously, WP Redis would hard fatal.
+* Triggers a PHP error if Redis goes away mid-request, for you to monitor in your logs.
+* Forces a flushAll on Redis when Redis comes back after failing. This behavior can be disabled with the `WP_REDIS_DISABLE_FAILBACK_FLUSH` constant.
+* Show an admin notice when Redis is unavailable but is expected to be.
 
 = 0.1 =
 * Initial commit of working code for the benefit of all.
