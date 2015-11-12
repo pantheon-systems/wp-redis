@@ -299,6 +299,14 @@ class WP_Object_Cache {
 	var $is_redis_connected = false;
 
 	/**
+	 * Whether or not the object cache thinks Redis needs a flush
+	 *
+	 * @var bool
+	 * @access private
+	 */
+	var $do_redis_failback_flush = false;
+
+	/**
 	 * Adds data to the cache if it doesn't already exist.
 	 *
 	 * @uses WP_Object_Cache::_exists Checks to see if the cache already has data.
@@ -717,6 +725,7 @@ class WP_Object_Cache {
 	 * @return mixed
 	 */
 	protected function _call_redis( $method ) {
+		global $wpdb;
 
 		$arguments = func_get_args();
 		array_shift( $arguments ); // ignore $method
@@ -740,6 +749,11 @@ class WP_Object_Cache {
 			}
 		}
 
+		if ( $this->is_redis_failback_flush_enabled() && ! $this->do_redis_failback_flush ) {
+			$wpdb->insert( $wpdb->options, array( 'option_name' => 'wp_redis_do_redis_failback_flush', 'option_value' => 1 ) );
+			$this->do_redis_failback_flush = true;
+		}
+
 		// Mock expected behavior from Redis for these methods
 		switch ( $method ) {
 				case 'incr':
@@ -756,6 +770,7 @@ class WP_Object_Cache {
 					return $val;
 				case 'delete':
 					return 1;
+				case 'flushAll':
 				case 'IsConnected':
 				case 'exists':
 					return false;
@@ -774,18 +789,43 @@ class WP_Object_Cache {
 	}
 
 	/**
+	 * Whether or not wakeup flush is enabled
+	 *
+	 * @return bool
+	 */
+	private function is_redis_failback_flush_enabled() {
+		if ( defined( 'WP_INSTALLING' ) && WP_INSTALLING ) {
+			return false;
+		} else if ( defined( 'WP_REDIS_DISABLE_FAILBACK_FLUSH' ) && WP_REDIS_DISABLE_FAILBACK_FLUSH ) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
 	 * Sets up object properties; PHP 5 style constructor
 	 *
 	 * @return null|WP_Object_Cache If cache is disabled, returns null.
 	 */
 	function __construct() {
-		global $blog_id, $table_prefix;
+		global $blog_id, $table_prefix, $wpdb;
 
 		$this->multisite = is_multisite();
 		$this->blog_prefix =  $this->multisite ? $blog_id . ':' : '';
 
 		if ( ! $this->_connect_redis() ) {
 			add_action( 'admin_notices', array( $this, 'wp_action_admin_notices_warn_missing_redis' ) );
+		}
+
+		if ( $this->is_redis_failback_flush_enabled() ) {
+			$this->do_redis_failback_flush = (bool) $wpdb->get_results( "SELECT option_value FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_failback_flush'" );
+			if ( $this->is_redis_connected && $this->do_redis_failback_flush ) {
+				$ret = $this->_call_redis( 'flushAll' );
+				if ( $ret ) {
+					$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_failback_flush'" );
+					$this->do_redis_failback_flush = false;
+				}
+			}
 		}
 
 		$this->global_prefix = '';
