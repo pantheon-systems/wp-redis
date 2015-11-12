@@ -49,5 +49,3 @@ Coming soon.
 
 = 0.1 =
 * Initial commit of working code for the benefit of all.
-
-== Upgrade Notice ==
