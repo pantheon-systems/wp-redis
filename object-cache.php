@@ -819,7 +819,9 @@ class WP_Object_Cache {
 			add_action( 'admin_notices', array( $this, 'wp_action_admin_notices_warn_missing_redis' ) );
 		}
 
-		if ( $this->is_redis_failback_flush_enabled() ) {
+		// $wpdb->options can be unset before multisite loads
+		// It's safe to skip here if unset, because cache will be reinitialized when `$blog_id` is available
+		if ( $this->is_redis_failback_flush_enabled() && ! empty( $wpdb->options ) ) {
 			$this->do_redis_failback_flush = (bool) $wpdb->get_results( "SELECT option_value FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_failback_flush'" );
 			if ( $this->is_redis_connected && $this->do_redis_failback_flush ) {
 				$ret = $this->_call_redis( 'flushAll' );
