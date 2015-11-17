@@ -12,7 +12,7 @@ Back your WP Object Cache with Redis, a high-performance in-memory storage backe
 
 == Description ==
 
-For sites concerned with high traffic, speed for logged-in usersm or dynamic pageloads, a performant, persistent object cache is a must. You also need something that can scale across multiple instances of your application, so using a local file cache or APC are out.
+For sites concerned with high traffic, speed for logged-in users, or dynamic pageloads, a high-speed and persistent object cache is a must. You also need something that can scale across multiple instances of your application, so using local file caches or APC are out.
 
 Redis is a great answer, and one we bundle on the Pantheon platform. This is our plugin for integrating with the cache, but you can use it on any self-hosted WordPress site if you have Redis.
 
@@ -23,7 +23,7 @@ Go forth and make awesome!
 This assumes you have a PHP environment with the required Redis library and a working Redis server (e.g. Pantheon).
 
 1. Install `object-cache.php` to `wp-content/object-cache.php` with a symlink or by copying the file.
-2. If you're not running on Pantheon, edit wp-config.php to add your cache credentials:
+2. If you're not running on Pantheon, edit wp-config.php to add your cache credentials, e.g.:
 
         $redis_server = array( 'host' => '127.0.0.1',
                                'port' => 6379,
@@ -40,6 +40,14 @@ If you are concerned with the speed of your site, backing it with a high-perform
 = How does this work with other caching plugins? =
 
 This plugin is for the internal application object cache. It doesn't have anything to do with page caches. On Pantheon you do not need additional page caching, but if you are self-hosted you can use your favorite page cache plugins in conjunction with WP Redis.
+
+= How can I contribute? =
+
+The best way to contribute to the development of this plugin is by participating on the GitHub project:
+
+https://github.com/pantheon-systems/wp-redis
+
+Pull requests and issues are welcome!
 
 == Changelog ==
 
