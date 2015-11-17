@@ -4,7 +4,7 @@
 **Requires at least:** 3.0.1  
 **Tested up to:** 4.4  
 **Compatible up to:** 4.1  
-**Stable tag:** 0.2.0  
+**Stable tag:** 0.2.1  
 **License:** GPLv2 or later  
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -52,6 +52,10 @@ https://github.com/pantheon-systems/wp-redis
 Pull requests and issues are welcome!
 
 ## Changelog ##
+
+### 0.2.1 (November 17, 2015) ###
+
+* Bug fix: prevent SQL error when `$wpdb->options` isn't yet initialized on multisite.
 
 ### 0.2.0 (November 17, 2015) ###
 
