@@ -54,7 +54,7 @@ Pull requests and issues are welcome!
 ### 0.2.0 (November 12, 2015) ###
 
 * Gracefully fails back to the WordPress object cache when Redis is unavailable or intermittent. Previously, WP Redis would hard fatal.
-* Triggers a PHP error if Redis goes away mid-request, for you to monitor in your logs.
+* Triggers a PHP error if Redis goes away mid-request, for you to monitor in your logs. Attempts one reconnect based on specific error messages.
 * Forces a flushAll on Redis when Redis comes back after failing. This behavior can be disabled with the `WP_REDIS_DISABLE_FAILBACK_FLUSH` constant.
 * Show an admin notice when Redis is unavailable but is expected to be.
 
