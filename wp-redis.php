@@ -3,7 +3,7 @@
 	Plugin Name: WP Redis
 	Plugin URI: http://github.com/alleyinteractive/wp-redis/
 	Description: WordPress Object Cache using Redis. Requires phpredis (https://github.com/nicolasff/phpredis).
-	Version: 0.1
+	Version: 0.2.0
 	Author: Matthew Boynes, Alley Interactive
 	Author URI: http://www.alleyinteractive.com/
 */

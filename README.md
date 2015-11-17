@@ -53,7 +53,7 @@ Pull requests and issues are welcome!
 
 ## Changelog ##
 
-### 0.2.0 (November 12, 2015) ###
+### 0.2.0 (November 17, 2015) ###
 
 * Gracefully fails back to the WordPress object cache when Redis is unavailable or intermittent. Previously, WP Redis would hard fatal.
 * Triggers a PHP error if Redis goes away mid-request, for you to monitor in your logs. Attempts one reconnect based on specific error messages.
