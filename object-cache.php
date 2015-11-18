@@ -738,7 +738,7 @@ class WP_Object_Cache {
 				$retry_exception_messages = array( 'socket error on read socket', 'Connection closed', 'Redis server went away' );
 				$retry_exception_messages = apply_filters( 'wp_redis_retry_exception_messages', $retry_exception_messages );
 				if ( in_array( $e->getMessage(), $retry_exception_messages ) ) {
-					trigger_error( 'WP Redis: ' . $e->getMessage(), E_WARNING );
+					trigger_error( 'WP Redis: ' . $e->getMessage(), E_USER_WARNING );
 					// Attempt to refresh the connection if it was successfully established once
 					// $this->is_redis_connected will be set inside _connect_redis()
 					if ( $this->_connect_redis() ) {
