@@ -46,11 +46,8 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertTrue( $this->cache->is_redis_connected );
 		$this->assertFalse( $this->cache->redis->IsConnected() );
 		// Reload occurs with set()
-		try {
-			$this->cache->set( 'foo', 'banana' );
-		} catch ( Exception $e ) {
-			$this->assertEquals( 'WP Redis: Connection closed', $e->getMessage() );
-		}
+		$this->cache->set( 'foo', 'banana' );
+		$this->assertEquals( 'WP Redis: Connection closed', $this->cache->last_triggered_error );
 		$this->assertEquals( 'banana', $this->cache->get( 'foo' ) );
 		$this->assertTrue( $this->cache->is_redis_connected );
 		$this->assertTrue( $this->cache->redis->IsConnected() );
@@ -68,15 +65,8 @@ class CacheTest extends WP_UnitTestCase {
 		$redis_server['port'] = 9999;
 		$this->cache->redis->connect( $redis_server['host'], $redis_server['port'], 1, NULL, 100 );
 		// Setting cache value when redis connection fails saves wakeup flush
-		try {
-			$this->cache->set( 'foo', 'bar' );
-		} catch ( Exception $e ) {
-			$this->assertEquals( 'WP Redis: Redis server went away', $e->getMessage() );
-			// Because an exception was thrown (and code execution was broken), we need to mock
-			// the behavior the plugin would've exhibited
-			$this->cache->is_redis_connected = false;
-			$this->cache->set( 'foo', 'bar' );
-		}
+		$this->cache->set( 'foo', 'bar' );
+		$this->assertEquals( 'WP Redis: Redis server went away', $this->cache->last_triggered_error );
 		$this->assertEquals( "INSERT INTO `{$wpdb->options}` (`option_name`, `option_value`) VALUES ('wp_redis_do_redis_failback_flush', '1')", $wpdb->last_query );
 		$this->assertTrue( (bool) $wpdb->get_results( "SELECT option_value FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_failback_flush'" ) );
 		$this->assertTrue( $this->cache->do_redis_failback_flush );
