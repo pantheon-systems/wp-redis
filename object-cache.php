@@ -706,7 +706,8 @@ class WP_Object_Cache {
 		}
 
 		$this->redis = new Redis;
-		$this->redis->connect( $redis_server['host'], $redis_server['port'], 1, NULL, 100 ); # 1s timeout, 100ms delay between reconnections
+		$port = ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379;
+		$this->redis->connect( $redis_server['host'], $port, 1, NULL, 100 ); # 1s timeout, 100ms delay between reconnections
 		if ( ! empty( $redis_server['auth'] ) ) {
 			$this->redis->auth( $redis_server['auth'] );
 		}
