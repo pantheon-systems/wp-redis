@@ -67,7 +67,7 @@ class CacheTest extends WP_UnitTestCase {
 		// Setting cache value when redis connection fails saves wakeup flush
 		$this->cache->set( 'foo', 'bar' );
 		$this->assertEquals( 'WP Redis: Redis server went away', $this->cache->last_triggered_error );
-		$this->assertEquals( "INSERT IGNORE INTO `{$wpdb->options}` (`option_name`, `option_value`) VALUES ('wp_redis_do_redis_failback_flush', '1')", $wpdb->last_query );
+		$this->assertEquals( "INSERT IGNORE INTO {$wpdb->options} (option_name,option_value) VALUES ('wp_redis_do_redis_failback_flush',1)", $wpdb->last_query );
 		$this->assertTrue( (bool) $wpdb->get_results( "SELECT option_value FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_failback_flush'" ) );
 		$this->assertTrue( $this->cache->do_redis_failback_flush );
 		$this->assertEquals( 'bar', $this->cache->get( 'foo' ) );
