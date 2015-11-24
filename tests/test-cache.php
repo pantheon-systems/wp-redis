@@ -32,12 +32,8 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertTrue( $this->cache->redis->IsConnected() );
 	}
 
-	/**
-	 * @expectedException PHPUnit_Framework_Error_Warning
-	 */
 	public function test_redis_reload_connection_closed() {
 		if ( ! class_exists( 'Redis' ) ) {
-			trigger_error( 'Mock error so PHPUnit still passes when this test is skipped.', E_WARNING );
 			$this->markTestSkipped( 'PHPRedis extension not available.' );
 		}
 		// Connection is live
@@ -51,18 +47,15 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertFalse( $this->cache->redis->IsConnected() );
 		// Reload occurs with set()
 		$this->cache->set( 'foo', 'banana' );
+		$this->assertEquals( 'WP Redis: Connection closed', $this->cache->last_triggered_error );
 		$this->assertEquals( 'banana', $this->cache->get( 'foo' ) );
 		$this->assertTrue( $this->cache->is_redis_connected );
 		$this->assertTrue( $this->cache->redis->IsConnected() );
 	}
 
-	/**
-	 * @expectedException PHPUnit_Framework_Error_Warning
-	 */
 	public function test_redis_reload_force_cache_flush() {
 		global $wpdb, $redis_server;
 		if ( ! class_exists( 'Redis' ) ) {
-			trigger_error( 'Mock error so PHPUnit still passes when this test is skipped.', E_WARNING );
 			$this->markTestSkipped( 'PHPRedis extension not available.' );
 		}
 		$this->assertFalse( (bool) $wpdb->get_results( "SELECT option_value FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_failback_flush'" ) );
@@ -73,7 +66,8 @@ class CacheTest extends WP_UnitTestCase {
 		$this->cache->redis->connect( $redis_server['host'], $redis_server['port'], 1, NULL, 100 );
 		// Setting cache value when redis connection fails saves wakeup flush
 		$this->cache->set( 'foo', 'bar' );
-		$this->assertEquals( "INSERT INTO `{$wpdb->options}` (`option_name`, `option_value`) VALUES ('wp_redis_do_redis_failback_flush', '1')", $wpdb->last_query );
+		$this->assertEquals( 'WP Redis: Redis server went away', $this->cache->last_triggered_error );
+		$this->assertEquals( "INSERT IGNORE INTO {$wpdb->options} (option_name,option_value) VALUES ('wp_redis_do_redis_failback_flush',1)", $wpdb->last_query );
 		$this->assertTrue( (bool) $wpdb->get_results( "SELECT option_value FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_failback_flush'" ) );
 		$this->assertTrue( $this->cache->do_redis_failback_flush );
 		$this->assertEquals( 'bar', $this->cache->get( 'foo' ) );

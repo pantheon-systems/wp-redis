@@ -307,6 +307,11 @@ class WP_Object_Cache {
 	var $do_redis_failback_flush = false;
 
 	/**
+	 * The last triggered error
+	 */
+	var $last_triggered_error = '';
+
+	/**
 	 * Adds data to the cache if it doesn't already exist.
 	 *
 	 * @uses WP_Object_Cache::_exists Checks to see if the cache already has data.
@@ -706,7 +711,8 @@ class WP_Object_Cache {
 		}
 
 		$this->redis = new Redis;
-		$this->redis->connect( $redis_server['host'], $redis_server['port'], 1, NULL, 100 ); # 1s timeout, 100ms delay between reconnections
+		$port = ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379;
+		$this->redis->connect( $redis_server['host'], $port, 1, NULL, 100 ); # 1s timeout, 100ms delay between reconnections
 		if ( ! empty( $redis_server['auth'] ) ) {
 			$this->_call_redis( 'auth', $redis_server['auth'] );
 		}
@@ -738,7 +744,12 @@ class WP_Object_Cache {
 				$retry_exception_messages = array( 'socket error on read socket', 'Connection closed', 'Redis server went away' );
 				$retry_exception_messages = apply_filters( 'wp_redis_retry_exception_messages', $retry_exception_messages );
 				if ( in_array( $e->getMessage(), $retry_exception_messages ) ) {
-					trigger_error( 'WP Redis: ' . $e->getMessage(), E_WARNING );
+					try {
+						$this->last_triggered_error = 'WP Redis: ' . $e->getMessage();
+						trigger_error( $this->last_triggered_error, E_USER_WARNING );
+					} catch( PHPUnit_Framework_Error_Warning $e ) {
+						// We'll inspect this in the test
+					}
 					// Attempt to refresh the connection if it was successfully established once
 					// $this->is_redis_connected will be set inside _connect_redis()
 					if ( $this->_connect_redis() ) {
@@ -752,7 +763,7 @@ class WP_Object_Cache {
 		}
 
 		if ( $this->is_redis_failback_flush_enabled() && ! $this->do_redis_failback_flush ) {
-			$wpdb->insert( $wpdb->options, array( 'option_name' => 'wp_redis_do_redis_failback_flush', 'option_value' => 1 ) );
+			$wpdb->query( "INSERT IGNORE INTO {$wpdb->options} (option_name,option_value) VALUES ('wp_redis_do_redis_failback_flush',1)" );
 			$this->do_redis_failback_flush = true;
 		}
 
