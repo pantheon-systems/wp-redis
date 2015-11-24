@@ -711,7 +711,8 @@ class WP_Object_Cache {
 		}
 
 		$this->redis = new Redis;
-		$this->redis->connect( $redis_server['host'], $redis_server['port'], 1, NULL, 100 ); # 1s timeout, 100ms delay between reconnections
+		$port = ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379;
+		$this->redis->connect( $redis_server['host'], $port, 1, NULL, 100 ); # 1s timeout, 100ms delay between reconnections
 		if ( ! empty( $redis_server['auth'] ) ) {
 			$this->redis->auth( $redis_server['auth'] );
 		}
@@ -762,7 +763,7 @@ class WP_Object_Cache {
 		}
 
 		if ( $this->is_redis_failback_flush_enabled() && ! $this->do_redis_failback_flush ) {
-			$wpdb->insert( $wpdb->options, array( 'option_name' => 'wp_redis_do_redis_failback_flush', 'option_value' => 1 ) );
+			$wpdb->query( "INSERT IGNORE INTO {$wpdb->options} (option_name,option_value) VALUES ('wp_redis_do_redis_failback_flush',1)" );
 			$this->do_redis_failback_flush = true;
 		}
 
