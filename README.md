@@ -4,7 +4,7 @@
 **Requires at least:** 3.0.1  
 **Tested up to:** 4.4  
 **Compatible up to:** 4.1  
-**Stable tag:** 0.2.1  
+**Stable tag:** 0.2.2  
 **License:** GPLv2 or later  
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -52,6 +52,12 @@ https://github.com/pantheon-systems/wp-redis
 Pull requests and issues are welcome!
 
 ## Changelog ##
+
+### 0.2.2 (November 24, 2015) ###
+
+* Bug fix: use `INSERT IGNORE INTO` instead of `INSERT INTO` to prevent SQL errors when two concurrent processes attempt to write failback flag at the same time.
+* Bug fix: use `E_USER_WARNING` with `trigger_error()`.
+* Bug fix: catch Exceptions thrown during authentication to permit failing back to internal object cache.
 
 ### 0.2.1 (November 17, 2015) ###
 
