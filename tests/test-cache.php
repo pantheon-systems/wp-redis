@@ -87,6 +87,22 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( "SELECT option_value FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_failback_flush'", $wpdb->last_query );
 	}
 
+	public function test_redis_bad_authentication() {
+		global $redis_server;
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
+		$redis_server['host'] = '127.0.0.1';
+		$redis_server['port'] = 9999;
+		$redis_server['auth'] = 'foobar';
+		$cache = new WP_Object_Cache;
+		$this->assertEquals( 'WP Redis: Redis server went away', $cache->last_triggered_error );
+		$this->assertFalse( $cache->is_redis_connected );
+		// Fails back to the internal object cache
+		$cache->set( 'foo', 'bar' );
+		$this->assertEquals( 'bar', $cache->get( 'foo' ) );
+	}
+
 	function test_miss() {
 		$this->assertEquals(NULL, $this->cache->get(rand_str()));
 	}
