@@ -716,12 +716,17 @@ class WP_Object_Cache {
 		if ( ! empty( $redis_server['auth'] ) ) {
 			try {
 				$this->redis->auth( $redis_server['auth'] );
+			// PhpRedis throws an Exception when it fails a server call.
+			// To prevent WordPress from fataling, we catch the Exception.
 			} catch ( RedisException $e ) {
 				try {
 					$this->last_triggered_error = 'WP Redis: ' . $e->getMessage();
+					// Be friendly to developers debugging production servers by triggering an error
 					trigger_error( $this->last_triggered_error, E_USER_WARNING );
 				} catch( PHPUnit_Framework_Error_Warning $e ) {
-					// We'll inspect this in the test
+					// PHPUnit throws an Exception when `trigger_error()` is called.
+					// To ensure our tests (which expect Exceptions to be caught) continue to run,
+					// we catch the PHPUnit exception and inspect the RedisException message
 				}
 			}
 		}
@@ -749,15 +754,20 @@ class WP_Object_Cache {
 			try {
 				$retval = call_user_func_array( array( $this->redis, $method ), $arguments );
 				return $retval;
+			// PhpRedis throws an Exception when it fails a server call.
+			// To prevent WordPress from fataling, we catch the Exception.
 			} catch( RedisException $e ) {
 				$retry_exception_messages = array( 'socket error on read socket', 'Connection closed', 'Redis server went away' );
 				$retry_exception_messages = apply_filters( 'wp_redis_retry_exception_messages', $retry_exception_messages );
 				if ( in_array( $e->getMessage(), $retry_exception_messages ) ) {
 					try {
 						$this->last_triggered_error = 'WP Redis: ' . $e->getMessage();
+						// Be friendly to developers debugging production servers by triggering an error
 						trigger_error( $this->last_triggered_error, E_USER_WARNING );
 					} catch( PHPUnit_Framework_Error_Warning $e ) {
-						// We'll inspect this in the test
+						// PHPUnit throws an Exception when `trigger_error()` is called.
+						// To ensure our tests (which expect Exceptions to be caught) continue to run,
+						// we catch the PHPUnit exception and inspect the RedisException message
 					}
 					// Attempt to refresh the connection if it was successfully established once
 					// $this->is_redis_connected will be set inside _connect_redis()

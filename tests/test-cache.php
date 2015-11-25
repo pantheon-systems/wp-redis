@@ -98,6 +98,7 @@ class CacheTest extends WP_UnitTestCase {
 		$cache = new WP_Object_Cache;
 		$this->assertEquals( 'WP Redis: Redis server went away', $cache->last_triggered_error );
 		$this->assertFalse( $cache->is_redis_connected );
+		// Fails back to the internal object cache
 		$cache->set( 'foo', 'bar' );
 		$this->assertEquals( 'bar', $cache->get( 'foo' ) );
 	}
