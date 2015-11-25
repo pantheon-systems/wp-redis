@@ -714,7 +714,16 @@ class WP_Object_Cache {
 		$port = ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379;
 		$this->redis->connect( $redis_server['host'], $port, 1, NULL, 100 ); # 1s timeout, 100ms delay between reconnections
 		if ( ! empty( $redis_server['auth'] ) ) {
-			$this->_call_redis( 'auth', $redis_server['auth'] );
+			try {
+				$this->redis->auth( $redis_server['auth'] );
+			} catch ( RedisException $e ) {
+				try {
+					$this->last_triggered_error = 'WP Redis: ' . $e->getMessage();
+					trigger_error( $this->last_triggered_error, E_USER_WARNING );
+				} catch( PHPUnit_Framework_Error_Warning $e ) {
+					// We'll inspect this in the test
+				}
+			}
 		}
 		$this->is_redis_connected = $this->redis->isConnected();
 		if ( ! $this->is_redis_connected ) {
@@ -783,7 +792,6 @@ class WP_Object_Cache {
 					return $val;
 				case 'delete':
 					return 1;
-				case 'auth':
 				case 'flushAll':
 				case 'IsConnected':
 				case 'exists':
