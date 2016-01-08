@@ -25,13 +25,14 @@ Go forth and make awesome!
 This assumes you have a PHP environment with the required Redis library and a working Redis server (e.g. Pantheon).
 
 1. Install `object-cache.php` to `wp-content/object-cache.php` with a symlink or by copying the file.
-2. If you're not running on Pantheon, edit wp-config.php to add your cache credentials, e.g.:
+1. If you're not running on Pantheon, edit wp-config.php to add your cache credentials, e.g.:
 
         $redis_server = array( 'host' => '127.0.0.1',
                                'port' => 6379,
                                'auth' => '12345' );
 
-3. Engage thrusters: you are now backing WP's Object Cache with Redis.
+1. On already installed sites delete all (`%_transient_%`) transients from wp_options: `wp transient delete-all`
+1. Engage thrusters: you are now backing WP's Object Cache with Redis.
 
 ## Frequently Asked Questions ##
 
