@@ -7,6 +7,10 @@ notifications:
     on_success: never
     on_failure: change
 
+branches:
+  only:
+    - master
+
 matrix:
   include:
     - php: 5.3
