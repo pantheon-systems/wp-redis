@@ -32,6 +32,7 @@ This assumes you have a PHP environment with the required Redis library and a wo
                                'auth' => '12345' );
 
 3. Engage thrusters: you are now backing WP's Object Cache with Redis.
+4. (Optional) To use the same Redis server with multiple, discreet WordPress installs, you can use the `WP_CACHE_KEY_SALT` constant to define a unique salt for each install.
 
 ## Frequently Asked Questions ##
 
