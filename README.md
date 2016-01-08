@@ -18,7 +18,7 @@ For sites concerned with high traffic, speed for logged-in users, or dynamic pag
 
 Redis is a great answer, and one we bundle on the Pantheon platform. This is our plugin for integrating with the cache, but you can use it on any self-hosted WordPress site if you have Redis.
 
-Go forth and make awesome!
+Go forth and make awesome! And, once you've built something great, [get involved with development on Github](https://github.com/pantheon-systems/wp-redis/issues).
 
 ## Installation ##
 
