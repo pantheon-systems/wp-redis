@@ -693,7 +693,7 @@ class WP_Object_Cache {
 			if ( isset( $this->cache[ $group ][ $key ] ) || array_key_exists( $key, $this->cache[ $group ] ) ) {
 				return true;
 			} else {
-				return $this->_call_redis( 'hexists', $group, $key );
+				return $this->_call_redis( 'hExists', $group, $key );
 			}
 		} else {
 			$id = $this->_key( $key, $group );
