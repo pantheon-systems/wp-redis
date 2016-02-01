@@ -904,6 +904,12 @@ class WP_Object_Cache {
 					$offset = isset( $arguments[1] ) && 'incrBy' === $method ? $arguments[1] : 1;
 					$val = $val + $offset;
 					return $val;
+				case 'hIncrBy':
+					if ( isset( $this->cache[ $arguments[0] ][ $arguments[1] ] ) ) {
+						return $this->cache[ $arguments[0] ][ $arguments[1] ] + $arguments[2];
+					} else {
+						return $arguments[2];
+					}
 				case 'decrBy':
 				case 'decr':
 					$val = $this->cache[ $arguments[0] ];
