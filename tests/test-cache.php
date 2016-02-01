@@ -342,6 +342,67 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertFalse( wp_cache_delete( $key, 'default') );
 	}
 
+	function test_delete_group() {
+		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
+			$this->markTestSkipped( 'Cache groups not enabled.' );
+		}
+		$key1 = rand_str();
+		$val1 = rand_str();
+		$key2 = rand_str();
+		$val2 = rand_str();
+		$key3 = rand_str();
+		$val3 = rand_str();
+		$group = 'foo';
+		$group2 = 'bar';
+
+		// Set up the values
+		$this->cache->set( $key1, $val1, $group );
+		$this->cache->set( $key2, $val2, $group );
+		$this->cache->set( $key3, $val3, $group2 );
+		$this->assertEquals( $val1, $this->cache->get( $key1, $group ) );
+		$this->assertEquals( $val2, $this->cache->get( $key2, $group ) );
+		$this->assertEquals( $val3, $this->cache->get( $key3, $group2 ) );
+
+		$this->assertTrue( $this->cache->delete_group( $group ) );
+
+		$this->assertFalse( $this->cache->get( $key1, $group ) );
+		$this->assertFalse( $this->cache->get( $key2, $group ) );
+		$this->assertEquals( $val3, $this->cache->get( $key3, $group2 ) );
+
+		$this->assertFalse( $this->cache->delete_group( $group ) );
+	}
+
+	function test_delete_group_non_persistent() {
+		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
+			$this->markTestSkipped( 'Cache groups not enabled.' );
+		}
+		$key1 = rand_str();
+		$val1 = rand_str();
+		$key2 = rand_str();
+		$val2 = rand_str();
+		$key3 = rand_str();
+		$val3 = rand_str();
+		$group = 'foo';
+		$group2 = 'bar';
+		$this->cache->add_non_persistent_groups( array( $group, $group2 ) );
+
+		// Set up the values
+		$this->cache->set( $key1, $val1, $group );
+		$this->cache->set( $key2, $val2, $group );
+		$this->cache->set( $key3, $val3, $group2 );
+		$this->assertEquals( $val1, $this->cache->get( $key1, $group ) );
+		$this->assertEquals( $val2, $this->cache->get( $key2, $group ) );
+		$this->assertEquals( $val3, $this->cache->get( $key3, $group2 ) );
+
+		$this->assertTrue( $this->cache->delete_group( $group ) );
+
+		$this->assertFalse( $this->cache->get( $key1, $group ) );
+		$this->assertFalse( $this->cache->get( $key2, $group ) );
+		$this->assertEquals( $val3, $this->cache->get( $key3, $group2 ) );
+
+		$this->assertFalse( $this->cache->delete_group( $group ) );
+	}
+
 	function test_switch_to_blog() {
 		if ( ! method_exists( $this->cache, 'switch_to_blog' ) )
 			return;

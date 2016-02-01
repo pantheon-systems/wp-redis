@@ -81,6 +81,21 @@ function wp_cache_delete($key, $group = '') {
 }
 
 /**
+ * Removes cache contents for a given group.
+ *
+ * @uses $wp_object_cache Object Cache Class
+ * @see WP_Object_Cache::delete_group()
+ *
+ * @param string $group Where the cache contents are grouped
+ * @return bool True on successful removal, false on failure
+ */
+function wp_cache_delete_group( $group ) {
+	global $wp_object_cache;
+	return $wp_object_cache->delete_group( $group );
+}
+
+
+/**
  * Removes all cache items.
  *
  * @uses $wp_object_cache Object Cache Class
@@ -458,6 +473,29 @@ class WP_Object_Cache {
 	}
 
 	/**
+	 * Remove the contents of all cache keys in the group.
+	 *
+	 * @param string $group Where the cache contents are grouped.
+	 * @return boolean True on success, false on failure.
+	 */
+	function delete_group( $group ) {
+		if ( ! self::USE_GROUPS ) {
+			return false;
+		}
+
+		if ( $this->_should_persist( $group ) ) {
+			$result = $this->_call_redis( 'delete', $group );
+			if ( 1 != $result ) {
+				return false;
+			}
+		} else if ( ! $this->_should_persist( $group ) && ! isset( $this->cache[ $group ] ) ) {
+			return false;
+		}
+		unset( $this->cache[ $group ] );
+		return true;
+	}
+
+	/**
 	 * Clears the object cache of all data.
 	 *
 	 * By default, this will flush the session cache as well as Redis, but we
@@ -687,10 +725,7 @@ class WP_Object_Cache {
 	 */
 	protected function _exists( $key, $group ) {
 		if ( self::USE_GROUPS ) {
-			if ( ! isset( $this->cache[ $group ] ) ) {
-				$this->cache[ $group ] = array();
-			}
-			if ( isset( $this->cache[ $group ][ $key ] ) || array_key_exists( $key, $this->cache[ $group ] ) ) {
+			if ( isset( $this->cache[ $group ][ $key ] ) || ( isset( $this->cache[ $group ] ) && array_key_exists( $key, $this->cache[ $group ] ) ) ) {
 				return true;
 			} else {
 				return $this->_call_redis( 'hExists', $group, $key );
