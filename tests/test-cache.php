@@ -226,6 +226,20 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 3, $this->cache->get( $key ) );
 	}
 
+	function test_incr_non_persistent() {
+		$key = rand_str();
+
+		$this->cache->add_non_persistent_groups( array( 'nonpersistent' ) );
+		$this->assertFalse( $this->cache->incr( $key, 1, 'nonpersistent' ) );
+
+		$this->cache->set( $key, 0, 'nonpersistent' );
+		$this->cache->incr( $key, 1, 'nonpersistent' );
+		$this->assertEquals( 1, $this->cache->get( $key, 'nonpersistent' ) );
+
+		$this->cache->incr( $key, 2, 'nonpersistent' );
+		$this->assertEquals( 3, $this->cache->get( $key, 'nonpersistent' ) );
+	}
+
 	function test_wp_cache_incr() {
 		$key = rand_str();
 
@@ -254,6 +268,24 @@ class CacheTest extends WP_UnitTestCase {
 
 		$this->cache->decr( $key, 2 );
 		$this->assertEquals( 0, $this->cache->get( $key ) );
+	}
+
+	function test_decr_non_persistent() {
+		$key = rand_str();
+
+		$this->cache->add_non_persistent_groups( array( 'nonpersistent' ) );
+		$this->assertFalse( $this->cache->decr( $key, 1, 'nonpersistent' ) );
+
+		$this->cache->set( $key, 0, 'nonpersistent' );
+		$this->cache->decr( $key, 1, 'nonpersistent' );
+		$this->assertEquals( 0, $this->cache->get( $key, 'nonpersistent' ) );
+
+		$this->cache->set( $key, 3, 'nonpersistent' );
+		$this->cache->decr( $key, 1, 'nonpersistent' );
+		$this->assertEquals( 2, $this->cache->get( $key, 'nonpersistent' ) );
+
+		$this->cache->decr( $key, 2, 'nonpersistent' );
+		$this->assertEquals( 0, $this->cache->get( $key, 'nonpersistent' ) );
 	}
 
 	/**
