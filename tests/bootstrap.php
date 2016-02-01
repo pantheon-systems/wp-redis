@@ -13,6 +13,10 @@ if ( getenv( 'WP_CORE_DIR' ) ) {
 	$_core_dir = '/tmp/wordpress';
 }
 
+if ( getenv( 'WP_REDIS_USE_CACHE_GROUPS' ) ) {
+	define( 'WP_REDIS_USE_CACHE_GROUPS', true );
+}
+
 // Easiest way to get this to where WordPress will load it
 copy( dirname( dirname( __FILE__ ) ) . '/object-cache.php', $_core_dir . '/wp-content/object-cache.php' );
 
