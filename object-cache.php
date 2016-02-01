@@ -542,24 +542,18 @@ class WP_Object_Cache {
 		}
 		$this->cache_hits += 1;
 
-		if ( self::USE_GROUPS ) {
-			if ( $this->_should_persist( $group ) && ( $force || ! $this->_isset_internal( $key, $group ) ) ) {
+		if ( $this->_should_persist( $group ) && ( $force || ! $this->_isset_internal( $key, $group ) ) ) {
+			if ( self::USE_GROUPS ) {
 				$redis_safe_group = $this->_key( '', $group );
 				$value = $this->_call_redis( 'hGet', $redis_safe_group, $key );
-				if ( ! is_numeric( $value ) ) {
-					$value = unserialize( $value );
-				}
-				$this->_set_internal( $key, $group, $value );
-			}
-		} else {
-			if ( $this->_should_persist( $group ) && ( $force || ! $this->_isset_internal( $key, $group ) ) ) {
+			} else {
 				$id = $this->_key( $key, $group );
 				$value = $this->_call_redis( 'get', $id );
-				if ( ! is_numeric( $value ) ) {
-					$value = unserialize( $value );
-				}
-				$this->_set_internal( $key, $group, $value );
 			}
+			if ( ! is_numeric( $value ) ) {
+				$value = unserialize( $value );
+			}
+			$this->_set_internal( $key, $group, $value );
 		}
 		return $this->_get_internal( $key, $group );
 	}
@@ -661,26 +655,28 @@ class WP_Object_Cache {
 
 		$this->_set_internal( $key, $group, $data );
 
-		if ( $this->_should_persist( $group ) ) {
-			# If this is an integer, store it as such. Otherwise, serialize it.
-			if ( ! is_numeric( $data ) || intval( $data ) != $data ) {
-				$data = serialize( $data );
-			}
-
-			// Redis doesn't support expire on hash group keys
-			if ( self::USE_GROUPS ) {
-				$redis_safe_group = $this->_key( '', $group );
-				$this->_call_redis( 'hSet', $redis_safe_group, $key, $data );
-			} else {
-				$id = $this->_key( $key, $group );
-				if ( empty( $expire ) ) {
-					$this->_call_redis( 'set', $id, $data );
-				} else {
-					$this->_call_redis( 'setex', $id, $expire, $data );
-				}
-			}
+		if ( ! $this->_should_persist( $group ) ) {
+			return true;
 		}
 
+		# If this is an integer, store it as such. Otherwise, serialize it.
+		if ( ! is_numeric( $data ) || intval( $data ) != $data ) {
+			$data = serialize( $data );
+		}
+
+		// Redis doesn't support expire on hash group keys
+		if ( self::USE_GROUPS ) {
+			$redis_safe_group = $this->_key( '', $group );
+			$this->_call_redis( 'hSet', $redis_safe_group, $key, $data );
+			return true;
+		}
+
+		$id = $this->_key( $key, $group );
+		if ( empty( $expire ) ) {
+			$this->_call_redis( 'set', $id, $data );
+		} else {
+			$this->_call_redis( 'setex', $id, $expire, $data );
+		}
 		return true;
 	}
 
