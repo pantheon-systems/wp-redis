@@ -31,7 +31,7 @@ module.exports = function( grunt ) {
 
 	grunt.loadNpmTasks( 'grunt-wp-readme-to-markdown' );
 	grunt.loadNpmTasks( 'grunt-phpcs' );
-	grunt.registerTask( 'readme', ['wp_readme_to_markdown']);
+	grunt.registerTask( 'readme', ['wp_readme_to_markdown'] );
 
 	grunt.util.linefeed = '\n';
 
