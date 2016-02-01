@@ -9,6 +9,10 @@ class CacheTest extends WP_UnitTestCase {
 
 	function setUp() {
 		parent::setUp();
+		$GLOBALS['redis_server'] = array(
+			'host'    => '127.0.0.1',
+			'port'    => 6379,
+		);
 		// create two cache objects with a shared cache dir
 		// this simulates a typical cache situation, two separate requests interacting
 		$this->cache =& $this->init_cache();
