@@ -418,10 +418,11 @@ class WP_Object_Cache {
 		}
 
 		if ( self::USE_GROUPS ) {
-			$result = $this->_call_redis( 'hIncrBy', $group, $key, -$offset );
+			$redis_safe_group = $this->_key( '', $group );
+			$result = $this->_call_redis( 'hIncrBy', $redis_safe_group, $key, -$offset );
 			if ( $result < 0 ) {
 				$result = 0;
-				$this->_call_redis( 'hSet', $group, $key, $result );
+				$this->_call_redis( 'hSet', $redis_safe_group, $key, $result );
 			}
 		} else {
 			$id = $this->_key( $key, $group );
@@ -458,7 +459,8 @@ class WP_Object_Cache {
 
 		if ( $this->_should_persist( $group ) ) {
 			if ( self::USE_GROUPS ) {
-				$result = $this->_call_redis( 'hDel', $group, $key );
+				$redis_safe_group = $this->_key( '', $group );
+				$result = $this->_call_redis( 'hDel', $redis_safe_group, $key );
 			} else {
 				$id = $this->_key( $key, $group );
 				$result = $this->_call_redis( 'delete', $id );
@@ -483,15 +485,17 @@ class WP_Object_Cache {
 			return false;
 		}
 
+		$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
+		$redis_safe_group = $this->_key( '', $group );
 		if ( $this->_should_persist( $group ) ) {
-			$result = $this->_call_redis( 'delete', $group );
+			$result = $this->_call_redis( 'delete', $redis_safe_group );
 			if ( 1 != $result ) {
 				return false;
 			}
-		} else if ( ! $this->_should_persist( $group ) && ! isset( $this->cache[ $group ] ) ) {
+		} else if ( ! $this->_should_persist( $group ) && ! isset( $this->cache[ $multisite_safe_group ] ) ) {
 			return false;
 		}
-		unset( $this->cache[ $group ] );
+		unset( $this->cache[ $multisite_safe_group ] );
 		return true;
 	}
 
@@ -539,20 +543,22 @@ class WP_Object_Cache {
 		$this->cache_hits += 1;
 
 		if ( self::USE_GROUPS ) {
-			if ( ! isset( $this->cache[ $group ] ) ) {
-				$this->cache[ $group ] = array();
+			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
+			$redis_safe_group = $this->_key( '', $group );
+			if ( ! isset( $this->cache[ $multisite_safe_group ] ) ) {
+				$this->cache[ $multisite_safe_group ] = array();
 			}
-			if ( $this->_should_persist( $group ) && ( $force || ( ! isset( $this->cache[ $group ][ $key ] ) && ! array_key_exists( $key, $this->cache[ $group ] ) ) ) ) {
-				$this->cache[ $group ][ $key ] = $this->_call_redis( 'hGet', $group, $key );
-				if ( ! is_numeric( $this->cache[ $group ][ $key ] ) ) {
-					$this->cache[ $group ][ $key ] = unserialize( $this->cache[ $group ][ $key ] );
+			if ( $this->_should_persist( $group ) && ( $force || ( ! isset( $this->cache[ $multisite_safe_group ][ $key ] ) && ! array_key_exists( $key, $this->cache[ $multisite_safe_group ] ) ) ) ) {
+				$this->cache[ $multisite_safe_group ][ $key ] = $this->_call_redis( 'hGet', $redis_safe_group, $key );
+				if ( ! is_numeric( $this->cache[ $multisite_safe_group ][ $key ] ) ) {
+					$this->cache[ $multisite_safe_group ][ $key ] = unserialize( $this->cache[ $multisite_safe_group ][ $key ] );
 				}
 			}
 
-			if ( is_object( $this->cache[ $group ][ $key ] ) ) {
-				return clone $this->cache[ $group ][ $key ];
+			if ( is_object( $this->cache[ $multisite_safe_group ][ $key ] ) ) {
+				return clone $this->cache[ $multisite_safe_group ][ $key ];
 			} else {
-				return $this->cache[ $group ][ $key ];
+				return $this->cache[ $multisite_safe_group ][ $key ];
 			}
 		} else {
 			$id = $this->_key( $key, $group );
@@ -602,7 +608,8 @@ class WP_Object_Cache {
 		}
 
 		if ( self::USE_GROUPS ) {
-			$result = $this->_call_redis( 'hIncrBy', $group, $key, $offset );
+			$redis_safe_group = $this->_key( '', $group );
+			$result = $this->_call_redis( 'hIncrBy', $redis_safe_group, $key, $offset );
 		} else {
 			$id = $this->_key( $key, $group );
 			$result = $this->_call_redis( 'incrBy', $id, $offset );
@@ -674,7 +681,8 @@ class WP_Object_Cache {
 
 			// Redis doesn't support expire on hash group keys
 			if ( self::USE_GROUPS ) {
-				$this->_call_redis( 'hSet', $group, $key, $data );
+				$redis_safe_group = $this->_key( '', $group );
+				$this->_call_redis( 'hSet', $redis_safe_group, $key, $data );
 			} else {
 				$id = $this->_key( $key, $group );
 				if ( empty( $expire ) ) {
@@ -725,10 +733,12 @@ class WP_Object_Cache {
 	 */
 	protected function _exists( $key, $group ) {
 		if ( self::USE_GROUPS ) {
-			if ( isset( $this->cache[ $group ][ $key ] ) || ( isset( $this->cache[ $group ] ) && array_key_exists( $key, $this->cache[ $group ] ) ) ) {
+			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
+			if ( isset( $this->cache[ $multisite_safe_group ][ $key ] ) || ( isset( $this->cache[ $multisite_safe_group ] ) && array_key_exists( $key, $this->cache[ $multisite_safe_group ] ) ) ) {
 				return true;
 			} else {
-				return $this->_call_redis( 'hExists', $group, $key );
+				$redis_safe_group = $this->_key( '', $group );
+				return $this->_call_redis( 'hExists', $redis_safe_group, $key );
 			}
 		} else {
 			$id = $this->_key( $key, $group );
@@ -749,8 +759,9 @@ class WP_Object_Cache {
 	 */
 	protected function _get_internal( $key, $group ) {
 		if ( self::USE_GROUPS ) {
-			if ( isset( $this->cache[ $group ][ $key ] ) ) {
-				return $this->cache[ $group ][ $key ];
+			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
+			if ( isset( $this->cache[ $multisite_safe_group ][ $key ] ) ) {
+				return $this->cache[ $multisite_safe_group ][ $key ];
 			}
 			return null;
 		} else {
@@ -771,10 +782,11 @@ class WP_Object_Cache {
 	 */
 	protected function _set_internal( $key, $group, $value ) {
 		if ( self::USE_GROUPS ) {
-			if ( ! isset( $this->cache[ $group ] ) ) {
-				$this->cache[ $group ] = array();
+			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
+			if ( ! isset( $this->cache[ $multisite_safe_group ] ) ) {
+				$this->cache[ $multisite_safe_group ] = array();
 			}
-			$this->cache[ $group ][ $key ] = $value;
+			$this->cache[ $multisite_safe_group ][ $key ] = $value;
 		} else {
 			$key = $this->_key( $key, $group );
 			$this->cache[ $key ] = $value;
@@ -789,8 +801,9 @@ class WP_Object_Cache {
 	 */
 	protected function _unset_internal( $key, $group ) {
 		if ( self::USE_GROUPS ) {
-			if ( isset( $this->cache[ $group ][ $key ] ) ) {
-				unset( $this->cache[ $group ][ $key ] );
+			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
+			if ( isset( $this->cache[ $multisite_safe_group ][ $key ] ) ) {
+				unset( $this->cache[ $multisite_safe_group ][ $key ] );
 			}
 		} else {
 			$key = $this->_key( $key, $group );
@@ -807,7 +820,7 @@ class WP_Object_Cache {
 	 * @param  string $group The cache group.
 	 * @return string        A properly prefixed redis cache key.
 	 */
-	protected function _key( $key, $group = 'default' ) {
+	protected function _key( $key = '', $group = 'default' ) {
 		if ( empty( $group ) ) {
 			$group = 'default';
 		}
