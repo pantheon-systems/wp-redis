@@ -374,7 +374,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( $val3, $this->cache->get( $key3, $group2 ) );
 
 		// _call_redis( 'delete' ) always returns true when Redis isn't available
-		if ( class_exists( 'PHPRedis' ) ) {
+		if ( class_exists( 'Redis' ) ) {
 			$this->assertFalse( $this->cache->delete_group( $group ) );
 		} else {
 			$this->assertTrue( $this->cache->delete_group( $group ) );
