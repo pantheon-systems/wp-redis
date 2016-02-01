@@ -711,7 +711,14 @@ class WP_Object_Cache {
 		}
 
 		$this->redis = new Redis;
-		$port = ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379;
+		
+		if ( file_exists( $redis_server['host'] ) && filetype( $redis_server['host'] ) == 'socket' ) { //unix socket connection
+			//port must be null or socket won't connect
+			$port = null;
+		}
+		else { //tcp connection
+			$port = ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379;	
+		}
 		$this->redis->connect( $redis_server['host'], $port, 1, NULL, 100 ); # 1s timeout, 100ms delay between reconnections
 		if ( ! empty( $redis_server['auth'] ) ) {
 			try {
