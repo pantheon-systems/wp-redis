@@ -917,6 +917,7 @@ class WP_Object_Cache {
 					$val = $val - $offset;
 					return $val;
 				case 'delete':
+				case 'hDel':
 					return 1;
 				case 'flushAll':
 				case 'IsConnected':
