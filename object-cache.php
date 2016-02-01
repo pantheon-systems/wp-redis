@@ -419,7 +419,7 @@ class WP_Object_Cache {
 
 		if ( self::USE_GROUPS ) {
 			$redis_safe_group = $this->_key( '', $group );
-			$result = $this->_call_redis( 'hIncrBy', $redis_safe_group, $key, -$offset );
+			$result = $this->_call_redis( 'hIncrBy', $redis_safe_group, $key, -$offset, $group );
 			if ( $result < 0 ) {
 				$result = 0;
 				$this->_call_redis( 'hSet', $redis_safe_group, $key, $result );
@@ -591,7 +591,7 @@ class WP_Object_Cache {
 
 		if ( self::USE_GROUPS ) {
 			$redis_safe_group = $this->_key( '', $group );
-			$result = $this->_call_redis( 'hIncrBy', $redis_safe_group, $key, $offset );
+			$result = $this->_call_redis( 'hIncrBy', $redis_safe_group, $key, $offset, $group );
 		} else {
 			$id = $this->_key( $key, $group );
 			$result = $this->_call_redis( 'incrBy', $id, $offset );
@@ -950,11 +950,8 @@ class WP_Object_Cache {
 					$val = $val + $offset;
 					return $val;
 				case 'hIncrBy':
-					if ( isset( $this->cache[ $arguments[0] ][ $arguments[1] ] ) ) {
-						return $this->cache[ $arguments[0] ][ $arguments[1] ] + $arguments[2];
-					} else {
-						return $arguments[2];
-					}
+					$val = $this->_get_internal( $arguments[1], $arguments[3] );
+					return $val + $arguments[2];
 				case 'decrBy':
 				case 'decr':
 					$val = $this->cache[ $arguments[0] ];
