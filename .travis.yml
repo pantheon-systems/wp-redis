@@ -38,3 +38,4 @@ script:
         echo 'extension = "redis.so"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
       fi
       phpunit
+      phpunit -c multisite.xml
