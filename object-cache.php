@@ -905,6 +905,10 @@ class WP_Object_Cache {
 		$arguments = func_get_args();
 		array_shift( $arguments ); // ignore $method
 
+		if ( 'hIncrBy' === $method ) {
+			$group = array_pop( $arguments );
+		}
+
 		if ( $this->is_redis_connected ) {
 			try {
 				$retval = call_user_func_array( array( $this->redis, $method ), $arguments );
@@ -950,7 +954,7 @@ class WP_Object_Cache {
 					$val = $val + $offset;
 					return $val;
 				case 'hIncrBy':
-					$val = $this->_get_internal( $arguments[1], $arguments[3] );
+					$val = $this->_get_internal( $arguments[1], $group );
 					return $val + $arguments[2];
 				case 'decrBy':
 				case 'decr':
