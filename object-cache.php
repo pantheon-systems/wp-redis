@@ -543,37 +543,25 @@ class WP_Object_Cache {
 		$this->cache_hits += 1;
 
 		if ( self::USE_GROUPS ) {
-			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
-			$redis_safe_group = $this->_key( '', $group );
-			if ( ! isset( $this->cache[ $multisite_safe_group ] ) ) {
-				$this->cache[ $multisite_safe_group ] = array();
-			}
-			if ( $this->_should_persist( $group ) && ( $force || ( ! isset( $this->cache[ $multisite_safe_group ][ $key ] ) && ! array_key_exists( $key, $this->cache[ $multisite_safe_group ] ) ) ) ) {
-				$this->cache[ $multisite_safe_group ][ $key ] = $this->_call_redis( 'hGet', $redis_safe_group, $key );
-				if ( ! is_numeric( $this->cache[ $multisite_safe_group ][ $key ] ) ) {
-					$this->cache[ $multisite_safe_group ][ $key ] = unserialize( $this->cache[ $multisite_safe_group ][ $key ] );
+			if ( $this->_should_persist( $group ) && ( $force || ! $this->_isset_internal( $key, $group ) ) ) {
+				$redis_safe_group = $this->_key( '', $group );
+				$value = $this->_call_redis( 'hGet', $redis_safe_group, $key );
+				if ( ! is_numeric( $value ) ) {
+					$value = unserialize( $value );
 				}
-			}
-
-			if ( is_object( $this->cache[ $multisite_safe_group ][ $key ] ) ) {
-				return clone $this->cache[ $multisite_safe_group ][ $key ];
-			} else {
-				return $this->cache[ $multisite_safe_group ][ $key ];
+				$this->_set_internal( $key, $group, $value );
 			}
 		} else {
-			$id = $this->_key( $key, $group );
-			if ( $this->_should_persist( $group ) && ( $force || ( ! isset( $this->cache[ $id ] ) && ! array_key_exists( $id, $this->cache ) ) ) ) {
-				$this->cache[ $id ] = $this->_call_redis( 'get', $id );
-				if ( ! is_numeric( $this->cache[ $id ] ) ) {
-					$this->cache[ $id ] = unserialize( $this->cache[ $id ] );
+			if ( $this->_should_persist( $group ) && ( $force || ! $this->_isset_internal( $key, $group ) ) ) {
+				$id = $this->_key( $key, $group );
+				$value = $this->_call_redis( 'get', $id );
+				if ( ! is_numeric( $value ) ) {
+					$value = unserialize( $value );
 				}
+				$this->_set_internal( $key, $group, $value );
 			}
-
-			if ( is_object( $this->cache[ $id ] ) )
-				return clone $this->cache[ $id ];
-			else
-				return $this->cache[ $id ];
 		}
+		return $this->_get_internal( $key, $group );
 	}
 
 	/**
@@ -732,21 +720,31 @@ class WP_Object_Cache {
 	 * @access protected
 	 */
 	protected function _exists( $key, $group ) {
+		if ( $this->_isset_internal( $key, $group ) ) {
+			return true;
+		}
+		if ( self::USE_GROUPS ) {
+			$redis_safe_group = $this->_key( '', $group );
+			return $this->_call_redis( 'hExists', $redis_safe_group, $key );
+		}
+		$id = $this->_key( $key, $group );
+		return $this->_call_redis( 'exists', $id );
+	}
+
+	/**
+	 * Check whether there's a value in the internal object cache.
+	 *
+	 * @param string $key
+	 * @param string $group
+	 * @return boolean
+	 */
+	protected function _isset_internal( $key, $group ) {
 		if ( self::USE_GROUPS ) {
 			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
-			if ( isset( $this->cache[ $multisite_safe_group ][ $key ] ) || ( isset( $this->cache[ $multisite_safe_group ] ) && array_key_exists( $key, $this->cache[ $multisite_safe_group ] ) ) ) {
-				return true;
-			} else {
-				$redis_safe_group = $this->_key( '', $group );
-				return $this->_call_redis( 'hExists', $redis_safe_group, $key );
-			}
+			return isset( $this->cache[ $multisite_safe_group ][ $key ] );
 		} else {
-			$id = $this->_key( $key, $group );
-			if ( isset( $this->cache[ $id ] ) || array_key_exists( $id, $this->cache ) ) {
-				return true;
-			} else {
-				return $this->_call_redis( 'exists', $id );
-			}
+			$key = $this->_key( $key, $group );
+			return isset( $this->cache[ $key ] );
 		}
 	}
 
@@ -758,19 +756,22 @@ class WP_Object_Cache {
 	 * @return mixed
 	 */
 	protected function _get_internal( $key, $group ) {
+		$value = null;
 		if ( self::USE_GROUPS ) {
 			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
 			if ( isset( $this->cache[ $multisite_safe_group ][ $key ] ) ) {
-				return $this->cache[ $multisite_safe_group ][ $key ];
+				$value = $this->cache[ $multisite_safe_group ][ $key ];
 			}
-			return null;
 		} else {
 			$key = $this->_key( $key, $group );
 			if ( isset( $this->cache[ $key ] ) ) {
-				return $this->cache[ $key ];
+				$value = $this->cache[ $key ];
 			}
-			return null;
 		}
+		if ( is_object( $value ) ) {
+			return clone $value;
+		}
+		return $value;
 	}
 
 	/**
