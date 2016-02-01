@@ -21,3 +21,10 @@ if ( getenv( 'WP_REDIS_USE_CACHE_GROUPS' ) ) {
 copy( dirname( dirname( __FILE__ ) ) . '/object-cache.php', $_core_dir . '/wp-content/object-cache.php' );
 
 require $_tests_dir . '/includes/bootstrap.php';
+
+error_log( PHP_EOL );
+$phpredis_state = class_exists( 'Redis' ) ? 'enabled' : 'disabled';
+error_log( 'PhpRedis: ' . $phpredis_state . PHP_EOL );
+$cache_groups_state = defined( 'WP_REDIS_USE_CACHE_GROUPS' ) && WP_REDIS_USE_CACHE_GROUPS ? 'enabled' : 'disabled';
+error_log( 'Cache groups: ' . $cache_groups_state . PHP_EOL );
+error_log( PHP_EOL );
