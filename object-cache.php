@@ -920,6 +920,7 @@ class WP_Object_Cache {
 		$arguments = func_get_args();
 		array_shift( $arguments ); // ignore $method
 
+		// $group is intended for the failback, and isn't passed to the Redis callback
 		if ( 'hIncrBy' === $method ) {
 			$group = array_pop( $arguments );
 		}
