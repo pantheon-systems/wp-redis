@@ -668,7 +668,7 @@ class WP_Object_Cache {
 		}
 
 		# If this is an integer, store it as such. Otherwise, serialize it.
-		if ( ! is_numeric( $data ) || intval( $data ) != $data ) {
+		if ( ! is_numeric( $data ) || intval( $data ) !== $data ) {
 			$data = serialize( $data );
 		}
 
