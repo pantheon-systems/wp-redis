@@ -57,7 +57,9 @@ Pull requests and issues are welcome!
 ## Changelog ##
 
 ### 0.3.0 (February 11, 2016) ###
+
 * Introduces opt-in support for Redis cache groups. Enable with `define( 'WP_REDIS_USE_CACHE_GROUPS', true );`. When enabled, WP Redis persists cache groups in a structured manner, instead of hashing the cache key and group together.
+* Uses PHP_CodeSniffer and [WordPress Coding Standards sniffs](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards) to ensure WP Redis adheres to WordPress coding standards.
 * Bug fix: Permits use of a Unix socket in `$redis_server['host']` by ensuring the supplied `$port` is null.
 
 ### 0.2.2 (November 24, 2015) ###
