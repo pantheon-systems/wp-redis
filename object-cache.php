@@ -413,6 +413,9 @@ class WP_Object_Cache {
 			} else {
 				$existing -= $offset;
 			}
+			if ( $existing < 0 ) {
+				$existing = 0;
+			}
 			$this->_set_internal( $key, $group, $existing );
 			return $existing;
 		}

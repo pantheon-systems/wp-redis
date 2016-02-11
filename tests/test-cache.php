@@ -274,6 +274,14 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->get( $key ) );
 	}
 
+	function test_decr_never_below_zero() {
+		$key = rand_str();
+		$this->cache->set( $key, 1 );
+		$this->assertEquals( 1, $this->cache->get( $key ) );
+		$this->cache->decr( $key, 2 );
+		$this->assertEquals( 0, $this->cache->get( $key ) );
+	}
+
 	function test_decr_non_persistent() {
 		$key = rand_str();
 
@@ -288,6 +296,15 @@ class CacheTest extends WP_UnitTestCase {
 		$this->cache->decr( $key, 1, 'nonpersistent' );
 		$this->assertEquals( 2, $this->cache->get( $key, 'nonpersistent' ) );
 
+		$this->cache->decr( $key, 2, 'nonpersistent' );
+		$this->assertEquals( 0, $this->cache->get( $key, 'nonpersistent' ) );
+	}
+
+	function test_decr_non_persistent_never_below_zero() {
+		$key = rand_str();
+		$this->cache->add_non_persistent_groups( array( 'nonpersistent' ) );
+		$this->cache->set( $key, 1, 'nonpersistent' );
+		$this->assertEquals( 1, $this->cache->get( $key, 'nonpersistent' ) );
 		$this->cache->decr( $key, 2, 'nonpersistent' );
 		$this->assertEquals( 0, $this->cache->get( $key, 'nonpersistent' ) );
 	}
