@@ -582,6 +582,9 @@ class WP_Object_Cache {
 			} else {
 				$existing += $offset;
 			}
+			if ( $existing < 0 ) {
+				$existing = 0;
+			}
 			$this->_set_internal( $key, $group, $existing );
 			return $existing;
 		}
@@ -589,9 +592,17 @@ class WP_Object_Cache {
 		if ( self::USE_GROUPS ) {
 			$redis_safe_group = $this->_key( '', $group );
 			$result = $this->_call_redis( 'hIncrBy', $redis_safe_group, $key, $offset, $group );
+			if ( $result < 0 ) {
+				$result = 0;
+				$this->_call_redis( 'hSet', $redis_safe_group, $key, $result );
+			}
 		} else {
 			$id = $this->_key( $key, $group );
 			$result = $this->_call_redis( 'incrBy', $id, $offset );
+			if ( $result < 0 ) {
+				$result = 0;
+				$this->_call_redis( 'set', $id, $result );
+			}
 		}
 
 		if ( is_int( $result ) ) {
