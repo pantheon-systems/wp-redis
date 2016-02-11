@@ -75,10 +75,10 @@ function wp_cache_decr( $key, $offset = 1, $group = '' ) {
  * @param string $group Where the cache contents are grouped
  * @return bool True on successful removal, false on failure
  */
-function wp_cache_delete($key, $group = '') {
+function wp_cache_delete( $key, $group = '' ) {
 	global $wp_object_cache;
 
-	return $wp_object_cache->delete($key, $group);
+	return $wp_object_cache->delete( $key, $group );
 }
 
 /**
@@ -868,12 +868,16 @@ class WP_Object_Cache {
 		if ( empty( $redis_server ) ) {
 			# Attempt to automatically load Pantheon's Redis config from the env.
 			if ( isset( $_SERVER['CACHE_HOST'] ) ) {
-				$redis_server = array( 'host' => $_SERVER['CACHE_HOST'],
-				                       'port' => $_SERVER['CACHE_PORT'],
-				                       'auth' => $_SERVER['CACHE_PASSWORD'] );
-			}
-			else {
-				$redis_server = array( 'host' => '127.0.0.1', 'port' => 6379 );
+				$redis_server = array(
+					'host' => $_SERVER['CACHE_HOST'],
+					'port' => $_SERVER['CACHE_PORT'],
+					'auth' => $_SERVER['CACHE_PASSWORD'],
+				);
+			} else {
+				$redis_server = array(
+					'host' => '127.0.0.1',
+					'port' => 6379,
+				);
 			}
 		}
 
@@ -882,24 +886,23 @@ class WP_Object_Cache {
 		if ( file_exists( $redis_server['host'] ) && 'socket' === filetype( $redis_server['host'] ) ) { //unix socket connection
 			//port must be null or socket won't connect
 			$port = null;
+		} else { //tcp connection
+			$port = ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379;
 		}
-		else { //tcp connection
-			$port = ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379;	
-		}
-		$this->redis->connect( $redis_server['host'], $port, 1, NULL, 100 ); # 1s timeout, 100ms delay between reconnections
+		$this->redis->connect( $redis_server['host'], $port, 1, null, 100 ); # 1s timeout, 100ms delay between reconnections
 		if ( ! empty( $redis_server['auth'] ) ) {
 			try {
 				$this->redis->auth( $redis_server['auth'] );
-			// PhpRedis throws an Exception when it fails a server call.
-			// To prevent WordPress from fataling, we catch the Exception.
 			} catch ( RedisException $e ) {
+				// PhpRedis throws an Exception when it fails a server call.
+				// To prevent WordPress from fataling, we catch the Exception.
 				try {
 					$this->last_triggered_error = 'WP Redis: ' . $e->getMessage();
 					// Be friendly to developers debugging production servers by triggering an error
 					// @codingStandardsIgnoreStart
 					trigger_error( $this->last_triggered_error, E_USER_WARNING );
 					// @codingStandardsIgnoreEnd
-				} catch( PHPUnit_Framework_Error_Warning $e ) {
+				} catch ( PHPUnit_Framework_Error_Warning $e ) {
 					// PHPUnit throws an Exception when `trigger_error()` is called.
 					// To ensure our tests (which expect Exceptions to be caught) continue to run,
 					// we catch the PHPUnit exception and inspect the RedisException message
@@ -935,17 +938,19 @@ class WP_Object_Cache {
 			try {
 				$retval = call_user_func_array( array( $this->redis, $method ), $arguments );
 				return $retval;
-			// PhpRedis throws an Exception when it fails a server call.
-			// To prevent WordPress from fataling, we catch the Exception.
-			} catch( RedisException $e ) {
+			} catch ( RedisException $e ) {
+				// PhpRedis throws an Exception when it fails a server call.
+				// To prevent WordPress from fataling, we catch the Exception.
 				$retry_exception_messages = array( 'socket error on read socket', 'Connection closed', 'Redis server went away' );
 				$retry_exception_messages = apply_filters( 'wp_redis_retry_exception_messages', $retry_exception_messages );
 				if ( in_array( $e->getMessage(), $retry_exception_messages ) ) {
 					try {
 						$this->last_triggered_error = 'WP Redis: ' . $e->getMessage();
 						// Be friendly to developers debugging production servers by triggering an error
+						// @codingStandardsIgnoreStart
 						trigger_error( $this->last_triggered_error, E_USER_WARNING );
-					} catch( PHPUnit_Framework_Error_Warning $e ) {
+						// @codingStandardsIgnoreEnd
+					} catch ( PHPUnit_Framework_Error_Warning $e ) {
 						// PHPUnit throws an Exception when `trigger_error()` is called.
 						// To ensure our tests (which expect Exceptions to be caught) continue to run,
 						// we catch the PHPUnit exception and inspect the RedisException message
@@ -969,29 +974,29 @@ class WP_Object_Cache {
 
 		// Mock expected behavior from Redis for these methods
 		switch ( $method ) {
-				case 'incr':
-				case 'incrBy':
-					$val = $this->cache[ $arguments[0] ];
-					$offset = isset( $arguments[1] ) && 'incrBy' === $method ? $arguments[1] : 1;
-					$val = $val + $offset;
-					return $val;
-				case 'hIncrBy':
-					$val = $this->_get_internal( $arguments[1], $group );
-					return $val + $arguments[2];
-				case 'decrBy':
-				case 'decr':
-					$val = $this->cache[ $arguments[0] ];
-					$offset = isset( $arguments[1] ) && 'decrBy' === $method ? $arguments[1] : 1;
-					$val = $val - $offset;
-					return $val;
-				case 'delete':
-				case 'hDel':
-					return 1;
-				case 'flushAll':
-				case 'IsConnected':
-				case 'exists':
-					return false;
-			}
+			case 'incr':
+			case 'incrBy':
+				$val = $this->cache[ $arguments[0] ];
+				$offset = isset( $arguments[1] ) && 'incrBy' === $method ? $arguments[1] : 1;
+				$val = $val + $offset;
+				return $val;
+			case 'hIncrBy':
+				$val = $this->_get_internal( $arguments[1], $group );
+				return $val + $arguments[2];
+			case 'decrBy':
+			case 'decr':
+				$val = $this->cache[ $arguments[0] ];
+				$offset = isset( $arguments[1] ) && 'decrBy' === $method ? $arguments[1] : 1;
+				$val = $val - $offset;
+				return $val;
+			case 'delete':
+			case 'hDel':
+				return 1;
+			case 'flushAll':
+			case 'IsConnected':
+			case 'exists':
+				return false;
+		}
 
 	}
 
@@ -1028,7 +1033,7 @@ class WP_Object_Cache {
 		global $blog_id, $table_prefix, $wpdb;
 
 		$this->multisite = is_multisite();
-		$this->blog_prefix =  $this->multisite ? $blog_id . ':' : '';
+		$this->blog_prefix = $this->multisite ? $blog_id . ':' : '';
 
 		if ( ! $this->_connect_redis() ) {
 			add_action( 'admin_notices', array( $this, 'wp_action_admin_notices_warn_missing_redis' ) );
