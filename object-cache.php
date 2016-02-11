@@ -878,8 +878,8 @@ class WP_Object_Cache {
 		}
 
 		$this->redis = new Redis;
-		
-		if ( file_exists( $redis_server['host'] ) && filetype( $redis_server['host'] ) == 'socket' ) { //unix socket connection
+
+		if ( file_exists( $redis_server['host'] ) && 'socket' === filetype( $redis_server['host'] ) ) { //unix socket connection
 			//port must be null or socket won't connect
 			$port = null;
 		}
