@@ -33,7 +33,7 @@ services:
 
 before_script:
     - |
-      if [[ -z "$WP_VERSION" ]] ; then
+      if [[ ! -z "$WP_VERSION" ]] ; then
         bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
       fi
     - |
@@ -44,7 +44,7 @@ before_script:
 
 script:
     - |
-      if [[ -z "$WP_VERSION" ]] ; then
+      if [[ ! -z "$WP_VERSION" ]] ; then
         if [[ "$PHP_REDIS" == "enabled" ]] ; then
           echo 'extension = "redis.so"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
         fi
