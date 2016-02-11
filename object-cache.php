@@ -699,13 +699,13 @@ class WP_Object_Cache {
 	 * key and the data.
 	 */
 	public function stats() {
-		echo "<p>";
-		echo "<strong>Cache Hits:</strong> {$this->cache_hits}<br />";
-		echo "<strong>Cache Misses:</strong> {$this->cache_misses}<br />";
-		echo "</p>";
+		echo '<p>';
+		echo '<strong>Cache Hits:</strong>' . (int) $this->cache_hits . '<br />';
+		echo '<strong>Cache Misses:</strong>' . (int) $this->cache_misses . '<br />';
+		echo '</p>';
 		echo '<ul>';
 		foreach ( $this->cache as $group => $cache ) {
-			echo "<li><strong>Group:</strong> $group - ( " . number_format( strlen( serialize( $cache ) ) / 1024, 2 ) . 'k )</li>';
+			echo '<li><strong>Group:</strong> ' . esc_html( $group ) . ' - ( ' . number_format( strlen( serialize( $cache ) ) / 1024, 2 ) . 'k )</li>';
 		}
 		echo '</ul>';
 	}
