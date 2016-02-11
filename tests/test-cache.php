@@ -67,7 +67,7 @@ class CacheTest extends WP_UnitTestCase {
 		// Force a bad connection
 		$redis_server['host'] = '127.0.0.1';
 		$redis_server['port'] = 9999;
-		$this->cache->redis->connect( $redis_server['host'], $redis_server['port'], 1, NULL, 100 );
+		$this->cache->redis->connect( $redis_server['host'], $redis_server['port'], 1, null, 100 );
 		// Setting cache value when redis connection fails saves wakeup flush
 		$this->cache->set( 'foo', 'bar' );
 		$this->assertEquals( 'WP Redis: Redis server went away', $this->cache->last_triggered_error );
@@ -84,7 +84,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->cache = $this->init_cache();
 		$this->assertFalse( $this->cache->do_redis_failback_flush );
 		$this->assertEquals( "DELETE FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_failback_flush'", $wpdb->last_query );
-		$this->assertEquals( NULL, $this->cache->get( 'foo' ) );
+		$this->assertEquals( null, $this->cache->get( 'foo' ) );
 		// Cache load, but Redis shouldn't be flushed again
 		$this->cache = $this->init_cache();
 		$this->assertFalse( $this->cache->do_redis_failback_flush );
@@ -108,15 +108,15 @@ class CacheTest extends WP_UnitTestCase {
 	}
 
 	public function test_miss() {
-		$this->assertEquals(NULL, $this->cache->get(rand_str()));
+		$this->assertEquals( null, $this->cache->get( rand_str() ) );
 	}
 
 	public function test_add_get() {
 		$key = rand_str();
 		$val = rand_str();
 
-		$this->cache->add($key, $val);
-		$this->assertEquals($val, $this->cache->get($key));
+		$this->cache->add( $key, $val );
+		$this->assertEquals( $val, $this->cache->get( $key ) );
 	}
 
 	public function test_add_get_0() {
@@ -124,17 +124,17 @@ class CacheTest extends WP_UnitTestCase {
 		$val = 0;
 
 		// you can store zero in the cache
-		$this->cache->add($key, $val);
-		$this->assertEquals($val, $this->cache->get($key));
+		$this->cache->add( $key, $val );
+		$this->assertEquals( $val, $this->cache->get( $key ) );
 	}
 
 	public function test_add_get_null() {
 		$key = rand_str();
 		$val = null;
 
-		$this->assertTrue( $this->cache->add($key, $val) );
+		$this->assertTrue( $this->cache->add( $key, $val ) );
 		// null is converted to empty string
-		$this->assertEquals( '', $this->cache->get($key) );
+		$this->assertEquals( '', $this->cache->get( $key ) );
 	}
 
 	public function test_add() {
@@ -143,11 +143,11 @@ class CacheTest extends WP_UnitTestCase {
 		$val2 = rand_str();
 
 		// add $key to the cache
-		$this->assertTrue($this->cache->add($key, $val1));
-		$this->assertEquals($val1, $this->cache->get($key));
+		$this->assertTrue( $this->cache->add( $key, $val1 ) );
+		$this->assertEquals( $val1, $this->cache->get( $key ) );
 		// $key is in the cache, so reject new calls to add()
-		$this->assertFalse($this->cache->add($key, $val2));
-		$this->assertEquals($val1, $this->cache->get($key));
+		$this->assertFalse( $this->cache->add( $key, $val2 ) );
+		$this->assertEquals( $val1, $this->cache->get( $key ) );
 	}
 
 	public function test_replace() {
@@ -156,12 +156,12 @@ class CacheTest extends WP_UnitTestCase {
 		$val2 = rand_str();
 
 		// memcached rejects replace() if the key does not exist
-		$this->assertFalse($this->cache->replace($key, $val));
-		$this->assertFalse($this->cache->get($key));
-		$this->assertTrue($this->cache->add($key, $val));
-		$this->assertEquals($val, $this->cache->get($key));
-		$this->assertTrue($this->cache->replace($key, $val2));
-		$this->assertEquals($val2, $this->cache->get($key));
+		$this->assertFalse( $this->cache->replace( $key, $val ) );
+		$this->assertFalse( $this->cache->get( $key ) );
+		$this->assertTrue( $this->cache->add( $key, $val ) );
+		$this->assertEquals( $val, $this->cache->get( $key ) );
+		$this->assertTrue( $this->cache->replace( $key, $val2 ) );
+		$this->assertEquals( $val2, $this->cache->get( $key ) );
 	}
 
 	public function test_set() {
@@ -170,28 +170,29 @@ class CacheTest extends WP_UnitTestCase {
 		$val2 = rand_str();
 
 		// memcached accepts set() if the key does not exist
-		$this->assertTrue($this->cache->set($key, $val1));
-		$this->assertEquals($val1, $this->cache->get($key));
+		$this->assertTrue( $this->cache->set( $key, $val1 ) );
+		$this->assertEquals( $val1, $this->cache->get( $key ) );
 		// Second set() with same key should be allowed
-		$this->assertTrue($this->cache->set($key, $val2));
-		$this->assertEquals($val2, $this->cache->get($key));
+		$this->assertTrue( $this->cache->set( $key, $val2 ) );
+		$this->assertEquals( $val2, $this->cache->get( $key ) );
 	}
 
 	public function test_flush() {
 		global $_wp_using_ext_object_cache;
 
-		if ( $_wp_using_ext_object_cache )
+		if ( $_wp_using_ext_object_cache ) {
 			return;
+		}
 
 		$key = rand_str();
 		$val = rand_str();
 
-		$this->cache->add($key, $val);
+		$this->cache->add( $key, $val );
 		// item is visible to both cache objects
-		$this->assertEquals($val, $this->cache->get($key));
+		$this->assertEquals( $val, $this->cache->get( $key ) );
 		$this->cache->flush();
 		// If there is no value get returns false.
-		$this->assertFalse($this->cache->get($key));
+		$this->assertFalse( $this->cache->get( $key ) );
 	}
 
 	// Make sure objects are cloned going to and from the cache
@@ -358,7 +359,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertTrue( $this->cache->delete( $key ) );
 		$this->assertFalse( $this->cache->get( $key ) );
 
-		$this->assertFalse( $this->cache->delete( $key, 'default') );
+		$this->assertFalse( $this->cache->delete( $key, 'default' ) );
 	}
 
 	public function test_wp_cache_delete() {
@@ -377,7 +378,7 @@ class CacheTest extends WP_UnitTestCase {
 		// Delete returns (bool) true when key is not set and $force is true
 		// $this->assertTrue( wp_cache_delete( $key, 'default', true ) );
 
-		$this->assertFalse( wp_cache_delete( $key, 'default') );
+		$this->assertFalse( wp_cache_delete( $key, 'default' ) );
 	}
 
 	public function test_delete_group() {
@@ -482,8 +483,9 @@ class CacheTest extends WP_UnitTestCase {
 	}
 
 	public function test_switch_to_blog() {
-		if ( ! method_exists( $this->cache, 'switch_to_blog' ) )
+		if ( ! method_exists( $this->cache, 'switch_to_blog' ) ) {
 			return;
+		}
 
 		$key = rand_str();
 		$val = rand_str();
@@ -531,7 +533,7 @@ class CacheTest extends WP_UnitTestCase {
 		wp_cache_init();
 
 		global $wp_object_cache;
-		// Differs from core tests because we'll have two different Redis sockets 
+		// Differs from core tests because we'll have two different Redis sockets
 		$this->assertEquals( $wp_object_cache->cache, $new_blank_cache_object->cache );
 	}
 
@@ -566,8 +568,8 @@ class CacheTest extends WP_UnitTestCase {
 	 * Remove the object-cache.php from the place we've dropped it
 	 */
 	static function tearDownAfterClass() {
-
+		// @codingStandardsIgnoreStart
 		unlink( ABSPATH . 'wp-content/object-cache.php' );
-
+		// @codingStandardsIgnoreEnd
 	}
 }
