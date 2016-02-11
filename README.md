@@ -26,9 +26,11 @@ This assumes you have a PHP environment with the [required PhpRedis extension](h
 1. Install `object-cache.php` to `wp-content/object-cache.php` with a symlink or by copying the file.
 2. If you're not running on Pantheon, edit wp-config.php to add your cache credentials, e.g.:
 
-        $redis_server = array( 'host' => '127.0.0.1',
-                               'port' => 6379,
-                               'auth' => '12345' );
+        $redis_server = array(
+            'host' => '127.0.0.1',
+            'port' => 6379,
+            'auth' => '12345',
+        );
 
 3. Engage thrusters: you are now backing WP's Object Cache with Redis.
 4. (Optional) To use the same Redis server with multiple, discreet WordPress installs, you can use the `WP_CACHE_KEY_SALT` constant to define a unique salt for each install.
