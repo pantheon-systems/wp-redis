@@ -33,7 +33,8 @@ This assumes you have a PHP environment with the [required PhpRedis extension](h
 
 3. Engage thrusters: you are now backing WP's Object Cache with Redis.
 4. (Optional) To use the same Redis server with multiple, discreet WordPress installs, you can use the `WP_CACHE_KEY_SALT` constant to define a unique salt for each install.
-5. (Optional) On an existing site previously using WordPress' transient cache, use WP-CLI to delete all (`%_transient_%`) transients from the options table: `wp transient delete-all`. WP Redis assumes responsibility for the transient cache.
+5. (Optional) To use true cache groups, with the ability to delete all keys for a given group, define the `WP_REDIS_USE_CACHE_GROUPS` constant to true. However, when enabled, the expiration value is not respected because expiration on group keys isn't a feature supported by Redis.
+6. (Optional) On an existing site previously using WordPress' transient cache, use WP-CLI to delete all (`%_transient_%`) transients from the options table: `wp transient delete-all`. WP Redis assumes responsibility for the transient cache.
 
 == Frequently Asked Questions ==
 

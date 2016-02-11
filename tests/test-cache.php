@@ -9,6 +9,10 @@ class CacheTest extends WP_UnitTestCase {
 
 	function setUp() {
 		parent::setUp();
+		$GLOBALS['redis_server'] = array(
+			'host'    => '127.0.0.1',
+			'port'    => 6379,
+		);
 		// create two cache objects with a shared cache dir
 		// this simulates a typical cache situation, two separate requests interacting
 		$this->cache =& $this->init_cache();
@@ -226,6 +230,37 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 3, $this->cache->get( $key ) );
 	}
 
+	function test_incr_never_below_zero() {
+		$key = rand_str();
+		$this->cache->set( $key, 1 );
+		$this->assertEquals( 1, $this->cache->get( $key ) );
+		$this->cache->incr( $key, -2 );
+		$this->assertEquals( 0, $this->cache->get( $key ) );
+	}
+
+	function test_incr_non_persistent() {
+		$key = rand_str();
+
+		$this->cache->add_non_persistent_groups( array( 'nonpersistent' ) );
+		$this->assertFalse( $this->cache->incr( $key, 1, 'nonpersistent' ) );
+
+		$this->cache->set( $key, 0, 'nonpersistent' );
+		$this->cache->incr( $key, 1, 'nonpersistent' );
+		$this->assertEquals( 1, $this->cache->get( $key, 'nonpersistent' ) );
+
+		$this->cache->incr( $key, 2, 'nonpersistent' );
+		$this->assertEquals( 3, $this->cache->get( $key, 'nonpersistent' ) );
+	}
+
+	function test_incr_non_persistent_never_below_zero() {
+		$key = rand_str();
+		$this->cache->add_non_persistent_groups( array( 'nonpersistent' ) );
+		$this->cache->set( $key, 1, 'nonpersistent' );
+		$this->assertEquals( 1, $this->cache->get( $key, 'nonpersistent' ) );
+		$this->cache->incr( $key, -2, 'nonpersistent' );
+		$this->assertEquals( 0, $this->cache->get( $key, 'nonpersistent' ) );
+	}
+
 	function test_wp_cache_incr() {
 		$key = rand_str();
 
@@ -254,6 +289,41 @@ class CacheTest extends WP_UnitTestCase {
 
 		$this->cache->decr( $key, 2 );
 		$this->assertEquals( 0, $this->cache->get( $key ) );
+	}
+
+	function test_decr_never_below_zero() {
+		$key = rand_str();
+		$this->cache->set( $key, 1 );
+		$this->assertEquals( 1, $this->cache->get( $key ) );
+		$this->cache->decr( $key, 2 );
+		$this->assertEquals( 0, $this->cache->get( $key ) );
+	}
+
+	function test_decr_non_persistent() {
+		$key = rand_str();
+
+		$this->cache->add_non_persistent_groups( array( 'nonpersistent' ) );
+		$this->assertFalse( $this->cache->decr( $key, 1, 'nonpersistent' ) );
+
+		$this->cache->set( $key, 0, 'nonpersistent' );
+		$this->cache->decr( $key, 1, 'nonpersistent' );
+		$this->assertEquals( 0, $this->cache->get( $key, 'nonpersistent' ) );
+
+		$this->cache->set( $key, 3, 'nonpersistent' );
+		$this->cache->decr( $key, 1, 'nonpersistent' );
+		$this->assertEquals( 2, $this->cache->get( $key, 'nonpersistent' ) );
+
+		$this->cache->decr( $key, 2, 'nonpersistent' );
+		$this->assertEquals( 0, $this->cache->get( $key, 'nonpersistent' ) );
+	}
+
+	function test_decr_non_persistent_never_below_zero() {
+		$key = rand_str();
+		$this->cache->add_non_persistent_groups( array( 'nonpersistent' ) );
+		$this->cache->set( $key, 1, 'nonpersistent' );
+		$this->assertEquals( 1, $this->cache->get( $key, 'nonpersistent' ) );
+		$this->cache->decr( $key, 2, 'nonpersistent' );
+		$this->assertEquals( 0, $this->cache->get( $key, 'nonpersistent' ) );
 	}
 
 	/**
@@ -308,6 +378,107 @@ class CacheTest extends WP_UnitTestCase {
 		// $this->assertTrue( wp_cache_delete( $key, 'default', true ) );
 
 		$this->assertFalse( wp_cache_delete( $key, 'default') );
+	}
+
+	function test_delete_group() {
+		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
+			$this->markTestSkipped( 'Cache groups not enabled.' );
+		}
+		$key1 = rand_str();
+		$val1 = rand_str();
+		$key2 = rand_str();
+		$val2 = rand_str();
+		$key3 = rand_str();
+		$val3 = rand_str();
+		$group = 'foo';
+		$group2 = 'bar';
+
+		// Set up the values
+		$this->cache->set( $key1, $val1, $group );
+		$this->cache->set( $key2, $val2, $group );
+		$this->cache->set( $key3, $val3, $group2 );
+		$this->assertEquals( $val1, $this->cache->get( $key1, $group ) );
+		$this->assertEquals( $val2, $this->cache->get( $key2, $group ) );
+		$this->assertEquals( $val3, $this->cache->get( $key3, $group2 ) );
+
+		$this->assertTrue( $this->cache->delete_group( $group ) );
+
+		$this->assertFalse( $this->cache->get( $key1, $group ) );
+		$this->assertFalse( $this->cache->get( $key2, $group ) );
+		$this->assertEquals( $val3, $this->cache->get( $key3, $group2 ) );
+
+		// _call_redis( 'delete' ) always returns true when Redis isn't available
+		if ( class_exists( 'Redis' ) ) {
+			$this->assertFalse( $this->cache->delete_group( $group ) );
+		} else {
+			$this->assertTrue( $this->cache->delete_group( $group ) );
+		}
+	}
+
+	function test_delete_group_non_persistent() {
+		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
+			$this->markTestSkipped( 'Cache groups not enabled.' );
+		}
+		$key1 = rand_str();
+		$val1 = rand_str();
+		$key2 = rand_str();
+		$val2 = rand_str();
+		$key3 = rand_str();
+		$val3 = rand_str();
+		$group = 'foo';
+		$group2 = 'bar';
+		$this->cache->add_non_persistent_groups( array( $group, $group2 ) );
+
+		// Set up the values
+		$this->cache->set( $key1, $val1, $group );
+		$this->cache->set( $key2, $val2, $group );
+		$this->cache->set( $key3, $val3, $group2 );
+		$this->assertEquals( $val1, $this->cache->get( $key1, $group ) );
+		$this->assertEquals( $val2, $this->cache->get( $key2, $group ) );
+		$this->assertEquals( $val3, $this->cache->get( $key3, $group2 ) );
+
+		$this->assertTrue( $this->cache->delete_group( $group ) );
+
+		$this->assertFalse( $this->cache->get( $key1, $group ) );
+		$this->assertFalse( $this->cache->get( $key2, $group ) );
+		$this->assertEquals( $val3, $this->cache->get( $key3, $group2 ) );
+
+		$this->assertFalse( $this->cache->delete_group( $group ) );
+	}
+
+	function test_wp_cache_delete_group() {
+		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
+			$this->markTestSkipped( 'Cache groups not enabled.' );
+		}
+		$key1 = rand_str();
+		$val1 = rand_str();
+		$key2 = rand_str();
+		$val2 = rand_str();
+		$key3 = rand_str();
+		$val3 = rand_str();
+		$group = 'foo';
+		$group2 = 'bar';
+
+		// Set up the values
+		wp_cache_set( $key1, $val1, $group );
+		wp_cache_set( $key2, $val2, $group );
+		wp_cache_set( $key3, $val3, $group2 );
+		$this->assertEquals( $val1, wp_cache_get( $key1, $group ) );
+		$this->assertEquals( $val2, wp_cache_get( $key2, $group ) );
+		$this->assertEquals( $val3, wp_cache_get( $key3, $group2 ) );
+
+		$this->assertTrue( wp_cache_delete_group( $group ) );
+
+		$this->assertFalse( wp_cache_get( $key1, $group ) );
+		$this->assertFalse( wp_cache_get( $key2, $group ) );
+		$this->assertEquals( $val3, wp_cache_get( $key3, $group2 ) );
+
+		// _call_redis( 'delete' ) always returns true when Redis isn't available
+		if ( class_exists( 'Redis' ) ) {
+			$this->assertFalse( wp_cache_delete_group( $group ) );
+		} else {
+			$this->assertTrue( wp_cache_delete_group( $group ) );
+		}
 	}
 
 	function test_switch_to_blog() {

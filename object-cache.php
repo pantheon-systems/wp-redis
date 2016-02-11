@@ -11,6 +11,10 @@ if ( ! defined( 'WP_REDIS_OBJECT_CACHE' ) ) {
 	define( 'WP_REDIS_OBJECT_CACHE', true );
 }
 
+if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) ) {
+	define( 'WP_REDIS_USE_CACHE_GROUPS', false );
+}
+
 /**
  * Adds data to the cache, if the cache key doesn't already exist.
  *
@@ -75,6 +79,21 @@ function wp_cache_delete($key, $group = '') {
 
 	return $wp_object_cache->delete($key, $group);
 }
+
+/**
+ * Removes cache contents for a given group.
+ *
+ * @uses $wp_object_cache Object Cache Class
+ * @see WP_Object_Cache::delete_group()
+ *
+ * @param string $group Where the cache contents are grouped
+ * @return bool True on successful removal, false on failure
+ */
+function wp_cache_delete_group( $group ) {
+	global $wp_object_cache;
+	return $wp_object_cache->delete_group( $group );
+}
+
 
 /**
  * Removes all cache items.
@@ -312,6 +331,14 @@ class WP_Object_Cache {
 	var $last_triggered_error = '';
 
 	/**
+	 * Whether or not to use true cache groups, instead of flattening.
+	 *
+	 * @var bool
+	 * @access private
+	 */
+	const USE_GROUPS = WP_REDIS_USE_CACHE_GROUPS;
+
+	/**
 	 * Adds data to the cache if it doesn't already exist.
 	 *
 	 * @uses WP_Object_Cache::_exists Checks to see if the cache already has data.
@@ -328,7 +355,7 @@ class WP_Object_Cache {
 		if ( function_exists( 'wp_suspend_cache_addition' ) && wp_suspend_cache_addition() )
 			return false;
 
-		if ( $this->_exists( $this->_key( $key, $group ) ) )
+		if ( $this->_exists( $key, $group ) )
 			return false;
 
 		return $this->set( $key, $data, $group, (int) $expire );
@@ -367,44 +394,48 @@ class WP_Object_Cache {
 	 * @return false|int False on failure, the item's new value on success.
 	 */
 	function decr( $key, $offset = 1, $group = 'default' ) {
-		$id = $this->_key( $key, $group );
-
-		$offset = (int) $offset;
 
 		// The key needs to exist in order to be decremented
-		if ( ! $this->_exists( $id ) ) {
+		if ( ! $this->_exists( $key, $group ) ) {
 			return false;
 		}
 
+		$offset = (int) $offset;
+
 		# If this isn't a persistant group, we have to sort this out ourselves, grumble grumble
 		if ( ! $this->_should_persist( $group ) ) {
-			if ( empty( $this->cache[ $id ] ) || ! is_numeric( $this->cache[ $id ] ) ) {
-				$this->cache[ $id ] = 0;
+			$existing = $this->_get_internal( $key, $group );
+			if ( empty( $existing ) || ! is_numeric( $existing ) ) {
+				$existing = 0;
 			} else {
-				$this->cache[ $id ] -= $offset;
-
-				if ( $this->cache[ $id ] < 0 ) {
-					$this->cache[ $id ] = 0;
-				}
+				$existing -= $offset;
 			}
-			return $this->cache[ $id ];
+			if ( $existing < 0 ) {
+				$existing = 0;
+			}
+			$this->_set_internal( $key, $group, $existing );
+			return $existing;
 		}
 
-		if ( $offset > 1 ) {
-			$result = $this->_call_redis( 'decrBy', $id, $offset );
+		if ( self::USE_GROUPS ) {
+			$redis_safe_group = $this->_key( '', $group );
+			$result = $this->_call_redis( 'hIncrBy', $redis_safe_group, $key, -$offset, $group );
+			if ( $result < 0 ) {
+				$result = 0;
+				$this->_call_redis( 'hSet', $redis_safe_group, $key, $result );
+			}
 		} else {
-			$result = $this->_call_redis( 'decr', $id );
-		}
-
-		if ( $result < 0 ) {
-			$result = 0;
-			$this->_call_redis( 'set', $id, $result );
+			$id = $this->_key( $key, $group );
+			$result = $this->_call_redis( 'decrBy', $id, $offset );
+			if ( $result < 0 ) {
+				$result = 0;
+				$this->_call_redis( 'set', $id, $result );
+			}
 		}
 
 		if ( is_int( $result ) ) {
-			$this->cache[ $id ] = $result;
+			$this->_set_internal( $key, $group, $result );
 		}
-
 		return $result;
 	}
 
@@ -422,19 +453,49 @@ class WP_Object_Cache {
 	 * @return bool False if the contents weren't deleted and true on success
 	 */
 	function delete( $key, $group = 'default', $force = false ) {
-		$id = $this->_key( $key, $group );
-
-		if ( ! $force && ! $this->_exists( $id ) )
+		if ( ! $force && ! $this->_exists( $key, $group ) ) {
 			return false;
+		}
 
 		if ( $this->_should_persist( $group ) ) {
-			$result = $this->_call_redis( 'delete', $id );
+			if ( self::USE_GROUPS ) {
+				$redis_safe_group = $this->_key( '', $group );
+				$result = $this->_call_redis( 'hDel', $redis_safe_group, $key );
+			} else {
+				$id = $this->_key( $key, $group );
+				$result = $this->_call_redis( 'delete', $id );
+			}
 			if ( 1 != $result ) {
 				return false;
 			}
 		}
 
-		unset( $this->cache[ $id ] );
+		$this->_unset_internal( $key, $group );
+		return true;
+	}
+
+	/**
+	 * Remove the contents of all cache keys in the group.
+	 *
+	 * @param string $group Where the cache contents are grouped.
+	 * @return boolean True on success, false on failure.
+	 */
+	function delete_group( $group ) {
+		if ( ! self::USE_GROUPS ) {
+			return false;
+		}
+
+		$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
+		$redis_safe_group = $this->_key( '', $group );
+		if ( $this->_should_persist( $group ) ) {
+			$result = $this->_call_redis( 'delete', $redis_safe_group );
+			if ( 1 != $result ) {
+				return false;
+			}
+		} else if ( ! $this->_should_persist( $group ) && ! isset( $this->cache[ $multisite_safe_group ] ) ) {
+			return false;
+		}
+		unset( $this->cache[ $multisite_safe_group ] );
 		return true;
 	}
 
@@ -475,28 +536,26 @@ class WP_Object_Cache {
 	 *		contents on success
 	 */
 	function get( $key, $group = 'default', $force = false, &$found = null ) {
-		$id = $this->_key( $key, $group );
-
-		if ( $this->_exists( $id ) ) {
-			$found = true;
-			$this->cache_hits += 1;
-
-			if ( $this->_should_persist( $group ) && ( $force || ( ! isset( $this->cache[ $id ] ) && ! array_key_exists( $id, $this->cache ) ) ) ) {
-				$this->cache[ $id ] = $this->_call_redis( 'get', $id );
-				if ( ! is_numeric( $this->cache[ $id ] ) ) {
-					$this->cache[ $id ] = unserialize( $this->cache[ $id ] );
-				}
-			}
-
-			if ( is_object( $this->cache[ $id ] ) )
-				return clone $this->cache[ $id ];
-			else
-				return $this->cache[ $id ];
+		if ( ! $this->_exists( $key, $group ) ) {
+			$this->cache_misses += 1;
+			return false;
 		}
+		$this->cache_hits += 1;
 
-		$found = false;
-		$this->cache_misses += 1;
-		return false;
+		if ( $this->_should_persist( $group ) && ( $force || ! $this->_isset_internal( $key, $group ) ) ) {
+			if ( self::USE_GROUPS ) {
+				$redis_safe_group = $this->_key( '', $group );
+				$value = $this->_call_redis( 'hGet', $redis_safe_group, $key );
+			} else {
+				$id = $this->_key( $key, $group );
+				$value = $this->_call_redis( 'get', $id );
+			}
+			if ( ! is_numeric( $value ) ) {
+				$value = unserialize( $value );
+			}
+			$this->_set_internal( $key, $group, $value );
+		}
+		return $this->_get_internal( $key, $group );
 	}
 
 	/**
@@ -508,39 +567,47 @@ class WP_Object_Cache {
 	 * @return false|int False on failure, the item's new value on success.
 	 */
 	function incr( $key, $offset = 1, $group = 'default' ) {
-		$id = $this->_key( $key, $group );
-
-		$offset = (int) $offset;
-
 		// The key needs to exist in order to be incremented
-		if ( ! $this->_exists( $id ) ) {
+		if ( ! $this->_exists( $key, $group ) ) {
 			return false;
 		}
 
+		$offset = (int) $offset;
+
 		# If this isn't a persistant group, we have to sort this out ourselves, grumble grumble
 		if ( ! $this->_should_persist( $group ) ) {
-			if ( empty( $this->cache[ $id ] ) || ! is_numeric( $this->cache[ $id ] ) ) {
-				$this->cache[ $id ] = 0;
+			$existing = $this->_get_internal( $key, $group );
+			if ( empty( $existing ) || ! is_numeric( $existing ) ) {
+				$existing = 1;
 			} else {
-				$this->cache[ $id ] += $offset;
-
-				if ( $this->cache[ $id ] < 0 ) {
-					$this->cache[ $id ] = 0;
-				}
+				$existing += $offset;
 			}
-			return $this->cache[ $id ];
+			if ( $existing < 0 ) {
+				$existing = 0;
+			}
+			$this->_set_internal( $key, $group, $existing );
+			return $existing;
 		}
 
-		if ( $offset > 1 ) {
-			$result = $this->_call_redis( 'incrBy', $id, $offset );
+		if ( self::USE_GROUPS ) {
+			$redis_safe_group = $this->_key( '', $group );
+			$result = $this->_call_redis( 'hIncrBy', $redis_safe_group, $key, $offset, $group );
+			if ( $result < 0 ) {
+				$result = 0;
+				$this->_call_redis( 'hSet', $redis_safe_group, $key, $result );
+			}
 		} else {
-			$result = $this->_call_redis( 'incr', $id );
+			$id = $this->_key( $key, $group );
+			$result = $this->_call_redis( 'incrBy', $id, $offset );
+			if ( $result < 0 ) {
+				$result = 0;
+				$this->_call_redis( 'set', $id, $result );
+			}
 		}
 
 		if ( is_int( $result ) ) {
-			$this->cache[ $id ] = $result;
+			$this->_set_internal( $key, $group, $result );
 		}
-
 		return $result;
 	}
 
@@ -555,7 +622,7 @@ class WP_Object_Cache {
 	 * @return bool False if not exists, true if contents were replaced
 	 */
 	function replace( $key, $data, $group = 'default', $expire = 0 ) {
-		if ( ! $this->_exists( $this->_key( $key, $group ) ) )
+		if ( ! $this->_exists( $key, $group ) )
 			return false;
 
 		return $this->set( $key, $data, $group, (int) $expire );
@@ -589,26 +656,35 @@ class WP_Object_Cache {
 	 * @return bool Always returns true
 	 */
 	function set( $key, $data, $group = 'default', $expire = 0 ) {
-		$id = $this->_key( $key, $group );
 
-		if ( is_object( $data ) )
+		if ( is_object( $data ) ) {
 			$data = clone $data;
-
-		$this->cache[ $id ] = $data;
-
-		if ( $this->_should_persist( $group ) ) {
-			# If this is an integer, store it as such. Otherwise, serialize it.
-			if ( ! is_numeric( $data ) || intval( $data ) != $data ) {
-				$data = serialize( $data );
-			}
-
-			if ( empty( $expire ) ) {
-				$this->_call_redis( 'set', $id, $data );
-			} else {
-				$this->_call_redis( 'setex', $id, $expire, $data );
-			}
 		}
 
+		$this->_set_internal( $key, $group, $data );
+
+		if ( ! $this->_should_persist( $group ) ) {
+			return true;
+		}
+
+		# If this is an integer, store it as such. Otherwise, serialize it.
+		if ( ! is_numeric( $data ) || intval( $data ) != $data ) {
+			$data = serialize( $data );
+		}
+
+		// Redis doesn't support expire on hash group keys
+		if ( self::USE_GROUPS ) {
+			$redis_safe_group = $this->_key( '', $group );
+			$this->_call_redis( 'hSet', $redis_safe_group, $key, $data );
+			return true;
+		}
+
+		$id = $this->_key( $key, $group );
+		if ( empty( $expire ) ) {
+			$this->_call_redis( 'set', $id, $data );
+		} else {
+			$this->_call_redis( 'setex', $id, $expire, $data );
+		}
 		return true;
 	}
 
@@ -647,11 +723,98 @@ class WP_Object_Cache {
 	 *
 	 * @access protected
 	 */
-	protected function _exists( $id ) {
-		if ( isset( $this->cache[ $id ] ) || array_key_exists( $id, $this->cache ) ) {
+	protected function _exists( $key, $group ) {
+		if ( $this->_isset_internal( $key, $group ) ) {
 			return true;
+		}
+		if ( self::USE_GROUPS ) {
+			$redis_safe_group = $this->_key( '', $group );
+			return $this->_call_redis( 'hExists', $redis_safe_group, $key );
+		}
+		$id = $this->_key( $key, $group );
+		return $this->_call_redis( 'exists', $id );
+	}
+
+	/**
+	 * Check whether there's a value in the internal object cache.
+	 *
+	 * @param string $key
+	 * @param string $group
+	 * @return boolean
+	 */
+	protected function _isset_internal( $key, $group ) {
+		if ( self::USE_GROUPS ) {
+			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
+			return isset( $this->cache[ $multisite_safe_group ][ $key ] );
 		} else {
-			return $this->_call_redis( 'exists', $id );
+			$key = $this->_key( $key, $group );
+			return isset( $this->cache[ $key ] );
+		}
+	}
+
+	/**
+	 * Get a value from the internal object cache
+	 *
+	 * @param string $key
+	 * @param string $group
+	 * @return mixed
+	 */
+	protected function _get_internal( $key, $group ) {
+		$value = null;
+		if ( self::USE_GROUPS ) {
+			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
+			if ( isset( $this->cache[ $multisite_safe_group ][ $key ] ) ) {
+				$value = $this->cache[ $multisite_safe_group ][ $key ];
+			}
+		} else {
+			$key = $this->_key( $key, $group );
+			if ( isset( $this->cache[ $key ] ) ) {
+				$value = $this->cache[ $key ];
+			}
+		}
+		if ( is_object( $value ) ) {
+			return clone $value;
+		}
+		return $value;
+	}
+
+	/**
+	 * Set a value to the internal object cache
+	 *
+	 * @param string $key
+	 * @param string $group
+	 * @param mixed $value
+	 */
+	protected function _set_internal( $key, $group, $value ) {
+		if ( self::USE_GROUPS ) {
+			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
+			if ( ! isset( $this->cache[ $multisite_safe_group ] ) ) {
+				$this->cache[ $multisite_safe_group ] = array();
+			}
+			$this->cache[ $multisite_safe_group ][ $key ] = $value;
+		} else {
+			$key = $this->_key( $key, $group );
+			$this->cache[ $key ] = $value;
+		}
+	}
+
+	/**
+	 * Unset a value from the internal object cache
+	 *
+	 * @param string $key
+	 * @param string $group
+	 */
+	protected function _unset_internal( $key, $group ) {
+		if ( self::USE_GROUPS ) {
+			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
+			if ( isset( $this->cache[ $multisite_safe_group ][ $key ] ) ) {
+				unset( $this->cache[ $multisite_safe_group ][ $key ] );
+			}
+		} else {
+			$key = $this->_key( $key, $group );
+			if ( isset( $this->cache[ $key ] ) ) {
+				unset( $this->cache[ $key ] );
+			}
 		}
 	}
 
@@ -662,7 +825,7 @@ class WP_Object_Cache {
 	 * @param  string $group The cache group.
 	 * @return string        A properly prefixed redis cache key.
 	 */
-	protected function _key( $key, $group = 'default' ) {
+	protected function _key( $key = '', $group = 'default' ) {
 		if ( empty( $group ) ) {
 			$group = 'default';
 		}
@@ -757,6 +920,11 @@ class WP_Object_Cache {
 		$arguments = func_get_args();
 		array_shift( $arguments ); // ignore $method
 
+		// $group is intended for the failback, and isn't passed to the Redis callback
+		if ( 'hIncrBy' === $method ) {
+			$group = array_pop( $arguments );
+		}
+
 		if ( $this->is_redis_connected ) {
 			try {
 				$retval = call_user_func_array( array( $this->redis, $method ), $arguments );
@@ -801,6 +969,9 @@ class WP_Object_Cache {
 					$offset = isset( $arguments[1] ) && 'incrBy' === $method ? $arguments[1] : 1;
 					$val = $val + $offset;
 					return $val;
+				case 'hIncrBy':
+					$val = $this->_get_internal( $arguments[1], $group );
+					return $val + $arguments[2];
 				case 'decrBy':
 				case 'decr':
 					$val = $this->cache[ $arguments[0] ];
@@ -808,6 +979,7 @@ class WP_Object_Cache {
 					$val = $val - $offset;
 					return $val;
 				case 'delete':
+				case 'hDel':
 					return 1;
 				case 'flushAll':
 				case 'IsConnected':
