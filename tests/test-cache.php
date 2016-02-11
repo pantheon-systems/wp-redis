@@ -7,7 +7,7 @@ class CacheTest extends WP_UnitTestCase {
 
 	private $cache;
 
-	function setUp() {
+	public function setUp() {
 		parent::setUp();
 		$GLOBALS['redis_server'] = array(
 			'host'    => '127.0.0.1',
@@ -18,7 +18,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->cache =& $this->init_cache();
 	}
 
-	function &init_cache() {
+	public function &init_cache() {
 		$cache = new WP_Object_Cache();
 		$cache->add_global_groups( array( 'global-cache-test', 'users', 'userlogins', 'usermeta', 'user_meta', 'site-transient', 'site-options', 'site-lookup', 'blog-lookup', 'blog-details', 'rss', 'global-posts', 'blog-id-cache' ) );
 		return $cache;
@@ -107,11 +107,11 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 'bar', $cache->get( 'foo' ) );
 	}
 
-	function test_miss() {
+	public function test_miss() {
 		$this->assertEquals(NULL, $this->cache->get(rand_str()));
 	}
 
-	function test_add_get() {
+	public function test_add_get() {
 		$key = rand_str();
 		$val = rand_str();
 
@@ -119,7 +119,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals($val, $this->cache->get($key));
 	}
 
-	function test_add_get_0() {
+	public function test_add_get_0() {
 		$key = rand_str();
 		$val = 0;
 
@@ -128,7 +128,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals($val, $this->cache->get($key));
 	}
 
-	function test_add_get_null() {
+	public function test_add_get_null() {
 		$key = rand_str();
 		$val = null;
 
@@ -137,7 +137,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( '', $this->cache->get($key) );
 	}
 
-	function test_add() {
+	public function test_add() {
 		$key = rand_str();
 		$val1 = rand_str();
 		$val2 = rand_str();
@@ -150,7 +150,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals($val1, $this->cache->get($key));
 	}
 
-	function test_replace() {
+	public function test_replace() {
 		$key = rand_str();
 		$val = rand_str();
 		$val2 = rand_str();
@@ -164,7 +164,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals($val2, $this->cache->get($key));
 	}
 
-	function test_set() {
+	public function test_set() {
 		$key = rand_str();
 		$val1 = rand_str();
 		$val2 = rand_str();
@@ -177,7 +177,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals($val2, $this->cache->get($key));
 	}
 
-	function test_flush() {
+	public function test_flush() {
 		global $_wp_using_ext_object_cache;
 
 		if ( $_wp_using_ext_object_cache )
@@ -195,7 +195,7 @@ class CacheTest extends WP_UnitTestCase {
 	}
 
 	// Make sure objects are cloned going to and from the cache
-	function test_object_refs() {
+	public function test_object_refs() {
 		$key = rand_str();
 		$object_a = new stdClass;
 		$object_a->foo = 'alpha';
@@ -217,7 +217,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 'bravo', $object_a->foo );
 	}
 
-	function test_incr() {
+	public function test_incr() {
 		$key = rand_str();
 
 		$this->assertFalse( $this->cache->incr( $key ) );
@@ -230,7 +230,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 3, $this->cache->get( $key ) );
 	}
 
-	function test_incr_never_below_zero() {
+	public function test_incr_never_below_zero() {
 		$key = rand_str();
 		$this->cache->set( $key, 1 );
 		$this->assertEquals( 1, $this->cache->get( $key ) );
@@ -238,7 +238,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->get( $key ) );
 	}
 
-	function test_incr_non_persistent() {
+	public function test_incr_non_persistent() {
 		$key = rand_str();
 
 		$this->cache->add_non_persistent_groups( array( 'nonpersistent' ) );
@@ -252,7 +252,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 3, $this->cache->get( $key, 'nonpersistent' ) );
 	}
 
-	function test_incr_non_persistent_never_below_zero() {
+	public function test_incr_non_persistent_never_below_zero() {
 		$key = rand_str();
 		$this->cache->add_non_persistent_groups( array( 'nonpersistent' ) );
 		$this->cache->set( $key, 1, 'nonpersistent' );
@@ -261,7 +261,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->get( $key, 'nonpersistent' ) );
 	}
 
-	function test_wp_cache_incr() {
+	public function test_wp_cache_incr() {
 		$key = rand_str();
 
 		$this->assertFalse( wp_cache_incr( $key ) );
@@ -274,7 +274,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 3, wp_cache_get( $key ) );
 	}
 
-	function test_decr() {
+	public function test_decr() {
 		$key = rand_str();
 
 		$this->assertFalse( $this->cache->decr( $key ) );
@@ -291,7 +291,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->get( $key ) );
 	}
 
-	function test_decr_never_below_zero() {
+	public function test_decr_never_below_zero() {
 		$key = rand_str();
 		$this->cache->set( $key, 1 );
 		$this->assertEquals( 1, $this->cache->get( $key ) );
@@ -299,7 +299,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->get( $key ) );
 	}
 
-	function test_decr_non_persistent() {
+	public function test_decr_non_persistent() {
 		$key = rand_str();
 
 		$this->cache->add_non_persistent_groups( array( 'nonpersistent' ) );
@@ -317,7 +317,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->get( $key, 'nonpersistent' ) );
 	}
 
-	function test_decr_non_persistent_never_below_zero() {
+	public function test_decr_non_persistent_never_below_zero() {
 		$key = rand_str();
 		$this->cache->add_non_persistent_groups( array( 'nonpersistent' ) );
 		$this->cache->set( $key, 1, 'nonpersistent' );
@@ -329,7 +329,7 @@ class CacheTest extends WP_UnitTestCase {
 	/**
 	 * @group 21327
 	 */
-	function test_wp_cache_decr() {
+	public function test_wp_cache_decr() {
 		$key = rand_str();
 
 		$this->assertFalse( wp_cache_decr( $key ) );
@@ -346,7 +346,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, wp_cache_get( $key ) );
 	}
 
-	function test_delete() {
+	public function test_delete() {
 		$key = rand_str();
 		$val = rand_str();
 
@@ -361,7 +361,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertFalse( $this->cache->delete( $key, 'default') );
 	}
 
-	function test_wp_cache_delete() {
+	public function test_wp_cache_delete() {
 		$key = rand_str();
 		$val = rand_str();
 
@@ -380,7 +380,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertFalse( wp_cache_delete( $key, 'default') );
 	}
 
-	function test_delete_group() {
+	public function test_delete_group() {
 		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
 			$this->markTestSkipped( 'Cache groups not enabled.' );
 		}
@@ -415,7 +415,7 @@ class CacheTest extends WP_UnitTestCase {
 		}
 	}
 
-	function test_delete_group_non_persistent() {
+	public function test_delete_group_non_persistent() {
 		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
 			$this->markTestSkipped( 'Cache groups not enabled.' );
 		}
@@ -446,7 +446,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertFalse( $this->cache->delete_group( $group ) );
 	}
 
-	function test_wp_cache_delete_group() {
+	public function test_wp_cache_delete_group() {
 		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
 			$this->markTestSkipped( 'Cache groups not enabled.' );
 		}
@@ -481,7 +481,7 @@ class CacheTest extends WP_UnitTestCase {
 		}
 	}
 
-	function test_switch_to_blog() {
+	public function test_switch_to_blog() {
 		if ( ! method_exists( $this->cache, 'switch_to_blog' ) )
 			return;
 
@@ -526,7 +526,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( $val2, $this->cache->get( $key, 'global-cache-test' ) );
 	}
 
-	function test_wp_cache_init() {
+	public function test_wp_cache_init() {
 		$new_blank_cache_object = new WP_Object_Cache();
 		wp_cache_init();
 
@@ -535,7 +535,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( $wp_object_cache->cache, $new_blank_cache_object->cache );
 	}
 
-	function test_wp_cache_replace() {
+	public function test_wp_cache_replace() {
 		$key  = 'my-key';
 		$val1 = 'first-val';
 		$val2 = 'second-val';
@@ -557,7 +557,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertFalse( wp_cache_get( $fake_key ) );
 	}
 
-	function tearDown() {
+	public function tearDown() {
 		parent::tearDown();
 		$this->flush_cache();
 	}
