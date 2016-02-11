@@ -573,9 +573,6 @@ class WP_Object_Cache {
 		}
 
 		$offset = (int) $offset;
-		if ( $offset < 1 ) {
-			$offset = 1;
-		}
 
 		# If this isn't a persistant group, we have to sort this out ourselves, grumble grumble
 		if ( ! $this->_should_persist( $group ) ) {
