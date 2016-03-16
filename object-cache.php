@@ -1087,10 +1087,7 @@ class WP_Object_Cache {
 			}
 		}
 
-		$this->global_prefix = '';
-		if ( function_exists( 'is_multisite' ) ) {
-			$this->global_prefix = ( is_multisite() || defined( 'CUSTOM_USER_TABLE' ) && defined( 'CUSTOM_USER_META_TABLE' ) ) ? '' : $table_prefix;
-		}
+		$this->global_prefix = ( $this->multisite || defined( 'CUSTOM_USER_TABLE' ) && defined( 'CUSTOM_USER_META_TABLE' ) ) ? '' : $table_prefix;
 
 		/**
 		 * @todo This should be moved to the PHP4 style constructor, PHP5
