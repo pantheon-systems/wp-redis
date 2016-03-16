@@ -1024,13 +1024,50 @@ class WP_Object_Cache {
 	}
 
 	/**
+	 * Sets up the query for the failback flush trigger.
+	 *
+	 * @param  string  $action Which query to generate.
+	 *
+	 * @return string          The generated query
+	 */
+	public function redis_failback_flush_trigger_query( $action = 'get' ) {
+		global $wpdb;
+
+		$table = $wpdb->options;
+		$col1 = 'option_value';
+		$col2 = 'option_name';
+
+		if ( $this->multisite ) {
+			$table = $wpdb->sitemeta;
+			$col1 = 'meta_value';
+			$col2 = 'meta_key';
+		}
+
+		switch ( $action ) {
+			case 'delete':
+				$query = sprintf( "DELETE FROM %s WHERE %s='wp_redis_do_redis_failback_flush'", $table, $col2 );
+				break;
+
+			case 'set':
+				$query = sprintf( "INSERT IGNORE INTO %s (%s,%s) VALUES ('wp_redis_do_redis_failback_flush',1)", $table, $col2, $col1 );
+				break;
+
+			default:
+				$query = sprintf( "SELECT %s FROM %s WHERE %s='wp_redis_do_redis_failback_flush'", $col1, $table, $col2 );
+				break;
+		}
+
+		return $query;
+	}
+
+	/**
 	 * Sets the failback flush trigger.
 	 *
 	 * @return bool
 	 */
 	private function set_redis_failback_flush_trigger() {
 		global $wpdb;
-		$wpdb->query( "INSERT IGNORE INTO {$wpdb->options} (option_name,option_value) VALUES ('wp_redis_do_redis_failback_flush',1)" );
+		$wpdb->query( $this->redis_failback_flush_trigger_query( 'set' ) );
 		$this->do_redis_failback_flush = true;
 
 		return $this->do_redis_failback_flush;
@@ -1043,7 +1080,9 @@ class WP_Object_Cache {
 	 */
 	private function check_redis_failback_flush_trigger() {
 		global $wpdb;
-		$this->do_redis_failback_flush = (bool) $wpdb->get_results( "SELECT option_value FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_failback_flush'" );
+		$this->do_redis_failback_flush = (bool) $wpdb->get_results(
+			$this->redis_failback_flush_trigger_query( 'get' )
+		);
 
 		return $this->do_redis_failback_flush;
 	}
@@ -1055,7 +1094,7 @@ class WP_Object_Cache {
 	 */
 	private function delete_redis_failback_flush_trigger() {
 		global $wpdb;
-		$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_failback_flush'" );
+		$wpdb->query( $this->redis_failback_flush_trigger_query( 'delete' ) );
 		$this->do_redis_failback_flush = false;
 
 		return $this->do_redis_failback_flush;
@@ -1067,7 +1106,7 @@ class WP_Object_Cache {
 	 * @return null|WP_Object_Cache If cache is disabled, returns null.
 	 */
 	public function __construct() {
-		global $blog_id, $table_prefix, $wpdb;
+		global $blog_id, $table_prefix;
 
 		$this->multisite = is_multisite();
 		$this->blog_prefix = $this->multisite ? $blog_id . ':' : '';
@@ -1076,9 +1115,7 @@ class WP_Object_Cache {
 			add_action( 'admin_notices', array( $this, 'wp_action_admin_notices_warn_missing_redis' ) );
 		}
 
-		// $wpdb->options can be unset before multisite loads
-		// It's safe to skip here if unset, because cache will be reinitialized when `$blog_id` is available
-		if ( $this->is_redis_failback_flush_enabled() && ! empty( $wpdb->options ) ) {
+		if ( $this->is_redis_failback_flush_enabled() ) {
 			if ( $this->is_redis_connected && $this->check_redis_failback_flush_trigger() ) {
 				$ret = $this->_call_redis( 'flushAll' );
 				if ( $ret ) {
