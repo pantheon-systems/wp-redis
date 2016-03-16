@@ -968,8 +968,7 @@ class WP_Object_Cache {
 		}
 
 		if ( $this->is_redis_failback_flush_enabled() && ! $this->do_redis_failback_flush ) {
-			$wpdb->query( "INSERT IGNORE INTO {$wpdb->options} (option_name,option_value) VALUES ('wp_redis_do_redis_failback_flush',1)" );
-			$this->do_redis_failback_flush = true;
+			$this->set_redis_failback_flush_trigger();
 		}
 
 		// Mock expected behavior from Redis for these methods
@@ -1025,6 +1024,44 @@ class WP_Object_Cache {
 	}
 
 	/**
+	 * Sets the failback flush trigger.
+	 *
+	 * @return bool
+	 */
+	private function set_redis_failback_flush_trigger() {
+		global $wpdb;
+		$wpdb->query( "INSERT IGNORE INTO {$wpdb->options} (option_name,option_value) VALUES ('wp_redis_do_redis_failback_flush',1)" );
+		$this->do_redis_failback_flush = true;
+
+		return $this->do_redis_failback_flush;
+	}
+
+	/**
+	 * Checks if the failback flush trigger exists.
+	 *
+	 * @return bool
+	 */
+	private function check_redis_failback_flush_trigger() {
+		global $wpdb;
+		$this->do_redis_failback_flush = (bool) $wpdb->get_results( "SELECT option_value FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_failback_flush'" );
+
+		return $this->do_redis_failback_flush;
+	}
+
+	/**
+	 * Deletes the failback flush trigger.
+	 *
+	 * @return bool
+	 */
+	private function delete_redis_failback_flush_trigger() {
+		global $wpdb;
+		$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_failback_flush'" );
+		$this->do_redis_failback_flush = false;
+
+		return $this->do_redis_failback_flush;
+	}
+
+	/**
 	 * Sets up object properties; PHP 5 style constructor
 	 *
 	 * @return null|WP_Object_Cache If cache is disabled, returns null.
@@ -1042,12 +1079,10 @@ class WP_Object_Cache {
 		// $wpdb->options can be unset before multisite loads
 		// It's safe to skip here if unset, because cache will be reinitialized when `$blog_id` is available
 		if ( $this->is_redis_failback_flush_enabled() && ! empty( $wpdb->options ) ) {
-			$this->do_redis_failback_flush = (bool) $wpdb->get_results( "SELECT option_value FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_failback_flush'" );
-			if ( $this->is_redis_connected && $this->do_redis_failback_flush ) {
+			if ( $this->is_redis_connected && $this->check_redis_failback_flush_trigger() ) {
 				$ret = $this->_call_redis( 'flushAll' );
 				if ( $ret ) {
-					$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_failback_flush'" );
-					$this->do_redis_failback_flush = false;
+					$this->delete_redis_failback_flush_trigger();
 				}
 			}
 		}
