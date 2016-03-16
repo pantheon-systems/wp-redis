@@ -62,7 +62,20 @@ class CacheTest extends WP_UnitTestCase {
 		if ( ! class_exists( 'Redis' ) ) {
 			$this->markTestSkipped( 'PHPRedis extension not available.' );
 		}
-		$this->assertFalse( (bool) $wpdb->get_results( "SELECT option_value FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_failback_flush'" ) );
+
+		if ( is_multisite() ) {
+			$table = $wpdb->sitemeta;
+			$col1 = 'meta_key';
+			$col2 = 'meta_value';
+		} else {
+			$table = $wpdb->options;
+			$col1 = 'option_name';
+			$col2 = 'option_value';
+		}
+
+		// @codingStandardsIgnoreStart
+		$this->assertFalse( (bool) $wpdb->get_results( "SELECT {$col2} FROM {$table} WHERE {$col1}='wp_redis_do_redis_failback_flush'" ) );
+		// @codingStandardsIgnoreEnd
 		$this->cache->set( 'foo', 'burrito' );
 		// Force a bad connection
 		$redis_server['host'] = '127.0.0.1';
@@ -71,24 +84,26 @@ class CacheTest extends WP_UnitTestCase {
 		// Setting cache value when redis connection fails saves wakeup flush
 		$this->cache->set( 'foo', 'bar' );
 		$this->assertEquals( 'WP Redis: Redis server went away', $this->cache->last_triggered_error );
-		$this->assertEquals( "INSERT IGNORE INTO {$wpdb->options} (option_name,option_value) VALUES ('wp_redis_do_redis_failback_flush',1)", $wpdb->last_query );
-		$this->assertTrue( (bool) $wpdb->get_results( "SELECT option_value FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_failback_flush'" ) );
+		// @codingStandardsIgnoreStart
+		$this->assertEquals( "INSERT IGNORE INTO {$table} ({$col1},{$col2}) VALUES ('wp_redis_do_redis_failback_flush',1)", $wpdb->last_query );
+		$this->assertTrue( (bool) $wpdb->get_results( "SELECT {$col2} FROM {$table} WHERE {$col1}='wp_redis_do_redis_failback_flush'" ) );
+		// @codingStandardsIgnoreEnd
 		$this->assertTrue( $this->cache->do_redis_failback_flush );
 		$this->assertEquals( 'bar', $this->cache->get( 'foo' ) );
 		// Cache load with bad connection
 		$this->cache = $this->init_cache();
 		$this->assertTrue( $this->cache->do_redis_failback_flush );
-		$this->assertEquals( "SELECT option_value FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_failback_flush'", $wpdb->last_query );
+		$this->assertEquals( "SELECT {$col2} FROM {$table} WHERE {$col1}='wp_redis_do_redis_failback_flush'", $wpdb->last_query );
 		// Cache load with a restored Redis connection will flush Redis
 		$redis_server['port'] = 6379;
 		$this->cache = $this->init_cache();
 		$this->assertFalse( $this->cache->do_redis_failback_flush );
-		$this->assertEquals( "DELETE FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_failback_flush'", $wpdb->last_query );
+		$this->assertEquals( "DELETE FROM {$table} WHERE {$col1}='wp_redis_do_redis_failback_flush'", $wpdb->last_query );
 		$this->assertEquals( null, $this->cache->get( 'foo' ) );
 		// Cache load, but Redis shouldn't be flushed again
 		$this->cache = $this->init_cache();
 		$this->assertFalse( $this->cache->do_redis_failback_flush );
-		$this->assertEquals( "SELECT option_value FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_failback_flush'", $wpdb->last_query );
+		$this->assertEquals( "SELECT {$col2} FROM {$table} WHERE {$col1}='wp_redis_do_redis_failback_flush'", $wpdb->last_query );
 	}
 
 	public function test_redis_bad_authentication() {

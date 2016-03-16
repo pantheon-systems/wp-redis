@@ -968,7 +968,18 @@ class WP_Object_Cache {
 		}
 
 		if ( $this->is_redis_failback_flush_enabled() && ! $this->do_redis_failback_flush ) {
-			$wpdb->query( "INSERT IGNORE INTO {$wpdb->options} (option_name,option_value) VALUES ('wp_redis_do_redis_failback_flush',1)" );
+			if ( is_multisite() ) {
+				$table = $wpdb->sitemeta;
+				$col1 = 'meta_key';
+				$col2 = 'meta_value';
+			} else {
+				$table = $wpdb->options;
+				$col1 = 'option_name';
+				$col2 = 'option_value';
+			}
+			// @codingStandardsIgnoreStart
+			$wpdb->query( "INSERT IGNORE INTO {$table} ({$col1},{$col2}) VALUES ('wp_redis_do_redis_failback_flush',1)" );
+			// @codingStandardsIgnoreEnd
 			$this->do_redis_failback_flush = true;
 		}
 
@@ -1041,12 +1052,25 @@ class WP_Object_Cache {
 
 		// $wpdb->options can be unset before multisite loads
 		// It's safe to skip here if unset, because cache will be reinitialized when `$blog_id` is available
-		if ( $this->is_redis_failback_flush_enabled() && ! empty( $wpdb->options ) ) {
-			$this->do_redis_failback_flush = (bool) $wpdb->get_results( "SELECT option_value FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_failback_flush'" );
+		if ( is_multisite() ) {
+			$table = $wpdb->sitemeta;
+			$col1 = 'meta_key';
+			$col2 = 'meta_value';
+		} else {
+			$table = $wpdb->options;
+			$col1 = 'option_name';
+			$col2 = 'option_value';
+		}
+		if ( $this->is_redis_failback_flush_enabled() ) {
+			// @codingStandardsIgnoreStart
+			$this->do_redis_failback_flush = (bool) $wpdb->get_results( "SELECT {$col2} FROM {$table} WHERE {$col1}='wp_redis_do_redis_failback_flush'" );
+			// @codingStandardsIgnoreEnd
 			if ( $this->is_redis_connected && $this->do_redis_failback_flush ) {
 				$ret = $this->_call_redis( 'flushAll' );
 				if ( $ret ) {
-					$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name='wp_redis_do_redis_failback_flush'" );
+					// @codingStandardsIgnoreStart
+					$wpdb->query( "DELETE FROM {$table} WHERE {$col1}='wp_redis_do_redis_failback_flush'" );
+					// @codingStandardsIgnoreEnd
 					$this->do_redis_failback_flush = false;
 				}
 			}
