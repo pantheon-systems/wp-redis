@@ -968,7 +968,7 @@ class WP_Object_Cache {
 		}
 
 		if ( $this->is_redis_failback_flush_enabled() && ! $this->do_redis_failback_flush ) {
-			if ( is_multisite() ) {
+			if ( $this->multisite ) {
 				$table = $wpdb->sitemeta;
 				$col1 = 'meta_key';
 				$col2 = 'meta_value';
@@ -1052,7 +1052,7 @@ class WP_Object_Cache {
 
 		// $wpdb->options can be unset before multisite loads
 		// It's safe to skip here if unset, because cache will be reinitialized when `$blog_id` is available
-		if ( is_multisite() ) {
+		if ( $this->multisite ) {
 			$table = $wpdb->sitemeta;
 			$col1 = 'meta_key';
 			$col2 = 'meta_value';
@@ -1076,10 +1076,7 @@ class WP_Object_Cache {
 			}
 		}
 
-		$this->global_prefix = '';
-		if ( function_exists( 'is_multisite' ) ) {
-			$this->global_prefix = ( is_multisite() || defined( 'CUSTOM_USER_TABLE' ) && defined( 'CUSTOM_USER_META_TABLE' ) ) ? '' : $table_prefix;
-		}
+		$this->global_prefix = ( $this->multisite || defined( 'CUSTOM_USER_TABLE' ) && defined( 'CUSTOM_USER_META_TABLE' ) ) ? '' : $table_prefix;
 
 		/**
 		 * @todo This should be moved to the PHP4 style constructor, PHP5
