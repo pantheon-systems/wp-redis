@@ -16,6 +16,10 @@ if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) ) {
 	define( 'WP_REDIS_USE_CACHE_GROUPS', false );
 }
 
+if ( ! defined( 'WP_REDIS_USE_PERSISTENT_CONNECTIONS' ) ) {
+	define( 'WP_REDIS_USE_PERSISTENT_CONNECTIONS', false );
+}
+
 /**
  * Adds data to the cache, if the cache key doesn't already exist.
  *
@@ -338,6 +342,16 @@ class WP_Object_Cache {
 	 * @access private
 	 */
 	const USE_GROUPS = WP_REDIS_USE_CACHE_GROUPS;
+
+	/**
+	 * Whether to use Redis::pconnect vs Redis::connect.
+	 *
+	 * @link  https://github.com/phpredis/phpredis#pconnect-popen pconnect docs
+	 *
+	 * @var bool
+	 * @access private
+	 */
+	const PERSISTENT_CONNECTIONS = WP_REDIS_USE_PERSISTENT_CONNECTIONS;
 
 	/**
 	 * Adds data to the cache if it doesn't already exist.
@@ -889,7 +903,13 @@ class WP_Object_Cache {
 		} else { //tcp connection
 			$port = ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379;
 		}
-		$this->redis->connect( $redis_server['host'], $port, 1, null, 100 ); # 1s timeout, 100ms delay between reconnections
+
+		if ( self::PERSISTENT_CONNECTIONS ) {
+			$this->redis->pconnect( $redis_server['host'], $port, 1, null, 100 ); # 1s timeout, 100ms delay between reconnections
+		} else {
+			$this->redis->connect( $redis_server['host'], $port, 1, null, 100 ); # 1s timeout, 100ms delay between reconnections
+		}
+
 		if ( ! empty( $redis_server['auth'] ) ) {
 			try {
 				$this->redis->auth( $redis_server['auth'] );
