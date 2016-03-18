@@ -1,12 +1,12 @@
 <?php
-/*
-	Plugin Name: WP Redis
-	Plugin URI: http://github.com/pantheon-systems/wp-redis/
-	Description: WordPress Object Cache using Redis. Requires the PhpRedis extension (https://github.com/phpredis/phpredis).
-	Version: 0.3.0
-	Author: Pantheon, Josh Koenig, Matthew Boynes, Daniel Bachhuber Alley Interactive
-	Author URI: https://pantheon.io/
-*/
+/**
+ * Plugin Name: WP Redis
+ * Plugin URI: http://github.com/pantheon-systems/wp-redis/
+ * Description: WordPress Object Cache using Redis. Requires the PhpRedis extension (https://github.com/phpredis/phpredis).
+ * Version: 0.3.0
+ * Author: Pantheon, Josh Koenig, Matthew Boynes, Daniel Bachhuber Alley Interactive
+ * Author URI: https://pantheon.io/
+ */
 /*  This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation; either version 2 of the License, or
