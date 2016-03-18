@@ -16,6 +16,7 @@ class CacheTest extends WP_UnitTestCase {
 		// create two cache objects with a shared cache dir
 		// this simulates a typical cache situation, two separate requests interacting
 		$this->cache =& $this->init_cache();
+		$this->cache->cache_hits = $this->cache->cache_misses = 0;
 	}
 
 	public function &init_cache() {
@@ -109,6 +110,8 @@ class CacheTest extends WP_UnitTestCase {
 
 	public function test_miss() {
 		$this->assertEquals( null, $this->cache->get( rand_str() ) );
+		$this->assertEquals( 0, $this->cache->cache_hits );
+		$this->assertEquals( 1, $this->cache->cache_misses );
 	}
 
 	public function test_add_get() {
@@ -117,6 +120,8 @@ class CacheTest extends WP_UnitTestCase {
 
 		$this->cache->add( $key, $val );
 		$this->assertEquals( $val, $this->cache->get( $key ) );
+		$this->assertEquals( 1, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
 	}
 
 	public function test_add_get_0() {
@@ -126,6 +131,8 @@ class CacheTest extends WP_UnitTestCase {
 		// you can store zero in the cache
 		$this->cache->add( $key, $val );
 		$this->assertEquals( $val, $this->cache->get( $key ) );
+		$this->assertEquals( 1, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
 	}
 
 	public function test_add_get_null() {
@@ -135,6 +142,8 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertTrue( $this->cache->add( $key, $val ) );
 		// null is converted to empty string
 		$this->assertEquals( '', $this->cache->get( $key ) );
+		$this->assertEquals( 1, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
 	}
 
 	public function test_add() {
@@ -148,6 +157,8 @@ class CacheTest extends WP_UnitTestCase {
 		// $key is in the cache, so reject new calls to add()
 		$this->assertFalse( $this->cache->add( $key, $val2 ) );
 		$this->assertEquals( $val1, $this->cache->get( $key ) );
+		$this->assertEquals( 2, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
 	}
 
 	public function test_replace() {
@@ -175,6 +186,8 @@ class CacheTest extends WP_UnitTestCase {
 		// Second set() with same key should be allowed
 		$this->assertTrue( $this->cache->set( $key, $val2 ) );
 		$this->assertEquals( $val2, $this->cache->get( $key ) );
+		$this->assertEquals( 2, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
 	}
 
 	public function test_flush() {
@@ -190,9 +203,13 @@ class CacheTest extends WP_UnitTestCase {
 		$this->cache->add( $key, $val );
 		// item is visible to both cache objects
 		$this->assertEquals( $val, $this->cache->get( $key ) );
+		$this->assertEquals( 1, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
 		$this->cache->flush();
 		// If there is no value get returns false.
 		$this->assertFalse( $this->cache->get( $key ) );
+		$this->assertEquals( 1, $this->cache->cache_hits );
+		$this->assertEquals( 1, $this->cache->cache_misses );
 	}
 
 	// Make sure objects are cloned going to and from the cache
@@ -222,21 +239,31 @@ class CacheTest extends WP_UnitTestCase {
 		$key = rand_str();
 
 		$this->assertFalse( $this->cache->incr( $key ) );
+		$this->assertEquals( 0, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
 
 		$this->cache->set( $key, 0 );
 		$this->cache->incr( $key );
 		$this->assertEquals( 1, $this->cache->get( $key ) );
+		$this->assertEquals( 1, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
 
 		$this->cache->incr( $key, 2 );
 		$this->assertEquals( 3, $this->cache->get( $key ) );
+		$this->assertEquals( 2, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
 	}
 
 	public function test_incr_never_below_zero() {
 		$key = rand_str();
 		$this->cache->set( $key, 1 );
 		$this->assertEquals( 1, $this->cache->get( $key ) );
+		$this->assertEquals( 1, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
 		$this->cache->incr( $key, -2 );
 		$this->assertEquals( 0, $this->cache->get( $key ) );
+		$this->assertEquals( 2, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
 	}
 
 	public function test_incr_non_persistent() {
@@ -279,25 +306,37 @@ class CacheTest extends WP_UnitTestCase {
 		$key = rand_str();
 
 		$this->assertFalse( $this->cache->decr( $key ) );
+		$this->assertEquals( 0, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
 
 		$this->cache->set( $key, 0 );
 		$this->cache->decr( $key );
 		$this->assertEquals( 0, $this->cache->get( $key ) );
+		$this->assertEquals( 1, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
 
 		$this->cache->set( $key, 3 );
 		$this->cache->decr( $key );
 		$this->assertEquals( 2, $this->cache->get( $key ) );
+		$this->assertEquals( 2, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
 
 		$this->cache->decr( $key, 2 );
 		$this->assertEquals( 0, $this->cache->get( $key ) );
+		$this->assertEquals( 3, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
 	}
 
 	public function test_decr_never_below_zero() {
 		$key = rand_str();
 		$this->cache->set( $key, 1 );
 		$this->assertEquals( 1, $this->cache->get( $key ) );
+		$this->assertEquals( 1, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
 		$this->cache->decr( $key, 2 );
 		$this->assertEquals( 0, $this->cache->get( $key ) );
+		$this->assertEquals( 2, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
 	}
 
 	public function test_decr_non_persistent() {
@@ -354,10 +393,14 @@ class CacheTest extends WP_UnitTestCase {
 		// Verify set
 		$this->assertTrue( $this->cache->set( $key, $val ) );
 		$this->assertEquals( $val, $this->cache->get( $key ) );
+		$this->assertEquals( 1, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
 
 		// Verify successful delete
 		$this->assertTrue( $this->cache->delete( $key ) );
 		$this->assertFalse( $this->cache->get( $key ) );
+		$this->assertEquals( 1, $this->cache->cache_hits );
+		$this->assertEquals( 1, $this->cache->cache_misses );
 
 		$this->assertFalse( $this->cache->delete( $key, 'default' ) );
 	}
