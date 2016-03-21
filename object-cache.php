@@ -353,6 +353,11 @@ class WP_Object_Cache {
 	 * @return bool False if cache key and group already exist, true on success
 	 */
 	public function add( $key, $data, $group = 'default', $expire = 0 ) {
+
+		if ( empty( $group ) ) {
+			$group = 'default';
+		}
+
 		if ( function_exists( 'wp_suspend_cache_addition' ) && wp_suspend_cache_addition() ) {
 			return false;
 		}
@@ -397,6 +402,10 @@ class WP_Object_Cache {
 	 * @return false|int False on failure, the item's new value on success.
 	 */
 	public function decr( $key, $offset = 1, $group = 'default' ) {
+
+		if ( empty( $group ) ) {
+			$group = 'default';
+		}
 
 		// The key needs to exist in order to be decremented
 		if ( ! $this->_exists( $key, $group ) ) {
@@ -456,6 +465,11 @@ class WP_Object_Cache {
 	 * @return bool False if the contents weren't deleted and true on success
 	 */
 	public function delete( $key, $group = 'default', $force = false ) {
+
+		if ( empty( $group ) ) {
+			$group = 'default';
+		}
+
 		if ( ! $force && ! $this->_exists( $key, $group ) ) {
 			return false;
 		}
@@ -539,6 +553,11 @@ class WP_Object_Cache {
 	 *		contents on success
 	 */
 	public function get( $key, $group = 'default', $force = false, &$found = null ) {
+
+		if ( empty( $group ) ) {
+			$group = 'default';
+		}
+
 		if ( ! $this->_exists( $key, $group ) ) {
 			$this->cache_misses += 1;
 			return false;
@@ -570,6 +589,11 @@ class WP_Object_Cache {
 	 * @return false|int False on failure, the item's new value on success.
 	 */
 	public function incr( $key, $offset = 1, $group = 'default' ) {
+
+		if ( empty( $group ) ) {
+			$group = 'default';
+		}
+
 		// The key needs to exist in order to be incremented
 		if ( ! $this->_exists( $key, $group ) ) {
 			return false;
@@ -625,6 +649,11 @@ class WP_Object_Cache {
 	 * @return bool False if not exists, true if contents were replaced
 	 */
 	public function replace( $key, $data, $group = 'default', $expire = 0 ) {
+
+		if ( empty( $group ) ) {
+			$group = 'default';
+		}
+
 		if ( ! $this->_exists( $key, $group ) ) {
 			return false;
 		}
@@ -660,6 +689,10 @@ class WP_Object_Cache {
 	 * @return bool Always returns true
 	 */
 	public function set( $key, $data, $group = 'default', $expire = 0 ) {
+
+		if ( empty( $group ) ) {
+			$group = 'default';
+		}
 
 		if ( is_object( $data ) ) {
 			$data = clone $data;
