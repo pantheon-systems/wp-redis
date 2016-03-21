@@ -1050,8 +1050,6 @@ class WP_Object_Cache {
 			add_action( 'admin_notices', array( $this, 'wp_action_admin_notices_warn_missing_redis' ) );
 		}
 
-		// $wpdb->options can be unset before multisite loads
-		// It's safe to skip here if unset, because cache will be reinitialized when `$blog_id` is available
 		if ( $this->multisite ) {
 			$table = $wpdb->sitemeta;
 			$col1 = 'meta_key';
