@@ -823,6 +823,10 @@ class WP_Object_Cache {
 	 * @param mixed $value
 	 */
 	protected function _set_internal( $key, $group, $value ) {
+		// Redis converts null to an empty string
+		if ( is_null( $value ) ) {
+			$value = '';
+		}
 		if ( self::USE_GROUPS ) {
 			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
 			if ( ! isset( $this->cache[ $multisite_safe_group ] ) ) {
