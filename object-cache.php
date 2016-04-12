@@ -287,6 +287,14 @@ class WP_Object_Cache {
 	var $cache_misses = 0;
 
 	/**
+	 * The amount of times a request was made to Redis
+	 *
+	 * @access private
+	 * @var int
+	 */
+	var $redis_calls = 0;
+
+	/**
 	 * List of global groups
 	 *
 	 * @var array
@@ -732,15 +740,16 @@ class WP_Object_Cache {
 	 * key and the data.
 	 */
 	public function stats() {
-		echo '<p>';
-		echo '<strong>Cache Hits:</strong>' . (int) $this->cache_hits . '<br />';
-		echo '<strong>Cache Misses:</strong>' . (int) $this->cache_misses . '<br />';
-		echo '</p>';
-		echo '<ul>';
+		echo '<p>' . PHP_EOL;
+		echo '<strong>Cache Hits:</strong>' . (int) $this->cache_hits . '<br />' . PHP_EOL;
+		echo '<strong>Cache Misses:</strong>' . (int) $this->cache_misses . '<br />'  . PHP_EOL;
+		echo '<strong>Redis Calls:</strong>' . (int) $this->redis_calls . '<br />'  . PHP_EOL;
+		echo '</p>' . PHP_EOL;
+		echo '<ul>' . PHP_EOL;
 		foreach ( $this->cache as $group => $cache ) {
-			echo '<li><strong>Group:</strong> ' . esc_html( $group ) . ' - ( ' . number_format( strlen( serialize( $cache ) ) / 1024, 2 ) . 'k )</li>';
+			echo '<li><strong>Group:</strong> ' . esc_html( $group ) . ' - ( ' . number_format( strlen( serialize( $cache ) ) / 1024, 2 ) . 'k )</li>' . PHP_EOL;
 		}
-		echo '</ul>';
+		echo '</ul>' . PHP_EOL;
 	}
 
 	/**
@@ -973,6 +982,7 @@ class WP_Object_Cache {
 
 		if ( $this->is_redis_connected ) {
 			try {
+				$this->redis_calls++;
 				$retval = call_user_func_array( array( $this->redis, $method ), $arguments );
 				return $retval;
 			} catch ( RedisException $e ) {
