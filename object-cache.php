@@ -740,16 +740,20 @@ class WP_Object_Cache {
 	 * key and the data.
 	 */
 	public function stats() {
-		echo '<p>' . PHP_EOL;
-		echo '<strong>Cache Hits:</strong>' . (int) $this->cache_hits . '<br />' . PHP_EOL;
-		echo '<strong>Cache Misses:</strong>' . (int) $this->cache_misses . '<br />'  . PHP_EOL;
-		echo '<strong>Redis Calls:</strong>' . (int) $this->redis_calls . '<br />'  . PHP_EOL;
-		echo '</p>' . PHP_EOL;
-		echo '<ul>' . PHP_EOL;
+		$out = array();
+		$out[] = '<p>';
+		$out[] = '<strong>Cache Hits:</strong>' . (int) $this->cache_hits . '<br />';
+		$out[] = '<strong>Cache Misses:</strong>' . (int) $this->cache_misses . '<br />';
+		$out[] = '<strong>Redis Calls:</strong>' . (int) $this->redis_calls . '<br />';
+		$out[] = '</p>';
+		$out[] = '<ul>';
 		foreach ( $this->cache as $group => $cache ) {
-			echo '<li><strong>Group:</strong> ' . esc_html( $group ) . ' - ( ' . number_format( strlen( serialize( $cache ) ) / 1024, 2 ) . 'k )</li>' . PHP_EOL;
+			$out[] = '<li><strong>Group:</strong> ' . esc_html( $group ) . ' - ( ' . number_format( strlen( serialize( $cache ) ) / 1024, 2 ) . 'k )</li>';
 		}
-		echo '</ul>' . PHP_EOL;
+		$out[] = '</ul>';
+		// @codingStandardsIgnoreStart
+		echo implode( PHP_EOL, $out );
+		// @codingStandardsIgnoreEnd
 	}
 
 	/**
