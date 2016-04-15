@@ -292,7 +292,7 @@ class WP_Object_Cache {
 	 * @access private
 	 * @var int
 	 */
-	var $redis_calls = 0;
+	var $redis_calls = array();
 
 	/**
 	 * List of global groups
@@ -740,11 +740,18 @@ class WP_Object_Cache {
 	 * key and the data.
 	 */
 	public function stats() {
+		$total_redis_calls = 0;
+		foreach ( $this->redis_calls as $method => $calls ) {
+			$total_redis_calls += $calls;
+		}
 		$out = array();
 		$out[] = '<p>';
 		$out[] = '<strong>Cache Hits:</strong>' . (int) $this->cache_hits . '<br />';
 		$out[] = '<strong>Cache Misses:</strong>' . (int) $this->cache_misses . '<br />';
-		$out[] = '<strong>Redis Calls:</strong>' . (int) $this->redis_calls . '<br />';
+		$out[] = '<strong>Redis Calls:</strong>' . (int) $total_redis_calls . ':<br />';
+		foreach ( $this->redis_calls as $method => $calls ) {
+			$out[] = ' - ' . esc_html( $method ) . ': ' . (int) $calls . '<br />';
+		}
 		$out[] = '</p>';
 		$out[] = '<ul>';
 		foreach ( $this->cache as $group => $cache ) {
@@ -991,7 +998,10 @@ class WP_Object_Cache {
 
 		if ( $this->is_redis_connected ) {
 			try {
-				$this->redis_calls++;
+				if ( ! isset( $this->redis_calls[ $method ] ) ) {
+					$this->redis_calls[ $method ] = 0;
+				}
+				$this->redis_calls[ $method ]++;
 				$retval = call_user_func_array( array( $this->redis, $method ), $arguments );
 				return $retval;
 			} catch ( RedisException $e ) {
