@@ -741,7 +741,7 @@ class WP_Object_Cache {
 	 */
 	public function stats() {
 		$total_redis_calls = 0;
-		foreach( $this->redis_calls as $method => $calls ) {
+		foreach ( $this->redis_calls as $method => $calls ) {
 			$total_redis_calls += $calls;
 		}
 		$out = array();
@@ -749,7 +749,7 @@ class WP_Object_Cache {
 		$out[] = '<strong>Cache Hits:</strong>' . (int) $this->cache_hits . '<br />';
 		$out[] = '<strong>Cache Misses:</strong>' . (int) $this->cache_misses . '<br />';
 		$out[] = '<strong>Redis Calls:</strong>' . (int) $total_redis_calls . ':<br />';
-		foreach( $this->redis_calls as $method => $calls ) {
+		foreach ( $this->redis_calls as $method => $calls ) {
 			$out[] = ' - ' . esc_html( $method ) . ': ' . (int) $calls . '<br />';
 		}
 		$out[] = '</p>';
