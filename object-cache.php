@@ -777,6 +777,11 @@ class WP_Object_Cache {
 		if ( $this->_isset_internal( $key, $group ) ) {
 			return true;
 		}
+
+		if ( ! $this->_should_persist( $group ) ) {
+			return false;
+		}
+
 		if ( self::USE_GROUPS ) {
 			$redis_safe_group = $this->_key( '', $group );
 			return $this->_call_redis( 'hExists', $redis_safe_group, $key );
