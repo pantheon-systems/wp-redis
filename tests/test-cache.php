@@ -7,6 +7,16 @@ class CacheTest extends WP_UnitTestCase {
 
 	private $cache;
 
+	private static $exists_key;
+
+	private static $set_key;
+
+	private static $incrBy_key;
+
+	private static $decrBy_key;
+
+	private static $delete_key;
+
 	public function setUp() {
 		parent::setUp();
 		$GLOBALS['redis_server'] = array(
@@ -18,6 +28,14 @@ class CacheTest extends WP_UnitTestCase {
 		$this->cache =& $this->init_cache();
 		$this->cache->cache_hits = $this->cache->cache_misses = 0;
 		$this->cache->redis_calls = array();
+
+		self::$exists_key = WP_Object_Cache::USE_GROUPS ? 'hExists' : 'exists';
+		self::$set_key = WP_Object_Cache::USE_GROUPS ? 'hSet' : 'set';
+		self::$incrBy_key = WP_Object_Cache::USE_GROUPS ? 'hIncrBy' : 'incrBy';
+		// 'hIncrBy' isn't a typo here — Redis doesn't support decrBy on groups
+		self::$decrBy_key = WP_Object_Cache::USE_GROUPS ? 'hIncrBy' : 'decrBy';
+		self::$delete_key = WP_Object_Cache::USE_GROUPS ? 'hDel' : 'delete';
+
 	}
 
 	public function &init_cache() {
@@ -130,7 +148,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 1, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals( array(
-				'exists'     => 1,
+				self::$exists_key     => 1,
 			), $this->cache->redis_calls );
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -147,8 +165,8 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals( array(
-				'exists'     => 1,
-				'set'        => 1,
+				self::$exists_key     => 1,
+				self::$set_key        => 1,
 			), $this->cache->redis_calls );
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -166,8 +184,8 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals( array(
-				'exists'     => 1,
-				'set'        => 1,
+				self::$exists_key     => 1,
+				self::$set_key        => 1,
 			), $this->cache->redis_calls );
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -185,8 +203,8 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals( array(
-				'exists'     => 1,
-				'set'        => 1,
+				self::$exists_key     => 1,
+				self::$set_key        => 1,
 			), $this->cache->redis_calls );
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -208,8 +226,8 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals( array(
-				'exists'     => 1,
-				'set'        => 1,
+				self::$exists_key     => 1,
+				self::$set_key        => 1,
 			), $this->cache->redis_calls );
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -230,8 +248,8 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( $val2, $this->cache->get( $key ) );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals( array(
-				'exists'     => 3,
-				'set'        => 2,
+				self::$exists_key     => 3,
+				self::$set_key        => 2,
 			), $this->cache->redis_calls );
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -253,7 +271,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals( array(
-				'set'        => 2,
+				self::$set_key        => 2,
 			), $this->cache->redis_calls );
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -282,8 +300,8 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 1, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals( array(
-				'exists'     => 2,
-				'set'        => 1,
+				self::$exists_key     => 2,
+				self::$set_key        => 1,
 			), $this->cache->redis_calls );
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -332,9 +350,9 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals( array(
-				'exists'     => 1,
-				'set'        => 1,
-				'incrBy'     => 2,
+				self::$exists_key     => 1,
+				self::$set_key        => 1,
+				self::$incrBy_key     => 2,
 			), $this->cache->redis_calls );
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -353,8 +371,8 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals( array(
-				'incrBy'     => 1,
-				'set'        => 2,
+				self::$incrBy_key     => 1,
+				self::$set_key        => 2,
 			), $this->cache->redis_calls );
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -424,9 +442,9 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals( array(
-				'exists'     => 1,
-				'set'        => 3,
-				'decrBy'     => 3,
+				self::$exists_key     => 1,
+				self::$set_key        => 3,
+				self::$decrBy_key     => 3,
 			), $this->cache->redis_calls );
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -445,8 +463,8 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals( array(
-				'decrBy'     => 1,
-				'set'        => 2,
+				self::$decrBy_key     => 1,
+				self::$set_key        => 2,
 			), $this->cache->redis_calls );
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -521,9 +539,9 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertFalse( $this->cache->delete( $key, 'default' ) );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals( array(
-				'exists'     => 2,
-				'set'        => 1,
-				'delete'     => 1,
+				self::$exists_key     => 2,
+				self::$set_key        => 1,
+				self::$delete_key     => 1,
 			), $this->cache->redis_calls );
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
