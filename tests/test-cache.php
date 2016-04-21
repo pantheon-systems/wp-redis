@@ -34,7 +34,7 @@ class CacheTest extends WP_UnitTestCase {
 		self::$incrBy_key = WP_Object_Cache::USE_GROUPS ? 'hIncrBy' : 'incrBy';
 		// 'hIncrBy' isn't a typo here — Redis doesn't support decrBy on groups
 		self::$decrBy_key = WP_Object_Cache::USE_GROUPS ? 'hIncrBy' : 'decrBy';
-		self::$delete_key = WP_Object_Cache::USE_GROUPS ? 'hDel' : 'delete';
+		self::$delete_key = WP_Object_Cache::USE_GROUPS ? 'hDel' : 'del';
 
 	}
 
