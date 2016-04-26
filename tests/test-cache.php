@@ -331,6 +331,16 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 'bravo', $object_a->foo );
 	}
 
+	public function test_get_found() {
+		$key = rand_str();
+		$found = null;
+		$this->cache->get( $key, 'default', false, $found );
+		$this->assertFalse( $found );
+		$this->cache->set( $key, 'alpha', 'default' );
+		$this->cache->get( $key, 'default', false, $found );
+		$this->assertTrue( $found );
+	}
+
 	public function test_incr() {
 		$key = rand_str();
 
