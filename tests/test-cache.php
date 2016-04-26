@@ -331,6 +331,32 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 'bravo', $object_a->foo );
 	}
 
+	public function test_get_force() {
+		$key = rand_str();
+		$group = 'default';
+		$this->cache->set( $key, 'alpha', $group );
+		$this->assertEquals( 'alpha', $this->cache->get( $key, $group ) );
+		// Duplicate of _set_internal()
+		if ( WP_Object_Cache::USE_GROUPS ) {
+			$multisite_safe_group = $this->cache->multisite && ! isset( $this->cache->global_groups[ $group ] ) ? $this->cache->blog_prefix . $group : $group;
+			if ( ! isset( $this->cache->cache[ $multisite_safe_group ] ) ) {
+				$this->cache->cache[ $multisite_safe_group ] = array();
+			}
+			$this->cache->cache[ $multisite_safe_group ][ $key ] = 'beta';
+		} else {
+			if ( ! empty( $this->cache->global_groups[ $group ] ) ) {
+				$prefix = $this->cache->global_prefix;
+			} else {
+				$prefix = $this->cache->blog_prefix;
+			}
+
+			$true_key = preg_replace( '/\s+/', '', WP_CACHE_KEY_SALT . "$prefix$group:$key" );
+			$this->cache->cache[ $true_key ] = 'beta';
+		}
+		$this->assertEquals( 'beta', $this->cache->get( $key, $group ) );
+		$this->assertEquals( 'alpha', $this->cache->get( $key, $group, true ) );
+	}
+
 	public function test_get_found() {
 		$key = rand_str();
 		$found = null;
