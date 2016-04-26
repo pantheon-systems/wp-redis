@@ -391,6 +391,67 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEmpty( $this->cache->redis_calls );
 	}
 
+	public function test_get_false_value() {
+		$key = rand_str();
+		$this->cache->set( $key, false );
+		$this->cache->cache_hits = $this->cache->cache_misses = 0; // reset everything
+		$this->cache->redis_calls = $this->cache->cache = array(); // reset everything
+		$found = null;
+		$this->assertFalse( $this->cache->get( $key, 'default', false, $found ) );
+		$this->assertTrue( $found );
+		$this->assertEquals( 1, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
+		if ( $this->cache->is_redis_connected ) {
+			$this->assertEquals( array(
+				self::$exists_key        => 1,
+				self::$get_key           => 1,
+			), $this->cache->redis_calls );
+		} else {
+			$this->assertEmpty( $this->cache->redis_calls );
+		}
+	}
+
+	public function test_get_true_value() {
+		$key = rand_str();
+		$this->cache->set( $key, true );
+		$this->cache->cache_hits = $this->cache->cache_misses = 0; // reset everything
+		$this->cache->redis_calls = $this->cache->cache = array(); // reset everything
+		$found = null;
+		$this->assertTrue( $this->cache->get( $key, 'default', false, $found ) );
+		$this->assertTrue( $found );
+		$this->assertEquals( 1, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
+		if ( $this->cache->is_redis_connected ) {
+			$this->assertEquals( array(
+				self::$exists_key        => 1,
+				self::$get_key           => 1,
+			), $this->cache->redis_calls );
+		} else {
+			$this->assertEmpty( $this->cache->redis_calls );
+		}
+	}
+
+	public function test_get_null_value() {
+		$key = rand_str();
+		$this->cache->set( $key, null );
+		$this->cache->cache_hits = $this->cache->cache_misses = 0; // reset everything
+		$this->cache->redis_calls = $this->cache->cache = array(); // reset everything
+		$found = null;
+		// Redis coherses `null` to an empty string
+		$this->assertEquals( '', $this->cache->get( $key, 'default', false, $found ) );
+		$this->assertTrue( $found );
+		$this->assertEquals( 1, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
+		if ( $this->cache->is_redis_connected ) {
+			$this->assertEquals( array(
+				self::$exists_key        => 1,
+				self::$get_key           => 1,
+			), $this->cache->redis_calls );
+		} else {
+			$this->assertEmpty( $this->cache->redis_calls );
+		}
+	}
+
 	public function test_get_force() {
 		if ( ! class_exists( 'Redis' ) ) {
 			$this->markTestSkipped( 'PHPRedis extension not available.' );
