@@ -567,28 +567,45 @@ class WP_Object_Cache {
 			$group = 'default';
 		}
 
-		if ( ! $this->_exists( $key, $group ) ) {
+		// Key is set internally, so we can use this value
+		if ( $this->_isset_internal( $key, $group ) && ! $force ) {
+			$this->cache_hits += 1;
+			$found = true;
+			return $this->_get_internal( $key, $group );
+		}
+
+		// Not a persistent group, so don't try Redis if the value doesn't exist
+		// internally
+		if ( ! $this->_should_persist( $group ) ) {
 			$this->cache_misses += 1;
 			$found = false;
 			return false;
 		}
-		$this->cache_hits += 1;
 
-		if ( $this->_should_persist( $group ) && ( $force || ! $this->_isset_internal( $key, $group ) ) ) {
-			if ( self::USE_GROUPS ) {
-				$redis_safe_group = $this->_key( '', $group );
-				$value = $this->_call_redis( 'hGet', $redis_safe_group, $key );
-			} else {
-				$id = $this->_key( $key, $group );
-				$value = $this->_call_redis( 'get', $id );
-			}
-			if ( ! is_numeric( $value ) ) {
-				$value = unserialize( $value );
-			}
-			$this->_set_internal( $key, $group, $value );
+		if ( self::USE_GROUPS ) {
+			$redis_safe_group = $this->_key( '', $group );
+			$value = $this->_call_redis( 'hGet', $redis_safe_group, $key );
+		} else {
+			$id = $this->_key( $key, $group );
+			$value = $this->_call_redis( 'get', $id );
 		}
+
+		// PhpRedis returns `false` when the key doesn't exist
+		if ( false === $value ) {
+			$this->cache_misses += 1;
+			$found = false;
+			return false;
+		}
+
+		// All non-numeric values are serialized
+		if ( ! is_numeric( $value ) ) {
+			$value = unserialize( $value );
+		}
+
+		$this->_set_internal( $key, $group, $value );
+		$this->cache_hits += 1;
 		$found = true;
-		return $this->_get_internal( $key, $group );
+		return $value;
 	}
 
 	/**
