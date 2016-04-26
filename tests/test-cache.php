@@ -407,7 +407,6 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals( array(
-				self::$exists_key        => 1,
 				self::$get_key           => 1,
 			), $this->cache->redis_calls );
 		} else {
@@ -430,7 +429,6 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals( array(
-				self::$exists_key        => 1,
 				self::$get_key           => 1,
 			), $this->cache->redis_calls );
 		} else {
@@ -454,7 +452,6 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals( array(
-				self::$exists_key        => 1,
 				self::$get_key           => 1,
 			), $this->cache->redis_calls );
 		} else {
