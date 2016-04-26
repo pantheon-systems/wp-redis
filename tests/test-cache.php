@@ -391,7 +391,10 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEmpty( $this->cache->redis_calls );
 	}
 
-	public function test_get_false_value() {
+	public function test_get_false_value_persistent_cache() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
 		$key = rand_str();
 		$this->cache->set( $key, false );
 		$this->cache->cache_hits = $this->cache->cache_misses = 0; // reset everything
@@ -411,7 +414,10 @@ class CacheTest extends WP_UnitTestCase {
 		}
 	}
 
-	public function test_get_true_value() {
+	public function test_get_true_value_persistent_cache() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
 		$key = rand_str();
 		$this->cache->set( $key, true );
 		$this->cache->cache_hits = $this->cache->cache_misses = 0; // reset everything
@@ -431,7 +437,10 @@ class CacheTest extends WP_UnitTestCase {
 		}
 	}
 
-	public function test_get_null_value() {
+	public function test_get_null_value_persistent_cache() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
 		$key = rand_str();
 		$this->cache->set( $key, null );
 		$this->cache->cache_hits = $this->cache->cache_misses = 0; // reset everything
