@@ -9,6 +9,8 @@ class CacheTest extends WP_UnitTestCase {
 
 	private static $exists_key;
 
+	private static $get_key;
+
 	private static $set_key;
 
 	private static $incrBy_key;
@@ -30,6 +32,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->cache->redis_calls = array();
 
 		self::$exists_key = WP_Object_Cache::USE_GROUPS ? 'hExists' : 'exists';
+		self::$get_key = WP_Object_Cache::USE_GROUPS ? 'hGet' : 'get';
 		self::$set_key = WP_Object_Cache::USE_GROUPS ? 'hSet' : 'set';
 		self::$incrBy_key = WP_Object_Cache::USE_GROUPS ? 'hIncrBy' : 'incrBy';
 		// 'hIncrBy' isn't a typo here — Redis doesn't support decrBy on groups
@@ -329,6 +332,40 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 'alpha', $object_b->foo );
 		$object_b->foo = 'charlie';
 		$this->assertEquals( 'bravo', $object_a->foo );
+	}
+
+	public function test_get_force() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
+
+		$key = rand_str();
+		$group = 'default';
+		$this->cache->set( $key, 'alpha', $group );
+		$this->assertEquals( 'alpha', $this->cache->get( $key, $group ) );
+		// Duplicate of _set_internal()
+		if ( WP_Object_Cache::USE_GROUPS ) {
+			$multisite_safe_group = $this->cache->multisite && ! isset( $this->cache->global_groups[ $group ] ) ? $this->cache->blog_prefix . $group : $group;
+			if ( ! isset( $this->cache->cache[ $multisite_safe_group ] ) ) {
+				$this->cache->cache[ $multisite_safe_group ] = array();
+			}
+			$this->cache->cache[ $multisite_safe_group ][ $key ] = 'beta';
+		} else {
+			if ( ! empty( $this->cache->global_groups[ $group ] ) ) {
+				$prefix = $this->cache->global_prefix;
+			} else {
+				$prefix = $this->cache->blog_prefix;
+			}
+
+			$true_key = preg_replace( '/\s+/', '', WP_CACHE_KEY_SALT . "$prefix$group:$key" );
+			$this->cache->cache[ $true_key ] = 'beta';
+		}
+		$this->assertEquals( 'beta', $this->cache->get( $key, $group ) );
+		$this->assertEquals( 'alpha', $this->cache->get( $key, $group, true ) );
+		$this->assertEquals( array(
+			self::$get_key        => 1,
+			self::$set_key        => 1,
+		), $this->cache->redis_calls );
 	}
 
 	public function test_get_found() {
