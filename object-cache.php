@@ -1092,6 +1092,8 @@ class WP_Object_Cache {
 			case 'flushAll':
 			case 'IsConnected':
 			case 'exists':
+			case 'get':
+			case 'hGet':
 				return false;
 		}
 
