@@ -332,6 +332,10 @@ class CacheTest extends WP_UnitTestCase {
 	}
 
 	public function test_get_force() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
+
 		$key = rand_str();
 		$group = 'default';
 		$this->cache->set( $key, 'alpha', $group );
