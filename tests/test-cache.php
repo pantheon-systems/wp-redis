@@ -368,6 +368,29 @@ class CacheTest extends WP_UnitTestCase {
 		}
 	}
 
+	public function test_get_non_persistent_group() {
+		$key = rand_str();
+		$group = 'nonpersistent';
+		$this->cache->add_non_persistent_groups( $group );
+		$this->cache->get( $key, $group );
+		$this->assertEquals( 0, $this->cache->cache_hits );
+		$this->assertEquals( 1, $this->cache->cache_misses );
+		$this->assertEmpty( $this->cache->redis_calls );
+		$this->cache->get( $key, $group );
+		$this->assertEquals( 0, $this->cache->cache_hits );
+		$this->assertEquals( 2, $this->cache->cache_misses );
+		$this->assertEmpty( $this->cache->redis_calls );
+		$this->cache->set( $key, 'alpha', $group );
+		$this->cache->get( $key, $group );
+		$this->assertEquals( 1, $this->cache->cache_hits );
+		$this->assertEquals( 2, $this->cache->cache_misses );
+		$this->assertEmpty( $this->cache->redis_calls );
+		$this->cache->get( $key, $group );
+		$this->assertEquals( 2, $this->cache->cache_hits );
+		$this->assertEquals( 2, $this->cache->cache_misses );
+		$this->assertEmpty( $this->cache->redis_calls );
+	}
+
 	public function test_get_force() {
 		if ( ! class_exists( 'Redis' ) ) {
 			$this->markTestSkipped( 'PHPRedis extension not available.' );
