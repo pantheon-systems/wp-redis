@@ -9,6 +9,8 @@ class CacheTest extends WP_UnitTestCase {
 
 	private static $exists_key;
 
+	private static $get_key;
+
 	private static $set_key;
 
 	private static $incrBy_key;
@@ -30,6 +32,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->cache->redis_calls = array();
 
 		self::$exists_key = WP_Object_Cache::USE_GROUPS ? 'hExists' : 'exists';
+		self::$get_key = WP_Object_Cache::USE_GROUPS ? 'hGet' : 'get';
 		self::$set_key = WP_Object_Cache::USE_GROUPS ? 'hSet' : 'set';
 		self::$incrBy_key = WP_Object_Cache::USE_GROUPS ? 'hIncrBy' : 'incrBy';
 		// 'hIncrBy' isn't a typo here — Redis doesn't support decrBy on groups
@@ -359,6 +362,10 @@ class CacheTest extends WP_UnitTestCase {
 		}
 		$this->assertEquals( 'beta', $this->cache->get( $key, $group ) );
 		$this->assertEquals( 'alpha', $this->cache->get( $key, $group, true ) );
+		$this->assertEquals( array(
+			self::$get_key        => 1,
+			self::$set_key        => 1,
+		), $this->cache->redis_calls );
 	}
 
 	public function test_get_found() {
