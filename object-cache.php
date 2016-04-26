@@ -557,6 +557,7 @@ class WP_Object_Cache {
 	 * @param int|string $key What the contents in the cache are called
 	 * @param string $group Where the cache contents are grouped
 	 * @param string $force Whether to force a refetch rather than relying on the local cache (default is false)
+	 * @param bool $found Optional. Whether the key was found in the cache. Disambiguates a return of false, a storable value. Passed by reference. Default null.
 	 * @return bool|mixed False on failure to retrieve contents or the cache
 	 *		contents on success
 	 */
@@ -568,6 +569,7 @@ class WP_Object_Cache {
 
 		if ( ! $this->_exists( $key, $group ) ) {
 			$this->cache_misses += 1;
+			$found = false;
 			return false;
 		}
 		$this->cache_hits += 1;
@@ -585,6 +587,7 @@ class WP_Object_Cache {
 			}
 			$this->_set_internal( $key, $group, $value );
 		}
+		$found = true;
 		return $this->_get_internal( $key, $group );
 	}
 
