@@ -334,6 +334,40 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 'bravo', $object_a->foo );
 	}
 
+	public function test_get_already_exists_internal() {
+		$key = rand_str();
+		$this->cache->set( $key, 'alpha' );
+		if ( $this->cache->is_redis_connected ) {
+			$this->assertEquals( array(
+				self::$set_key        => 1,
+			), $this->cache->redis_calls );
+		} else {
+			$this->assertEmpty( $this->cache->redis_calls );
+		}
+		$this->cache->redis_calls = array(); // reset to limit scope of test
+		$this->assertEquals( 'alpha', $this->cache->get( $key ) );
+		$this->assertEquals( 1, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
+		$this->assertEmpty( $this->cache->redis_calls );
+	}
+
+	public function test_get_missing_persistent() {
+		$key = rand_str();
+		$this->cache->get( $key );
+		$this->assertEquals( 0, $this->cache->cache_hits );
+		$this->assertEquals( 1, $this->cache->cache_misses );
+		$this->cache->get( $key );
+		$this->assertEquals( 0, $this->cache->cache_hits );
+		$this->assertEquals( 2, $this->cache->cache_misses );
+		if ( $this->cache->is_redis_connected ) {
+			$this->assertEquals( array(
+				self::$exists_key        => 2,
+			), $this->cache->redis_calls );
+		} else {
+			$this->assertEmpty( $this->cache->redis_calls );
+		}
+	}
+
 	public function test_get_force() {
 		if ( ! class_exists( 'Redis' ) ) {
 			$this->markTestSkipped( 'PHPRedis extension not available.' );
