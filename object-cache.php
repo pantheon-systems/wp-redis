@@ -1033,7 +1033,7 @@ class WP_Object_Cache {
 			}
 		}
 
-		if ( $this->is_redis_failback_flush_enabled() && ! $this->do_redis_failback_flush ) {
+		if ( $this->is_redis_failback_flush_enabled() && ! $this->do_redis_failback_flush && ! empty( $wpdb ) ) {
 			if ( $this->multisite ) {
 				$table = $wpdb->sitemeta;
 				$col1 = 'meta_key';
@@ -1112,20 +1112,20 @@ class WP_Object_Cache {
 		$this->multisite = is_multisite();
 		$this->blog_prefix = $this->multisite ? $blog_id . ':' : '';
 
-		if ( ! $this->_connect_redis() ) {
+		if ( ! $this->_connect_redis() && function_exists( 'add_action' ) ) {
 			add_action( 'admin_notices', array( $this, 'wp_action_admin_notices_warn_missing_redis' ) );
 		}
 
-		if ( $this->multisite ) {
-			$table = $wpdb->sitemeta;
-			$col1 = 'meta_key';
-			$col2 = 'meta_value';
-		} else {
-			$table = $wpdb->options;
-			$col1 = 'option_name';
-			$col2 = 'option_value';
-		}
-		if ( $this->is_redis_failback_flush_enabled() ) {
+		if ( $this->is_redis_failback_flush_enabled() && ! empty( $wpdb ) ) {
+			if ( $this->multisite ) {
+				$table = $wpdb->sitemeta;
+				$col1 = 'meta_key';
+				$col2 = 'meta_value';
+			} else {
+				$table = $wpdb->options;
+				$col1 = 'option_name';
+				$col2 = 'option_value';
+			}
 			// @codingStandardsIgnoreStart
 			$this->do_redis_failback_flush = (bool) $wpdb->get_results( "SELECT {$col2} FROM {$table} WHERE {$col1}='wp_redis_do_redis_failback_flush'" );
 			// @codingStandardsIgnoreEnd
