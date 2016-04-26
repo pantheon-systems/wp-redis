@@ -343,6 +343,8 @@ class CacheTest extends WP_UnitTestCase {
 		$group = 'default';
 		$this->cache->set( $key, 'alpha', $group );
 		$this->assertEquals( 'alpha', $this->cache->get( $key, $group ) );
+		$this->assertEquals( 1, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
 		// Duplicate of _set_internal()
 		if ( WP_Object_Cache::USE_GROUPS ) {
 			$multisite_safe_group = $this->cache->multisite && ! isset( $this->cache->global_groups[ $group ] ) ? $this->cache->blog_prefix . $group : $group;
@@ -362,6 +364,8 @@ class CacheTest extends WP_UnitTestCase {
 		}
 		$this->assertEquals( 'beta', $this->cache->get( $key, $group ) );
 		$this->assertEquals( 'alpha', $this->cache->get( $key, $group, true ) );
+		$this->assertEquals( 3, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
 		$this->assertEquals( array(
 			self::$get_key        => 1,
 			self::$set_key        => 1,
@@ -373,9 +377,13 @@ class CacheTest extends WP_UnitTestCase {
 		$found = null;
 		$this->cache->get( $key, 'default', false, $found );
 		$this->assertFalse( $found );
+		$this->assertEquals( 0, $this->cache->cache_hits );
+		$this->assertEquals( 1, $this->cache->cache_misses );
 		$this->cache->set( $key, 'alpha', 'default' );
 		$this->cache->get( $key, 'default', false, $found );
 		$this->assertTrue( $found );
+		$this->assertEquals( 1, $this->cache->cache_hits );
+		$this->assertEquals( 1, $this->cache->cache_misses );
 	}
 
 	public function test_incr() {
