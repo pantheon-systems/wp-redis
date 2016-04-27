@@ -67,6 +67,15 @@ Pull requests and issues are welcome!
 
 == Changelog ==
 
+= 0.5.0 (April 27, 2016) =
+
+* Performance boost! Removes redundant `exists` call from `wp_cache_get()`, which easily halves the number of Redis calls.
+* Uses `add_action()` and `$wpdb` in a safer manner for compatibility with Batcache, which loads the object cache before aforementioned APIs are available.
+* For debugging purposes, tracks number of calls to Redis, and includes breakdown of call types.
+* Adds a slew of more explicit test coverage against existing features.
+* For consistency with the actual Redis call, calls `del` instead of `delete`.
+* Bug fix: If a group isn't persistent, don't ever make an `exists` call against Redis.
+
 = 0.4.0 (March 23, 2016) =
 
 * Introduces `wp redis-cli`, a WP-CLI command to launch redis-cli with WordPress' Redis credentials.
