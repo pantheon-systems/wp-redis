@@ -53,12 +53,33 @@ class WP_Redis_CLI_Command {
 	 * Runs through the entirety of the WP bootstrap process
 	 */
 	private function load_wordpress_with_template() {
+		global $wp_query;
+
 		WP_CLI::get_runner()->load_wordpress();
 
 		// Set up the main WordPress query.
 		wp();
 
+		$interpreted = array();
+		foreach( $wp_query as $key => $value ) {
+			if ( 0 === stripos( $key, 'is_' ) && $value ) {
+				$interpreted[] = $key;
+			}
+		}
+		WP_CLI::debug( 'Main WP_Query: ' . implode( ', ', $interpreted ), 'redis-debug' );
+
 		define( 'WP_USE_THEMES', true );
+
+		add_filter( 'template_include', function( $template ) {
+			$display_template = str_replace( dirname( get_template_directory() ) . '/', '', $template );
+			WP_CLI::debug( "Theme template: {$display_template}", 'redis-debug' );
+			return $template;
+		}, 999 );
+
+		// Template is normally loaded in global scope, so we need to replicate
+		foreach( $GLOBALS as $key => $value ) {
+			global $$key;
+		}
 
 		// Load the theme template.
 		ob_start();
