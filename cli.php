@@ -37,16 +37,20 @@ class WP_Redis_CLI_Command {
 	 * [--url=<url>]
 	 * : Execute a request against a specified URL. Defaults to home_url( '/' ).
 	 *
+	 * [--format=<format>]
+	 * : Render the results in a particular format.
+	 *
 	 * @when before_wp_load
 	 */
 	public function debug( $_, $assoc_args ) {
 		global $wp_object_cache;
 		$this->load_wordpress_with_template();
-		var_dump( array(
+		$data = array(
 			'cache_hits'      => $wp_object_cache->cache_hits,
 			'cache_misses'    => $wp_object_cache->cache_misses,
 			'redis_calls'     => $wp_object_cache->redis_calls,
-		) );
+		);
+		WP_CLI::print_value( $data, $assoc_args );
 	}
 
 	/**
