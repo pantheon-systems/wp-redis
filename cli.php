@@ -65,7 +65,7 @@ class WP_Redis_CLI_Command {
 		wp();
 
 		$interpreted = array();
-		foreach( $wp_query as $key => $value ) {
+		foreach ( $wp_query as $key => $value ) {
 			if ( 0 === stripos( $key, 'is_' ) && $value ) {
 				$interpreted[] = $key;
 			}
@@ -81,7 +81,7 @@ class WP_Redis_CLI_Command {
 		}, 999 );
 
 		// Template is normally loaded in global scope, so we need to replicate
-		foreach( $GLOBALS as $key => $value ) {
+		foreach ( $GLOBALS as $key => $value ) {
 			global $$key;
 		}
 
