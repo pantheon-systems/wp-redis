@@ -93,5 +93,4 @@ class WP_Redis_CLI_Command {
 
 }
 
-WP_CLI::add_command( 'redis-cli', array( 'WP_Redis_CLI_Command', 'cli' ) );
-WP_CLI::add_command( 'redis-debug', array( 'WP_Redis_CLI_Command', 'debug' ) );
+WP_CLI::add_command( 'redis', 'WP_Redis_CLI_Command' );
