@@ -1,0 +1,24 @@
+machine:
+  php:
+    # https://circleci.com/docs/environment#php
+    version: 5.5.11
+  environment:
+    # DB config. Using default CircleCI's database.
+    TERMINUS_ENV: ci-$CIRCLE_BUILD_NUM
+    TERMINUS_SITE: wp-redis
+
+dependencies:
+  cache_directories:
+    - ~/.composer/cache
+  override:
+    - composer global require pantheon-systems/terminus
+    - composer install
+    - terminus auth login --machine-token=$TERMINUS_TOKEN
+
+test:
+  pre:
+    - ./bin/behat-prepare.sh
+  override:
+    - ./bin/behat-test.sh
+  post:
+    - ./bin/behat-cleanup.sh
