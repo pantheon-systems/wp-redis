@@ -29,17 +29,20 @@ rm -rf $PREPARE_DIR
 git clone -b $TERMINUS_ENV $PANTHEON_GIT_URL $PREPARE_DIR
 
 ###
-# Add the copy of object-cache.php to the environment
+# Add the copy of this plugin itself to the environment
 ###
-cd $BASH_DIR/..
+rm -rf $PREPARE_DIR/wp-content/plugins/wp-redis
 rm -rf $PREPARE_DIR/wp-content/object-cache.php
+cd $BASH_DIR/..
+rsync -av --exclude='vendor/' --exclude='node_modules/' --exclude='tests/' ./* $PREPARE_DIR/wp-content/plugins/wp-redis
+rm -rf $PREPARE_DIR/wp-content/plugins/wp-redis/.git
 cp object-cache.php $PREPARE_DIR/wp-content/object-cache.php
 
 ###
 # Push files to the environment
 ###
 cd $PREPARE_DIR
-git add wp-content/object-cache.php
+git add wp-content
 git config user.email "wp-redis@getpantheon.com"
 git config user.name "Pantheon"
 git commit -m "Include WP Redis and its configuration files"
@@ -49,3 +52,4 @@ git push
 # Set up WordPress, theme, and plugins for the test run
 ###
 terminus wp "core install --title=$TERMINUS_ENV-$TERMINUS_SITE --url=$PANTHEON_SITE_URL --admin_user=pantheon --admin_email=wp-redis@getpantheon.com --admin_password=pantheon"
+terminus wp "plugin activate wp-redis"
