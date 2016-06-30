@@ -1029,7 +1029,7 @@ class WP_Object_Cache {
 				// To prevent WordPress from fataling, we catch the Exception.
 				$retry_exception_messages = array( 'socket error on read socket', 'Connection closed', 'Redis server went away' );
 				$retry_exception_messages = apply_filters( 'wp_redis_retry_exception_messages', $retry_exception_messages );
-				if ( in_array( $e->getMessage(), $retry_exception_messages ) ) {
+				if ( in_array( $e->getMessage(), $retry_exception_messages, true ) ) {
 					try {
 						$this->last_triggered_error = 'WP Redis: ' . $e->getMessage();
 						// Be friendly to developers debugging production servers by triggering an error
