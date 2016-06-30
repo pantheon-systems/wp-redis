@@ -20,7 +20,7 @@ if ( getenv( 'WP_REDIS_USE_CACHE_GROUPS' ) ) {
 }
 
 // Easiest way to get this to where WordPress will load it
-copy( dirname( dirname( __FILE__ ) ) . '/object-cache.php', $_core_dir . '/wp-content/object-cache.php' );
+copy( dirname( dirname( dirname( __FILE__ ) ) ) . '/object-cache.php', $_core_dir . '/wp-content/object-cache.php' );
 
 require $_tests_dir . '/includes/bootstrap.php';
 
