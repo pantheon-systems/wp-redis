@@ -1,5 +1,9 @@
 #!/bin/bash
 
+###
+# Delete the Pantheon site environment after the Behat test suite has run.
+###
+
 set -ex
 
 if [ -z "$TERMINUS_SITE" ] || [ -z "$TERMINUS_ENV" ]; then
