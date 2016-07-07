@@ -11,7 +11,7 @@ Feature: WP Redis
     And I should be on "/wp-admin/"
     And I should not see "The Pantheon Redis service needs to be enabled"
 
-  Scenario: Redis debug should include 'Redis calls'
+  Scenario: Redis debug should include 'Redis Calls'
 
     When I am on the homepage
     Then I should not see "Redis Calls:"
