@@ -10,6 +10,11 @@ machine:
 dependencies:
   cache_directories:
     - ~/.composer/cache
+  pre:
+    # Set the PHP timezone so that Behat script does not fail.
+    # Using > instead of >> will overwrite the file and disable xdebug.
+    # xdebug makes composer slower.
+    - echo "date.timezone = 'US/Central'"  >  /opt/circleci/php/5.6.22/etc/conf.d/xdebug.ini    
   override:
     - composer global require pantheon-systems/terminus
     - composer install
