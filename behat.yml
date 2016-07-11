@@ -1,0 +1,12 @@
+# behat.yml
+default:
+  suites:
+    default:
+      paths:
+        - tests/behat
+      contexts:
+        - Behat\MinkExtension\Context\MinkContext
+  extensions:
+    Behat\MinkExtension:
+      # base_url set by ENV
+      goutte: ~
