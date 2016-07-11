@@ -64,4 +64,5 @@ git push
 # Set up WordPress, theme, and plugins for the test run
 ###
 terminus wp "core install --title=$TERMINUS_ENV-$TERMINUS_SITE --url=$PANTHEON_SITE_URL --admin_user=pantheon --admin_email=wp-redis@getpantheon.com --admin_password=pantheon"
+terminus wp "cache flush"
 terminus wp "plugin activate wp-redis"
