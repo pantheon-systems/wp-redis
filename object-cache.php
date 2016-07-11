@@ -1,5 +1,6 @@
 <?php
 
+// WP Redis
 // This file needs to be symlinked or copied to wp-content/object-cache.php
 
 # Users with setups where multiple installs share a common wp-config.php or $table_prefix
