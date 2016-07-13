@@ -1,5 +1,6 @@
 {
   "name": "pantheon-systems/wp-redis",
+  "type": "wordpress-plugin",
   "authors": [
     {
       "name": "Pantheon",
