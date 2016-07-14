@@ -6,12 +6,12 @@
 # such that it can be run a second time if a step fails.
 ###
 
-set -ex
-
 if [ -z "$TERMINUS_TOKEN" ]; then
 	echo "TERMINUS_TOKEN environment variables missing; assuming unauthenticated build"
 	exit 0
 fi
+
+set -ex
 
 if [ -z "$TERMINUS_SITE" ] || [ -z "$TERMINUS_ENV" ]; then
 	echo "TERMINUS_SITE and TERMINUS_ENV environment variables must be set"
