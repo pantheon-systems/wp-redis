@@ -3,7 +3,6 @@ machine:
     # https://circleci.com/docs/environment#php
     version: 5.6.22
   environment:
-    # DB config. Using default CircleCI's database.
     TERMINUS_ENV: ci-$CIRCLE_BUILD_NUM
     TERMINUS_SITE: wp-redis
 
