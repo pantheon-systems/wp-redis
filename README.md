@@ -40,25 +40,7 @@ This assumes you have a PHP environment with the [required PhpRedis extension](h
 6. (Optional) To use true cache groups, with the ability to delete all keys for a given group, define the `WP_REDIS_USE_CACHE_GROUPS` constant to true. However, when enabled, the expiration value is not respected because expiration on group keys isn't a feature supported by Redis.
 7. (Optional) On an existing site previously using WordPress' transient cache, use WP-CLI to delete all (`%_transient_%`) transients from the options table: `wp transient delete-all`. WP Redis assumes responsibility for the transient cache.
 
-## Frequently Asked Questions ##
-
-### Why would I want to use this plugin? ###
-
-If you are concerned with the speed of your site, backing it with a high-performance, persistent object cache can have a huge impact. It takes load off your database, and is faster for loading all the data objects WordPress needs to run.
-
-### How does this work with other caching plugins? ###
-
-This plugin is for the internal application object cache. It doesn't have anything to do with page caches. On Pantheon you do not need additional page caching, but if you are self-hosted you can use your favorite page cache plugins in conjunction with WP Redis.
-
-### How do I disable the persistent object cache for a bad actor? ###
-
-A page load with 2,000 Redis calls can be 2 full seonds of object cache transactions. If a plugin you're using is erroneously creating a huge number of cache keys, you might be able to mitigate the problem by disabling cache persistency for the plugin's group:
-
-    wp_cache_add_non_persistent_groups( array( 'bad-actor' ) );
-
-This declaration means use of `wp_cache_set( 'foo', 'bar', 'bad-actor' );` and `wp_cache_get( 'foo', 'bad-actor' );` will not use Redis, and instead fall back to WordPress' default runtime object cache.
-
-### How can I contribute? ###
+## Contributing ##
 
 The best way to contribute to the development of this plugin is by participating on the GitHub project:
 
@@ -76,6 +58,24 @@ Both of these test suites can be run locally, with a varying amount of setup.
 PHPUnit requires the [WordPress PHPUnit test suite](https://make.wordpress.org/core/handbook/testing/automated-testing/phpunit/), and access to a database with name `wordpress_test`. If you haven't already configured the test suite locally, you can run `bash bin/install-wp-tests.sh wordpress_test root '' localhost`. You'll also need to enable Redis and the PHPRedis extension in order to run the test suite against Redis.
 
 Behat requires a Pantheon site with Redis enabled. Once you've created the site, you'll need install Terminus, and set the `TERMINUS_TOKEN`, `TERMINUS_SITE`, and `TERMINUS_ENV` environment variables. Then, you can run `./bin/behat-prepare.sh` to prepare the site for the test suite.
+
+## Frequently Asked Questions ##
+
+### Why would I want to use this plugin? ###
+
+If you are concerned with the speed of your site, backing it with a high-performance, persistent object cache can have a huge impact. It takes load off your database, and is faster for loading all the data objects WordPress needs to run.
+
+### How does this work with other caching plugins? ###
+
+This plugin is for the internal application object cache. It doesn't have anything to do with page caches. On Pantheon you do not need additional page caching, but if you are self-hosted you can use your favorite page cache plugins in conjunction with WP Redis.
+
+### How do I disable the persistent object cache for a bad actor? ###
+
+A page load with 2,000 Redis calls can be 2 full seonds of object cache transactions. If a plugin you're using is erroneously creating a huge number of cache keys, you might be able to mitigate the problem by disabling cache persistency for the plugin's group:
+
+    wp_cache_add_non_persistent_groups( array( 'bad-actor' ) );
+
+This declaration means use of `wp_cache_set( 'foo', 'bar', 'bad-actor' );` and `wp_cache_get( 'foo', 'bad-actor' );` will not use Redis, and instead fall back to WordPress' default runtime object cache.
 
 ## Changelog ##
 
