@@ -1,6 +1,6 @@
 # WP Redis #
 **Contributors:** getpantheon, danielbachhuber, mboynes, Outlandish Josh  
-**Tags:** cache, plugin  
+**Tags:** cache, plugin, redis
 **Requires at least:** 3.0.1  
 **Tested up to:** 4.5.3  
 **Stable tag:** 0.5.0  
