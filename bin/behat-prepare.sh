@@ -78,6 +78,6 @@ mv pantheon-wordpress-upstream-master/features tests/pantheon-wordpress-upstream
 # Skip the installation scenario, because WordPress is already installed
 rm tests/pantheon-wordpress-upstream/0-install.feature
 # Skip the plugin scenario, because it doesn't expect another plugin to be installed
-rm tests/pantheon-wordpress-upstream/plugin.feature
+rm tests/pantheon-wordpress-upstream/plugins.feature
 rm -rf pantheon-wordpress-upstream-master
 rm master.zip
