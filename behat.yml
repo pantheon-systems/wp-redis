@@ -4,6 +4,7 @@ default:
     default:
       paths:
         - tests/behat
+        - tests/pantheon-wordpress-upstream
       contexts:
         - Behat\MinkExtension\Context\MinkContext
   extensions:

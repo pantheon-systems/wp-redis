@@ -66,3 +66,15 @@ git push
 terminus wp "core install --title=$TERMINUS_ENV-$TERMINUS_SITE --url=$PANTHEON_SITE_URL --admin_user=pantheon --admin_email=wp-redis@getpantheon.com --admin_password=pantheon"
 terminus wp "cache flush"
 terminus wp "plugin activate wp-redis"
+
+###
+# Download the Pantheon WordPress Upstream tests
+###
+cd $BASH_DIR/..
+rm -rf pantheon-wordpress-upstream-master tests/pantheon-wordpress-upstream
+wget https://github.com/pantheon-systems/pantheon-wordpress-upstream/archive/master.zip
+unzip master.zip
+mv pantheon-wordpress-upstream-master/features tests/pantheon-wordpress-upstream
+rm tests/pantheon-wordpress-upstream/0-install.feature
+rm -rf pantheon-wordpress-upstream-master
+rm master.zip

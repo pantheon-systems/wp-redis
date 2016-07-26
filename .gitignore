@@ -1,5 +1,8 @@
+*.zip
 .DS_Store
 composer.lock
 node_modules/
 vendor/
 phpredis
+pantheon-wordpress-upstream-master
+tests/pantheon-wordpress-upstream
