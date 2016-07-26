@@ -15,9 +15,14 @@ dependencies:
     # xdebug makes composer slower.
     - echo "date.timezone = 'US/Central'"  >  /opt/circleci/php/5.6.22/etc/conf.d/xdebug.ini    
   override:
-    - composer global require pantheon-systems/terminus
-    - composer install
-    - terminus auth login --machine-token=$TERMINUS_TOKEN
+    - |
+      if [ -z "$TERMINUS_TOKEN" ]; then
+        echo "TERMINUS_TOKEN environment variables missing; assuming unauthenticated build"
+        exit 0
+      fi
+      composer global require pantheon-systems/terminus
+      composer install
+      terminus auth login --machine-token=$TERMINUS_TOKEN
 
 test:
   pre:

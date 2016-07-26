@@ -4,6 +4,11 @@
 # Delete the Pantheon site environment after the Behat test suite has run.
 ###
 
+if [ -z "$TERMINUS_TOKEN" ]; then
+	echo "TERMINUS_TOKEN environment variables missing; assuming unauthenticated build"
+	exit 0
+fi
+
 set -ex
 
 if [ -z "$TERMINUS_SITE" ] || [ -z "$TERMINUS_ENV" ]; then
