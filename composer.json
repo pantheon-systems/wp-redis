@@ -19,5 +19,14 @@
   "scripts": {
     "post-install-cmd": "\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs",
     "post-update-cmd" : "\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs"
+  },
+  "repositories": {
+    "pantheon-wordpress-upstream-tests": {
+      "type": "vcs",
+      "url": "git@github.com:pantheon-systems/pantheon-wordpress-upstream-tests.git"
+    }
+  },
+  "require": {
+    "pantheon-systems/pantheon-wordpress-upstream-tests": "dev-master"
   }
 }
