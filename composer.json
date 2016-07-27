@@ -14,10 +14,17 @@
     "behat/mink-extension": "~2.0",
     "symfony/dependency-injection": "2.7.11",
     "behat/behat": "^3.1",
-    "behat/mink-goutte-driver": "^1.2"
+    "behat/mink-goutte-driver": "^1.2",
+    "pantheon-systems/pantheon-wordpress-upstream-tests": "dev-master"
   },
   "scripts": {
     "post-install-cmd": "\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs",
     "post-update-cmd" : "\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs"
+  },
+  "repositories": {
+    "pantheon-wordpress-upstream-tests": {
+      "type": "vcs",
+      "url": "git@github.com:pantheon-systems/pantheon-wordpress-upstream-tests.git"
+    }
   }
 }
