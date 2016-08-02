@@ -1,6 +1,6 @@
 # WP Redis #
 **Contributors:** getpantheon, danielbachhuber, mboynes, Outlandish Josh  
-**Tags:** cache, plugin, redis
+**Tags:** cache, plugin, redis  
 **Requires at least:** 3.0.1  
 **Tested up to:** 4.5.3  
 **Stable tag:** 0.5.0  
@@ -19,7 +19,7 @@ Redis is a great answer, and one we bundle on the Pantheon platform. This is our
 
 It's important to note that a persistent object cache isn't a panacea - a page load with 2,000 Redis calls can be 2 full seconds of object cache transactions. Make sure you use the object cache wisely: keep to a sensible number of keys, don't store a huge amount of data on each key, and avoid stampeding frontend writes and deletes.
 
-Go forth and make awesome! And, once you've built something great, [send us feature requests (or bug reports)](https://github.com/pantheon-systems/wp-redis/issues).
+Go forth and make awesome! And, once you've built something great, [send us feature requests (or bug reports)](https://github.com/pantheon-systems/wp-redis/issues). Take a look at the wiki for [useful code snippets and other tips](https://github.com/pantheon-systems/wp-redis/wiki).
 
 ## Installation ##
 
