@@ -89,7 +89,7 @@ function admin_check() {
 	if ( ! defined( 'WP_REDIS_OBJECT_CACHE' ) && ! file_exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
 
 		$error = sprintf(
-		/* translators: %s: path to object-cache.php file */
+			/* translators: %s: path to object-cache.php file */
 			esc_html__( 'No file/symlink was found at %s. Please deactivate and reactivate wp-redis plugin to install the required drop-in.', 'wp-redis' ),
 			'<code>' . esc_html( WP_CONTENT_DIR . '/object-cache.php' ) . '</code>'
 		);
@@ -124,7 +124,7 @@ function symlink_status() {
 
 		return -1;
 
-	} elseif ( $src === readlink( $dest ) ) {
+	} elseif ( readlink( $dest ) === $src ) {
 
 		return true;
 
