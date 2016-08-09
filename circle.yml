@@ -5,6 +5,7 @@ machine:
   environment:
     TERMINUS_ENV: ci-$CIRCLE_BUILD_NUM
     TERMINUS_SITE: wp-redis
+    WORDPRESS_ADMIN_USERNAME: pantheon
     # A random password is set in the dependencies:pre stage as a text file.
     # This line reads the same file repeatedly. If the openssl call were used
     # in this step, it would result in a different password being used in each
