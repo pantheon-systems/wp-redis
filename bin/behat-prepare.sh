@@ -6,9 +6,9 @@
 # such that it can be run a second time if a step fails.
 ###
 
-terminus auth whoami
+terminus auth whoami > /dev/null
 if [ $? -ne 0 ]; then
-	echo "TERMINUS_TOKEN environment variables missing; assuming unauthenticated build"
+	echo "Terminus unauthenticated; assuming unauthenticated build"
 	exit 0
 fi
 
