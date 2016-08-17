@@ -36,6 +36,6 @@ test:
   pre:
     - ./bin/behat-prepare.sh
   override:
-    - ./bin/behat-test.sh
+    - ./bin/behat-test.sh --strict
   post:
     - ./bin/behat-cleanup.sh
