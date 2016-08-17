@@ -80,10 +80,11 @@ class WP_Redis_CLI_Command {
 	 *     | status         | connected |
 	 *     | used_memory    | 529.38K   |
 	 *     | uptime         | 0 days    |
+	 *     | key_count      | 11        |
 	 *     | redis_host     | 127.0.0.1 |
 	 *     | redis_port     | 6379      |
 	 *     | redis_auth     |           |
-	 *     | redis_database |           |
+	 *     | redis_database | 0         |
 	 *     +----------------+-----------+
 	 *
 	 *     $ wp redis info --field=used_memory
@@ -104,14 +105,20 @@ class WP_Redis_CLI_Command {
 			} else {
 				$uptime_in_days .= ' days';
 			}
+			$database = ! empty( $redis_server['database'] ) ? $redis_server['database'] : 0;
+			$key_count = 0;
+			if ( preg_match( '#keys=([\d]+)#', $info[ 'db' . $database ], $matches ) ) {
+				$key_count = $matches[1];
+			}
 			$data = array(
 				'status'          => 'connected',
 				'used_memory'     => $info['used_memory_human'],
 				'uptime'          => $uptime_in_days,
+				'key_count'       => $key_count,
 				'redis_host'      => $redis_server['host'],
 				'redis_port'      => ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379,
 				'redis_auth'      => ! empty( $redis_server['auth'] ) ? $redis_server['auth'] : '',
-				'redis_database'  => ! empty( $redis_server['database'] ) ? $redis_server['database'] : '',
+				'redis_database'  => $database,
 			);
 			$formatter = new \WP_CLI\Formatter( $assoc_args, array_keys( $data ) );
 			$formatter->display_item( $data );
