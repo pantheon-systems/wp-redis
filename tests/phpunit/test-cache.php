@@ -749,9 +749,6 @@ class CacheTest extends WP_UnitTestCase {
 	}
 
 	public function test_delete_group() {
-		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
-			$this->markTestSkipped( 'Cache groups not enabled.' );
-		}
 		$key1 = rand_str();
 		$val1 = rand_str();
 		$key2 = rand_str();
@@ -760,6 +757,10 @@ class CacheTest extends WP_UnitTestCase {
 		$val3 = rand_str();
 		$group = 'foo';
 		$group2 = 'bar';
+
+		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
+			$this->cache->add_redis_hash_groups( array( $group, $group2 ) );
+		}
 
 		// Set up the values
 		$this->cache->set( $key1, $val1, $group );
@@ -784,9 +785,6 @@ class CacheTest extends WP_UnitTestCase {
 	}
 
 	public function test_delete_group_non_persistent() {
-		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
-			$this->markTestSkipped( 'Cache groups not enabled.' );
-		}
 		$key1 = rand_str();
 		$val1 = rand_str();
 		$key2 = rand_str();
@@ -796,6 +794,10 @@ class CacheTest extends WP_UnitTestCase {
 		$group = 'foo';
 		$group2 = 'bar';
 		$this->cache->add_non_persistent_groups( array( $group, $group2 ) );
+
+		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
+			$this->cache->add_redis_hash_groups( array( $group, $group2 ) );
+		}
 
 		// Set up the values
 		$this->cache->set( $key1, $val1, $group );
@@ -815,9 +817,7 @@ class CacheTest extends WP_UnitTestCase {
 	}
 
 	public function test_wp_cache_delete_group() {
-		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
-			$this->markTestSkipped( 'Cache groups not enabled.' );
-		}
+
 		$key1 = rand_str();
 		$val1 = rand_str();
 		$key2 = rand_str();
@@ -826,6 +826,10 @@ class CacheTest extends WP_UnitTestCase {
 		$val3 = rand_str();
 		$group = 'foo';
 		$group2 = 'bar';
+
+		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
+			$GLOBALS['wp_object_cache']->add_redis_hash_groups( array( $group, $group2 ) );
+		}
 
 		// Set up the values
 		wp_cache_set( $key1, $val1, $group );
