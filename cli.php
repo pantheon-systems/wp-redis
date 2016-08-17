@@ -54,6 +54,74 @@ class WP_Redis_CLI_Command {
 	}
 
 	/**
+	 * Provide details on the Redis connection.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--field=<field>]
+	 * : Get the value of a particular field.
+	 *
+	 * [--format=<format>]
+	 * : Render results in a particular format.
+	 * ---
+	 * default: table
+	 * options:
+	 *   - table
+	 *   - json
+	 *   - yaml
+	 * ---
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     $ wp redis info
+	 *     +----------------+-----------+
+	 *     | Field          | Value     |
+	 *     +----------------+-----------+
+	 *     | status         | connected |
+	 *     | used_memory    | 529.38K   |
+	 *     | uptime         | 0 days    |
+	 *     | redis_host     | 127.0.0.1 |
+	 *     | redis_port     | 6379      |
+	 *     | redis_auth     |           |
+	 *     | redis_database |           |
+	 *     +----------------+-----------+
+	 *
+	 *     $ wp redis info --field=used_memory
+	 *     529.38K
+	 */
+	public function info( $_, $assoc_args ) {
+		global $wp_object_cache, $redis_server;
+
+		if ( ! defined( 'WP_REDIS_OBJECT_CACHE' ) || ! WP_REDIS_OBJECT_CACHE ) {
+			WP_CLI::error( "WP Redis object-cache.php file is missing from the wp-content/ directory." );
+		}
+
+		if ( $wp_object_cache->is_redis_connected ) {
+			$info = $wp_object_cache->redis->info();
+			$uptime_in_days = $info['uptime_in_days'];
+			if ( 1 === $info['uptime_in_days'] ) {
+				$uptime_in_days .= ' day';
+			} else {
+				$uptime_in_days .= ' days';
+			}
+			$data = array(
+				'status'          => 'connected',
+				'used_memory'     => $info['used_memory_human'],
+				'uptime'          => $uptime_in_days,
+				'redis_host'      => $redis_server['host'],
+				'redis_port'      => ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379,
+				'redis_auth'      => ! empty( $redis_server['auth'] ) ? $redis_server['auth'] : '',
+				'redis_database'  => ! empty( $redis_server['database'] ) ? $redis_server['database'] : '',
+			);
+			$formatter = new \WP_CLI\Formatter( $assoc_args, array_keys( $data ) );
+			$formatter->display_item( $data );
+		} else {
+			WP_CLI::error( $wp_object_cache->missing_redis_message );
+		}
+
+	}
+
+	/**
 	 * Runs through the entirety of the WP bootstrap process
 	 */
 	private function load_wordpress_with_template() {
