@@ -93,7 +93,7 @@ class WP_Redis_CLI_Command {
 		global $wp_object_cache, $redis_server;
 
 		if ( ! defined( 'WP_REDIS_OBJECT_CACHE' ) || ! WP_REDIS_OBJECT_CACHE ) {
-			WP_CLI::error( "WP Redis object-cache.php file is missing from the wp-content/ directory." );
+			WP_CLI::error( 'WP Redis object-cache.php file is missing from the wp-content/ directory.' );
 		}
 
 		if ( $wp_object_cache->is_redis_connected ) {
