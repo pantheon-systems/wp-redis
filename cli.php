@@ -58,6 +58,9 @@ class WP_Redis_CLI_Command {
 	 *
 	 * ## OPTIONS
 	 *
+	 * [--reset]
+	 * : Reset Redis stats. Only affects `lifetime_hitrate` currently.
+	 *
 	 * [--field=<field>]
 	 * : Get the value of a particular field.
 	 *
@@ -91,6 +94,9 @@ class WP_Redis_CLI_Command {
 	 *
 	 *     $ wp redis info --field=used_memory
 	 *     529.38K
+	 *
+	 *     $ wp redis info --reset
+	 *     Success: Redis stats reset.
 	 */
 	public function info( $_, $assoc_args ) {
 		global $wp_object_cache, $redis_server;
@@ -99,7 +105,13 @@ class WP_Redis_CLI_Command {
 			WP_CLI::error( 'WP Redis object-cache.php file is missing from the wp-content/ directory.' );
 		}
 
-		if ( $wp_object_cache->is_redis_connected ) {
+		if ( $wp_object_cache->is_redis_connected && WP_CLI\Utils\get_flag_value( $assoc_args, 'reset' ) ) {
+			if ( $wp_object_cache->redis->eval("return redis.call('CONFIG','RESETSTAT')") ) {
+				WP_CLI::success( 'Redis stats reset.' );
+			} else {
+				WP_CLI::error( "Couldn't reset Redis stats." );
+			}
+		} else if ( $wp_object_cache->is_redis_connected ) {
 			$info = $wp_object_cache->redis->info();
 			$uptime_in_days = $info['uptime_in_days'];
 			if ( 1 === $info['uptime_in_days'] ) {
