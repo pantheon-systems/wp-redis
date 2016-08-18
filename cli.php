@@ -107,7 +107,7 @@ class WP_Redis_CLI_Command {
 
 		if ( $wp_object_cache->is_redis_connected && WP_CLI\Utils\get_flag_value( $assoc_args, 'reset' ) ) {
 			// Redis::resetStat() isn't functional, see https://github.com/phpredis/phpredis/issues/928
-			if ( $wp_object_cache->redis->eval("return redis.call('CONFIG','RESETSTAT')") ) {
+			if ( $wp_object_cache->redis->eval( "return redis.call('CONFIG','RESETSTAT')" ) ) {
 				WP_CLI::success( 'Redis stats reset.' );
 			} else {
 				WP_CLI::error( "Couldn't reset Redis stats." );
