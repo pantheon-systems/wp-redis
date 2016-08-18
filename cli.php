@@ -74,18 +74,20 @@ class WP_Redis_CLI_Command {
 	 * ## EXAMPLES
 	 *
 	 *     $ wp redis info
-	 *     +----------------+-----------+
-	 *     | Field          | Value     |
-	 *     +----------------+-----------+
-	 *     | status         | connected |
-	 *     | used_memory    | 529.38K   |
-	 *     | uptime         | 0 days    |
-	 *     | key_count      | 11        |
-	 *     | redis_host     | 127.0.0.1 |
-	 *     | redis_port     | 6379      |
-	 *     | redis_auth     |           |
-	 *     | redis_database | 0         |
-	 *     +----------------+-----------+
+	 *     +-------------------+-----------+
+	 *     | Field             | Value     |
+	 *     +-------------------+-----------+
+	 *     | status            | connected |
+	 *     | used_memory       | 529.25K   |
+	 *     | uptime            | 0 days    |
+	 *     | key_count         | 20        |
+	 *     | instantaneous_ops | 9/sec     |
+	 *     | lifetime_hitrate  | 53.42%    |
+	 *     | redis_host        | 127.0.0.1 |
+	 *     | redis_port        | 6379      |
+	 *     | redis_auth        |           |
+	 *     | redis_database    | 0         |
+	 *     +-------------------+-----------+
 	 *
 	 *     $ wp redis info --field=used_memory
 	 *     529.38K
@@ -111,14 +113,16 @@ class WP_Redis_CLI_Command {
 				$key_count = $matches[1];
 			}
 			$data = array(
-				'status'          => 'connected',
-				'used_memory'     => $info['used_memory_human'],
-				'uptime'          => $uptime_in_days,
-				'key_count'       => $key_count,
-				'redis_host'      => $redis_server['host'],
-				'redis_port'      => ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379,
-				'redis_auth'      => ! empty( $redis_server['auth'] ) ? $redis_server['auth'] : '',
-				'redis_database'  => $database,
+				'status'            => 'connected',
+				'used_memory'       => $info['used_memory_human'],
+				'uptime'            => $uptime_in_days,
+				'key_count'         => $key_count,
+				'instantaneous_ops' => $info['instantaneous_ops_per_sec'] . '/sec',
+				'lifetime_hitrate'  => round( ( $info['keyspace_hits'] / ( $info['keyspace_hits'] + $info['keyspace_misses'] ) * 100 ), 2 ) . '%',
+				'redis_host'        => $redis_server['host'],
+				'redis_port'        => ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379,
+				'redis_auth'        => ! empty( $redis_server['auth'] ) ? $redis_server['auth'] : '',
+				'redis_database'    => $database,
 			);
 			$formatter = new \WP_CLI\Formatter( $assoc_args, array_keys( $data ) );
 			$formatter->display_item( $data );
