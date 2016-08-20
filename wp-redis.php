@@ -47,7 +47,7 @@ function activation() {
 			);
 
 			deactivate_plugins( __FILE__ );
-			wp_die( $error );
+			wp_die( wp_kses( $error, array( 'code' => array() ) ) );
 
 		} elseif ( -1 === $status ) {
 
@@ -58,13 +58,15 @@ function activation() {
 			);
 
 			deactivate_plugins( __FILE__ );
-			wp_die( $error );
+			wp_die( wp_kses( $error, array( 'code' => array() ) ) );
 
 		}
 	} else {
 
 		if ( function_exists( 'symlink' ) ) {
+			// @codingStandardsIgnoreStart
 			@symlink( plugin_dir_path( __FILE__ ) . 'object-cache.php', $db );
+			// @codingStandardsIgnoreEnd
 		}
 	}
 }
@@ -73,10 +75,11 @@ function activation() {
  * On deactivation: remove the symlinked file if found and is pointing to the correct file
  */
 function deactivation() {
-
+	// @codingStandardsIgnoreStart
 	if ( true === symlink_status() ) {
 		unlink( WP_CONTENT_DIR . '/object-cache.php' );
 	}
+	// @codingStandardsIgnoreEnd
 }
 
 /**
@@ -88,23 +91,25 @@ function admin_check() {
 
 	if ( ! defined( 'WP_REDIS_OBJECT_CACHE' ) && ! file_exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
 
-		$error = sprintf(
-			/* translators: %s: path to object-cache.php file */
-			esc_html__( 'No file/symlink was found at %s. Please deactivate and reactivate wp-redis plugin to install the required drop-in.', 'wp-redis' ),
-			'<code>' . esc_html( WP_CONTENT_DIR . '/object-cache.php' ) . '</code>'
+		printf(
+			'<div class="updated error"><p>%s</p></div>',
+			sprintf(
+				/* translators: %s: path to object-cache.php file */
+				esc_html__( 'No file/symlink was found at %s. Please deactivate and reactivate wp-redis plugin to install the required drop-in.', 'wp-redis' ),
+				'<code>' . esc_html( WP_CONTENT_DIR . '/object-cache.php' ) . '</code>'
+			)
 		);
-
-		printf( '<div class="updated error"><p>%s</p></div>', $error );
 
 	} elseif ( false === symlink_status() ) {
 
-		$error = sprintf(
-			/* translators: %s: path to object-cache.php file */
-			esc_html__( 'The symlink at %s is no longer pointing to the correct location. Please remove the symlink, then deactivate and reactivate wp-redis plugin.', 'wp-redis' ),
-			'<code>' . esc_html( WP_CONTENT_DIR . '/object-cache.php' ) . '</code>'
+		printf(
+			'<div class="updated error"><p>%s</p></div>',
+			sprintf(
+				/* translators: %s: path to object-cache.php file */
+				esc_html__( 'The symlink at %s is no longer pointing to the correct location. Please remove the symlink, then deactivate and reactivate wp-redis plugin.', 'wp-redis' ),
+				'<code>' . esc_html( WP_CONTENT_DIR . '/object-cache.php' ) . '</code>'
+			)
 		);
-
-		printf( '<div class="updated error"><p>%s</p></div>', $error );
 
 	}
 }
