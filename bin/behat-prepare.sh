@@ -11,12 +11,17 @@ if [ -z "$TERMINUS_TOKEN" ]; then
 	exit 0
 fi
 
-set -ex
-
 if [ -z "$TERMINUS_SITE" ] || [ -z "$TERMINUS_ENV" ]; then
 	echo "TERMINUS_SITE and TERMINUS_ENV environment variables must be set"
 	exit 1
 fi
+
+if [ -z "$WORDPRESS_ADMIN_USERNAME" ] || [ -z "$WORDPRESS_ADMIN_PASSWORD" ]; then
+	echo "WORDPRESS_ADMIN_USERNAME and WORDPRESS_ADMIN_PASSWORD environment variables must be set"
+	exit 1
+fi
+
+set -ex
 
 ###
 # Create a new environment for this particular test run.
@@ -67,16 +72,9 @@ git push
 ###
 # Set up WordPress, theme, and plugins for the test run
 ###
-terminus wp "core install --title=$TERMINUS_ENV-$TERMINUS_SITE --url=$PANTHEON_SITE_URL --admin_user=pantheon --admin_email=wp-redis@getpantheon.com --admin_password=pantheon"
+# Silence output so as not to show the password.
+{
+  terminus wp "core install --title=$TERMINUS_ENV-$TERMINUS_SITE --url=$PANTHEON_SITE_URL --admin_user=$WORDPRESS_ADMIN_USERNAME --admin_email=wp-redis@getpantheon.com --admin_password=$WORDPRESS_ADMIN_PASSWORD"
+} &> /dev/null
 terminus wp "cache flush"
 terminus wp "plugin activate wp-redis"
-
-###
-# Download the Pantheon WordPress Upstream tests
-###
-cd $BASH_DIR/..
-cp -r vendor/pantheon-systems/pantheon-wordpress-upstream-tests/features tests/pantheon-wordpress-upstream
-# Skip the installation scenario, because WordPress is already installed
-rm tests/pantheon-wordpress-upstream/0-install.feature
-# Skip the plugin scenario, because it doesn't expect another plugin to be installed
-rm tests/pantheon-wordpress-upstream/plugins.feature

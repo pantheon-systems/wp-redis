@@ -4,9 +4,17 @@ default:
     default:
       paths:
         - tests/behat
-        - tests/pantheon-wordpress-upstream
       contexts:
         - Behat\MinkExtension\Context\MinkContext
+        - PantheonSystems\PantheonWordPressUpstreamTests\Behat\AdminLogIn
+    core:
+      filters:
+        tags: "~@upstreamonly"
+      paths:
+        - vendor/pantheon-systems/pantheon-wordpress-upstream-tests/features
+      contexts:
+        - Behat\MinkExtension\Context\MinkContext
+        - PantheonSystems\PantheonWordPressUpstreamTests\Behat\AdminLogIn
   extensions:
     Behat\MinkExtension:
       # base_url set by ENV

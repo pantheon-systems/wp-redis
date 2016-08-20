@@ -5,11 +5,19 @@ machine:
   environment:
     TERMINUS_ENV: ci-$CIRCLE_BUILD_NUM
     TERMINUS_SITE: wp-redis
+    WORDPRESS_ADMIN_USERNAME: pantheon
+    # A random password is set in the dependencies:pre stage as a text file.
+    # This line reads the same file repeatedly. If the openssl call were used
+    # in this step, it would result in a different password being used in each
+    # line of other steps. Each CircleCI command runs in a separate shell.
+    WORDPRESS_ADMIN_PASSWORD: $(cat ~/WORDPRESS_ADMIN_PASSWORD)
 
 dependencies:
   cache_directories:
     - ~/.composer/cache
   pre:
+    # The environment step uses this file to set a global variable.
+    - echo $(openssl rand -hex 8) > ~/WORDPRESS_ADMIN_PASSWORD
     # Set the PHP timezone so that Behat script does not fail.
     # Using > instead of >> will overwrite the file and disable xdebug.
     # xdebug makes composer slower.
@@ -28,6 +36,6 @@ test:
   pre:
     - ./bin/behat-prepare.sh
   override:
-    - ./bin/behat-test.sh
+    - ./bin/behat-test.sh --strict
   post:
     - ./bin/behat-cleanup.sh
