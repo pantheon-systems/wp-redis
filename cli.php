@@ -112,37 +112,14 @@ class WP_Redis_CLI_Command {
 			} else {
 				WP_CLI::error( "Couldn't reset Redis stats." );
 			}
-		} else if ( $wp_object_cache->is_redis_connected ) {
-			$info = $wp_object_cache->redis->info();
-			$uptime_in_days = $info['uptime_in_days'];
-			if ( 1 === $info['uptime_in_days'] ) {
-				$uptime_in_days .= ' day';
-			} else {
-				$uptime_in_days .= ' days';
+		} else {
+			$data = wp_redis_get_info();
+			if ( is_wp_error( $data ) ) {
+				WP_CLI::error( $data );
 			}
-			$database = ! empty( $redis_server['database'] ) ? $redis_server['database'] : 0;
-			$key_count = 0;
-			if ( preg_match( '#keys=([\d]+)#', $info[ 'db' . $database ], $matches ) ) {
-				$key_count = $matches[1];
-			}
-			$data = array(
-				'status'            => 'connected',
-				'used_memory'       => $info['used_memory_human'],
-				'uptime'            => $uptime_in_days,
-				'key_count'         => $key_count,
-				'instantaneous_ops' => $info['instantaneous_ops_per_sec'] . '/sec',
-				'lifetime_hitrate'  => round( ( $info['keyspace_hits'] / ( $info['keyspace_hits'] + $info['keyspace_misses'] ) * 100 ), 2 ) . '%',
-				'redis_host'        => $redis_server['host'],
-				'redis_port'        => ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379,
-				'redis_auth'        => ! empty( $redis_server['auth'] ) ? $redis_server['auth'] : '',
-				'redis_database'    => $database,
-			);
 			$formatter = new \WP_CLI\Formatter( $assoc_args, array_keys( $data ) );
 			$formatter->display_item( $data );
-		} else {
-			WP_CLI::error( $wp_object_cache->missing_redis_message );
 		}
-
 	}
 
 	/**
