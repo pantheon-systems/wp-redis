@@ -24,7 +24,11 @@ class WP_Redis_CLI_Command {
 			}
 		}
 
-		$cmd = WP_CLI\Utils\esc_cmd( 'redis-cli -h %s -p %s -a %s', $redis_server['host'], $redis_server['port'], $redis_server['auth'] );
+		if ( ! isset( $redis_server['database'] ) ) {
+			$redis_server['database'] = 0;
+		}
+
+		$cmd = WP_CLI\Utils\esc_cmd( 'redis-cli -h %s -p %s -a %s -n %d', $redis_server['host'], $redis_server['port'], $redis_server['auth'], $redis_server['database'] );
 		WP_CLI::launch( $cmd );
 
 	}

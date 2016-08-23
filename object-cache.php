@@ -973,9 +973,12 @@ class WP_Object_Cache {
 			$port = ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379;
 		}
 		$this->redis->connect( $redis_server['host'], $port, 1, null, 100 ); # 1s timeout, 100ms delay between reconnections
-		if ( ! empty( $redis_server['auth'] ) ) {
+		foreach ( array( 'auth' => 'auth', 'database' => 'select' ) as $k => $method ) {
+			if ( ! isset( $redis_server[ $k ] ) ) {
+				continue;
+			}
 			try {
-				$this->redis->auth( $redis_server['auth'] );
+				$this->redis->$method( $redis_server[ $k ] );
 			} catch ( RedisException $e ) {
 				// PhpRedis throws an Exception when it fails a server call.
 				// To prevent WordPress from fataling, we catch the Exception.
