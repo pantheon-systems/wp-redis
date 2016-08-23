@@ -29,9 +29,10 @@ This assumes you have a PHP environment with the [required PhpRedis extension](h
 2. If you're not running on Pantheon, edit wp-config.php to add your cache credentials, e.g.:
 
         $redis_server = array(
-            'host' => '127.0.0.1',
-            'port' => 6379,
-            'auth' => '12345',
+            'host'     => '127.0.0.1',
+            'port'     => 6379,
+            'auth'     => '12345',
+            'database' => 0, // Optionally use a specific numeric Redis database. Default is 0.
         );
 
 3. Engage thrusters: you are now backing WP's Object Cache with Redis.

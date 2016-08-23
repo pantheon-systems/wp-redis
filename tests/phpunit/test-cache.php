@@ -904,6 +904,21 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( $wp_object_cache->cache, $new_blank_cache_object->cache );
 	}
 
+	public function test_redis_connect_custom_database() {
+		global $redis_server;
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
+		$redis_server['database'] = 2;
+		$second_cache = new WP_Object_Cache;
+		$this->cache->set( 'foo', 'bar' );
+		$this->assertEquals( 'bar', $this->cache->get( 'foo' ) );
+		$this->assertFalse( $second_cache->get( 'foo' ) );
+		$second_cache->set( 'foo', 'apple' );
+		$this->assertEquals( 'apple', $second_cache->get( 'foo' ) );
+		$this->assertEquals( 'bar', $this->cache->get( 'foo' ) );
+	}
+
 	public function test_wp_cache_replace() {
 		$key  = 'my-key';
 		$val1 = 'first-val';
