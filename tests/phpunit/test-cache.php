@@ -941,6 +941,17 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertFalse( wp_cache_get( $fake_key ) );
 	}
 
+	public function test_wp_redis_get_info() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
+		$data = wp_redis_get_info();
+		$this->assertEquals( 'connected', $data['status'] );
+		$this->assertInternalType( 'int', $data['key_count'] );
+		$this->assertRegExp( '/[\d]+\/sec/', $data['instantaneous_ops'] );
+		$this->assertRegExp( '/[\d]+\sdays/', $data['uptime'] );
+	}
+
 	public function tearDown() {
 		parent::tearDown();
 		$this->flush_cache();

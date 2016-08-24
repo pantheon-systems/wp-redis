@@ -22,6 +22,11 @@ if ( getenv( 'WP_REDIS_USE_CACHE_GROUPS' ) ) {
 // Easiest way to get this to where WordPress will load it
 copy( dirname( dirname( dirname( __FILE__ ) ) ) . '/object-cache.php', $_core_dir . '/wp-content/object-cache.php' );
 
+function _manually_load_plugin() {
+	require dirname( dirname( dirname( __FILE__ ) ) ) . '/wp-redis.php';
+}
+tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
+
 require $_tests_dir . '/includes/bootstrap.php';
 
 error_log( PHP_EOL );
