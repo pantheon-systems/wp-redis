@@ -4,9 +4,15 @@
 # Execute the Behat test suite against a prepared Pantheon site environment.
 ###
 
-if [ -z "$TERMINUS_TOKEN" ]; then
-	echo "TERMINUS_TOKEN environment variables missing; assuming unauthenticated build"
+terminus auth whoami > /dev/null
+if [ $? -ne 0 ]; then
+	echo "Terminus unauthenticated; assuming unauthenticated build"
 	exit 0
+fi
+
+if [ -z "$TERMINUS_SITE" ] || [ -z "$TERMINUS_ENV" ]; then
+	echo "TERMINUS_SITE and TERMINUS_ENV environment variables must be set"
+	exit 1
 fi
 
 if [ -z "$WORDPRESS_ADMIN_USERNAME" ] || [ -z "$WORDPRESS_ADMIN_PASSWORD" ]; then

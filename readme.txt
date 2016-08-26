@@ -2,7 +2,7 @@
 Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh
 Tags: cache, plugin, redis
 Requires at least: 3.0.1
-Tested up to: 4.5.3
+Tested up to: 4.6
 Stable tag: 0.5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -29,9 +29,10 @@ This assumes you have a PHP environment with the [required PhpRedis extension](h
 2. If you're not running on Pantheon, edit wp-config.php to add your cache credentials, e.g.:
 
         $redis_server = array(
-            'host' => '127.0.0.1',
-            'port' => 6379,
-            'auth' => '12345',
+            'host'     => '127.0.0.1',
+            'port'     => 6379,
+            'auth'     => '12345',
+            'database' => 0, // Optionally use a specific numeric Redis database. Default is 0.
         );
 
 3. Engage thrusters: you are now backing WP's Object Cache with Redis.
