@@ -228,6 +228,17 @@ function wp_cache_add_non_persistent_groups( $groups ) {
 }
 
 /**
+ * Adds a group or set of groups to the list of groups that use Redis hashes.
+ *
+ * @param string|array $groups A group or an array of groups to add.
+ */
+function wp_cache_add_redis_hash_groups( $groups ) {
+	global $wp_object_cache;
+
+	$wp_object_cache->add_redis_hash_groups( $groups );
+}
+
+/**
  * Reset internal cache keys and structures. If the cache backend uses global
  * blog or site IDs as part of its cache keys, this function instructs the
  * backend to reset those keys and perform any cleanup since blog or site IDs
@@ -310,6 +321,14 @@ class WP_Object_Cache {
 	 * @access protected
 	 */
 	var $non_persistent_groups = array();
+
+	/**
+	 * List of groups which use Redis hashes.
+	 *
+	 * @var array
+	 * @access protected
+	 */
+	var $redis_hash_groups = array();
 
 	/**
 	 * The blog prefix to prepend to keys in non-global groups.
@@ -403,6 +422,18 @@ class WP_Object_Cache {
 	}
 
 	/**
+	 * Sets the list of groups that use Redis hashes.
+	 *
+	 * @param array $groups List of groups that use Redis hashes.
+	 */
+	public function add_redis_hash_groups( $groups ) {
+		$groups = (array) $groups;
+
+		$groups = array_fill_keys( $groups, true );
+		$this->redis_hash_groups = array_merge( $this->redis_hash_groups, $groups );
+	}
+
+	/**
 	 * Decrement numeric cache item's value
 	 *
 	 * @param int|string $key The cache key to increment
@@ -438,7 +469,7 @@ class WP_Object_Cache {
 			return $existing;
 		}
 
-		if ( self::USE_GROUPS ) {
+		if ( $this->_should_use_redis_hashes( $group ) ) {
 			$redis_safe_group = $this->_key( '', $group );
 			$result = $this->_call_redis( 'hIncrBy', $redis_safe_group, $key, -$offset, $group );
 			if ( $result < 0 ) {
@@ -484,7 +515,7 @@ class WP_Object_Cache {
 		}
 
 		if ( $this->_should_persist( $group ) ) {
-			if ( self::USE_GROUPS ) {
+			if ( $this->_should_use_redis_hashes( $group ) ) {
 				$redis_safe_group = $this->_key( '', $group );
 				$result = $this->_call_redis( 'hDel', $redis_safe_group, $key );
 			} else {
@@ -507,7 +538,7 @@ class WP_Object_Cache {
 	 * @return boolean True on success, false on failure.
 	 */
 	public function delete_group( $group ) {
-		if ( ! self::USE_GROUPS ) {
+		if ( ! $this->_should_use_redis_hashes( $group ) ) {
 			return false;
 		}
 
@@ -583,7 +614,7 @@ class WP_Object_Cache {
 			return false;
 		}
 
-		if ( self::USE_GROUPS ) {
+		if ( $this->_should_use_redis_hashes( $group ) ) {
 			$redis_safe_group = $this->_key( '', $group );
 			$value = $this->_call_redis( 'hGet', $redis_safe_group, $key );
 		} else {
@@ -645,7 +676,7 @@ class WP_Object_Cache {
 			return $existing;
 		}
 
-		if ( self::USE_GROUPS ) {
+		if ( $this->_should_use_redis_hashes( $group ) ) {
 			$redis_safe_group = $this->_key( '', $group );
 			$result = $this->_call_redis( 'hIncrBy', $redis_safe_group, $key, $offset, $group );
 			if ( $result < 0 ) {
@@ -739,7 +770,7 @@ class WP_Object_Cache {
 		}
 
 		// Redis doesn't support expire on hash group keys
-		if ( self::USE_GROUPS ) {
+		if ( $this->_should_use_redis_hashes( $group ) ) {
 			$redis_safe_group = $this->_key( '', $group );
 			$this->_call_redis( 'hSet', $redis_safe_group, $key, $data );
 			return true;
@@ -810,7 +841,7 @@ class WP_Object_Cache {
 			return false;
 		}
 
-		if ( self::USE_GROUPS ) {
+		if ( $this->_should_use_redis_hashes( $group ) ) {
 			$redis_safe_group = $this->_key( '', $group );
 			return $this->_call_redis( 'hExists', $redis_safe_group, $key );
 		}
@@ -826,7 +857,7 @@ class WP_Object_Cache {
 	 * @return boolean
 	 */
 	protected function _isset_internal( $key, $group ) {
-		if ( self::USE_GROUPS ) {
+		if ( $this->_should_use_redis_hashes( $group ) ) {
 			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
 			return isset( $this->cache[ $multisite_safe_group ][ $key ] );
 		} else {
@@ -844,7 +875,7 @@ class WP_Object_Cache {
 	 */
 	protected function _get_internal( $key, $group ) {
 		$value = null;
-		if ( self::USE_GROUPS ) {
+		if ( $this->_should_use_redis_hashes( $group ) ) {
 			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
 			if ( isset( $this->cache[ $multisite_safe_group ][ $key ] ) ) {
 				$value = $this->cache[ $multisite_safe_group ][ $key ];
@@ -873,7 +904,7 @@ class WP_Object_Cache {
 		if ( is_null( $value ) ) {
 			$value = '';
 		}
-		if ( self::USE_GROUPS ) {
+		if ( $this->_should_use_redis_hashes( $group ) ) {
 			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
 			if ( ! isset( $this->cache[ $multisite_safe_group ] ) ) {
 				$this->cache[ $multisite_safe_group ] = array();
@@ -892,7 +923,7 @@ class WP_Object_Cache {
 	 * @param string $group
 	 */
 	protected function _unset_internal( $key, $group ) {
-		if ( self::USE_GROUPS ) {
+		if ( $this->_should_use_redis_hashes( $group ) ) {
 			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
 			if ( isset( $this->cache[ $multisite_safe_group ][ $key ] ) ) {
 				unset( $this->cache[ $multisite_safe_group ][ $key ] );
@@ -934,6 +965,19 @@ class WP_Object_Cache {
 	 */
 	protected function _should_persist( $group ) {
 		return empty( $this->non_persistent_groups[ $group ] );
+	}
+
+	/**
+	 * Should this group use Redis hashes?
+	 *
+	 * @param string $group Cache group.
+	 * @return bool True if the group should use Redis hashes, false if not.
+	 */
+	protected function _should_use_redis_hashes( $group ) {
+		if ( self::USE_GROUPS || ! empty( $this->redis_hash_groups[ $group ] ) ) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
