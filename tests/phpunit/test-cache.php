@@ -749,9 +749,6 @@ class CacheTest extends WP_UnitTestCase {
 	}
 
 	public function test_delete_group() {
-		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
-			$this->markTestSkipped( 'Cache groups not enabled.' );
-		}
 		$key1 = rand_str();
 		$val1 = rand_str();
 		$key2 = rand_str();
@@ -760,6 +757,10 @@ class CacheTest extends WP_UnitTestCase {
 		$val3 = rand_str();
 		$group = 'foo';
 		$group2 = 'bar';
+
+		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
+			$this->cache->add_redis_hash_groups( array( $group, $group2 ) );
+		}
 
 		// Set up the values
 		$this->cache->set( $key1, $val1, $group );
@@ -784,9 +785,6 @@ class CacheTest extends WP_UnitTestCase {
 	}
 
 	public function test_delete_group_non_persistent() {
-		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
-			$this->markTestSkipped( 'Cache groups not enabled.' );
-		}
 		$key1 = rand_str();
 		$val1 = rand_str();
 		$key2 = rand_str();
@@ -796,6 +794,10 @@ class CacheTest extends WP_UnitTestCase {
 		$group = 'foo';
 		$group2 = 'bar';
 		$this->cache->add_non_persistent_groups( array( $group, $group2 ) );
+
+		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
+			$this->cache->add_redis_hash_groups( array( $group, $group2 ) );
+		}
 
 		// Set up the values
 		$this->cache->set( $key1, $val1, $group );
@@ -815,9 +817,7 @@ class CacheTest extends WP_UnitTestCase {
 	}
 
 	public function test_wp_cache_delete_group() {
-		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
-			$this->markTestSkipped( 'Cache groups not enabled.' );
-		}
+
 		$key1 = rand_str();
 		$val1 = rand_str();
 		$key2 = rand_str();
@@ -826,6 +826,10 @@ class CacheTest extends WP_UnitTestCase {
 		$val3 = rand_str();
 		$group = 'foo';
 		$group2 = 'bar';
+
+		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
+			$GLOBALS['wp_object_cache']->add_redis_hash_groups( array( $group, $group2 ) );
+		}
 
 		// Set up the values
 		wp_cache_set( $key1, $val1, $group );
@@ -904,6 +908,21 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( $wp_object_cache->cache, $new_blank_cache_object->cache );
 	}
 
+	public function test_redis_connect_custom_database() {
+		global $redis_server;
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
+		$redis_server['database'] = 2;
+		$second_cache = new WP_Object_Cache;
+		$this->cache->set( 'foo', 'bar' );
+		$this->assertEquals( 'bar', $this->cache->get( 'foo' ) );
+		$this->assertFalse( $second_cache->get( 'foo' ) );
+		$second_cache->set( 'foo', 'apple' );
+		$this->assertEquals( 'apple', $second_cache->get( 'foo' ) );
+		$this->assertEquals( 'bar', $this->cache->get( 'foo' ) );
+	}
+
 	public function test_wp_cache_replace() {
 		$key  = 'my-key';
 		$val1 = 'first-val';
@@ -924,6 +943,17 @@ class CacheTest extends WP_UnitTestCase {
 
 		// Make sure $fake_key is not stored
 		$this->assertFalse( wp_cache_get( $fake_key ) );
+	}
+
+	public function test_wp_redis_get_info() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
+		$data = wp_redis_get_info();
+		$this->assertEquals( 'connected', $data['status'] );
+		$this->assertInternalType( 'int', $data['key_count'] );
+		$this->assertRegExp( '/[\d]+\/sec/', $data['instantaneous_ops'] );
+		$this->assertRegExp( '/[\d]+\sdays/', $data['uptime'] );
 	}
 
 	public function tearDown() {
