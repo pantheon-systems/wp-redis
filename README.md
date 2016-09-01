@@ -25,8 +25,18 @@ Go forth and make awesome! And, once you've built something great, [send us feat
 
 This assumes you have a PHP environment with the [required PhpRedis extension](https://github.com/phpredis/phpredis) and a working Redis server (e.g. Pantheon).
 
-1. Install `object-cache.php` to `wp-content/object-cache.php` with a symlink or by copying the file.
-2. If you're not running on Pantheon, edit wp-config.php to add your cache credentials, e.g.:
+#### Automatic Symlinking
+
+- Install / Activate the plugin, and it'll attempt creating a symlink to `wp-content/object-cache.php` automatically.
+
+#### Manual way
+
+- Install `object-cache.php` to `wp-content/object-cache.php` with a symlink or by copying the file.
+
+
+#### Optional Configuration
+
+- If you're not running on Pantheon, edit wp-config.php to add your cache credentials, e.g.:
 
         $redis_server = array(
             'host'     => '127.0.0.1',
@@ -35,11 +45,12 @@ This assumes you have a PHP environment with the [required PhpRedis extension](h
             'database' => 0, // Optionally use a specific numeric Redis database. Default is 0.
         );
 
-3. Engage thrusters: you are now backing WP's Object Cache with Redis.
-4. (Optional) To use the `wp redis` WP-CLI commands, activate the WP Redis plugin. No activation is necessary if you're solely using the object cache drop-in.
-5. (Optional) To use the same Redis server with multiple, discreet WordPress installs, you can use the `WP_CACHE_KEY_SALT` constant to define a unique salt for each install.
-6. (Optional) To use true cache groups, with the ability to delete all keys for a given group, register groups with `wp_cache_add_redis_hash_groups()`, or define the `WP_REDIS_USE_CACHE_GROUPS` constant to true to enable with all groups. However, when enabled, the expiration value is not respected because expiration on group keys isn't a feature supported by Redis.
-7. (Optional) On an existing site previously using WordPress' transient cache, use WP-CLI to delete all (`%_transient_%`) transients from the options table: `wp transient delete-all`. WP Redis assumes responsibility for the transient cache.
+- To use the `wp redis` WP-CLI commands, activate the WP Redis plugin. No activation is necessary if you're solely using the object cache drop-in.
+- To use the same Redis server with multiple, discreet WordPress installs, you can use the `WP_CACHE_KEY_SALT` constant to define a unique salt for each install.
+- To use true cache groups, with the ability to delete all keys for a given group, register groups with `wp_cache_add_redis_hash_groups()`, or define the `WP_REDIS_USE_CACHE_GROUPS` constant to true to enable with all groups. However, when enabled, the expiration value is not respected because expiration on group keys isn't a feature supported by Redis.
+- (Optional) On an existing site previously using WordPress' transient cache, use WP-CLI to delete all (`%_transient_%`) transients from the options table: `wp transient delete-all`. WP Redis assumes responsibility for the transient cache.
+
+Engage thrusters! you are now backing WordPress's Object Cache with Redis!
 
 ## Contributing ##
 
@@ -69,6 +80,10 @@ If you are concerned with the speed of your site, backing it with a high-perform
 ### How does this work with other caching plugins? ###
 
 This plugin is for the internal application object cache. It doesn't have anything to do with page caches. On Pantheon you do not need additional page caching, but if you are self-hosted you can use your favorite page cache plugins in conjunction with WP Redis.
+
+### Can I disable automatic creation of the symlink ? ###
+
+You can define `WP_REDIS_NO_SYMLINK` to stop the plugin from automatically creating/removing the symlink on plugin activation/deactivation. ie: `define( 'WP_REDIS_NO_SYMLINK', true )`
 
 ### How do I disable the persistent object cache for a bad actor? ###
 
