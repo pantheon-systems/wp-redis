@@ -140,6 +140,8 @@ function symlink_status() {
 	}
 }
 
-register_activation_hook( __FILE__, __NAMESPACE__ . '\\activation' );
-register_deactivation_hook( __FILE__, __NAMESPACE__ . '\\deactivation' );
-add_action( 'admin_notices', __NAMESPACE__ . '\\admin_check' );
+if ( ! defined( 'WP_REDIS_NO_SYMLINK' ) ) {
+	register_activation_hook( __FILE__, __NAMESPACE__ . '\\activation' );
+	register_deactivation_hook( __FILE__, __NAMESPACE__ . '\\deactivation' );
+	add_action( 'admin_notices', __NAMESPACE__ . '\\admin_check' );
+}
