@@ -90,8 +90,8 @@ function admin_check() {
 		printf(
 			'<div class="updated error"><p>%s</p></div>',
 			sprintf(
-			/* translators: %s: path to object-cache.php file */
-				esc_html__( 'The symlink at %s is no longer pointing to the correct location. Please remove the symlink, then click here to install it properly.', 'wp-redis' ),
+				/* translators: %s: path to object-cache.php file */
+				esc_html__( 'ERROR: Redis cache drop-in symlink at %s is no longer pointing to the correct location.', 'wp-redis' ),
 				'<code>' . esc_html( WP_CONTENT_DIR . '/object-cache.php' ) . '</code>'
 			)
 		);
