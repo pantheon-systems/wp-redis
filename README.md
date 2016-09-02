@@ -25,7 +25,7 @@ Go forth and make awesome! And, once you've built something great, [send us feat
 
 This assumes you have a PHP environment with the [required PhpRedis extension](https://github.com/phpredis/phpredis) and a working Redis server (e.g. Pantheon).
 
-1. Install `object-cache.php` to `wp-content/object-cache.php` with a symlink or by copying the file.
+1. Install the cache drop-in by clicking the link in the admin notice complaining about the missing drop-in, or copy/symlink `object-cache.php` to `wp-content/object-cache.php`.
 2. If you're not running on Pantheon, edit wp-config.php to add your cache credentials, e.g.:
 
         $redis_server = array(
