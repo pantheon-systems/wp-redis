@@ -75,7 +75,7 @@ class WP_Redis_CLI_Command {
 		// @codingStandardsIgnoreStart
 		if ( symlink( $target, 'object-cache.php' ) ) {
 			// @codingStandardsIgnoreEnd
-			WP_CLI::success( 'Enabled WP Redis by creating wp-content/object-cache.php symlink' );
+			WP_CLI::success( 'Enabled WP Redis by creating wp-content/object-cache.php symlink.' );
 		} else {
 			WP_CLI::error( 'Failed create wp-content/object-cache.php symlink and enable WP Redis.' );
 		}
