@@ -47,15 +47,15 @@ This plugin implements a variety of [WP-CLI](https://wp-cli.org) commands. All c
 
     $ wp help redis
 
-    **NAME**
+    NAME
 
       wp redis
 
-    **SYNOPSIS**
+    SYNOPSIS
 
       wp redis <command>
 
-    **SUBCOMMANDS**
+    SUBCOMMANDS
 
       cli         Launch redis-cli using Redis configuration for WordPress
       debug       Debug object cache hit / miss ratio for any page URL.
