@@ -41,6 +41,29 @@ This assumes you have a PHP environment with the [required PhpRedis extension](h
 6. (Optional) To use true cache groups, with the ability to delete all keys for a given group, register groups with `wp_cache_add_redis_hash_groups()`, or define the `WP_REDIS_USE_CACHE_GROUPS` constant to true to enable with all groups. However, when enabled, the expiration value is not respected because expiration on group keys isn't a feature supported by Redis.
 7. (Optional) On an existing site previously using WordPress' transient cache, use WP-CLI to delete all (`%_transient_%`) transients from the options table: `wp transient delete-all`. WP Redis assumes responsibility for the transient cache.
 
+== WP-CLI Commands ==
+
+This plugin implements a variety of [WP-CLI](https://wp-cli.org) commands. All commands are grouped into the `wp redis` namespace.
+
+    $ wp help redis
+
+    NAME
+
+      wp redis
+
+    SYNOPSIS
+
+      wp redis <command>
+
+    SUBCOMMANDS
+
+      cli         Launch redis-cli using Redis configuration for WordPress
+      debug       Debug object cache hit / miss ratio for any page URL.
+      enable      Enable WP Redis by creating the symlink for object-cache.php
+      info        Provide details on the Redis connection.
+
+Use `wp help redis <command>` to learn more about each command.
+
 == Contributing ==
 
 The best way to contribute to the development of this plugin is by participating on the GitHub project:
