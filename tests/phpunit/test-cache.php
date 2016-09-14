@@ -19,6 +19,8 @@ class CacheTest extends WP_UnitTestCase {
 
 	private static $delete_key;
 
+	private static $flush_all_key;
+
 	public function setUp() {
 		parent::setUp();
 		$GLOBALS['redis_server'] = array(
@@ -38,6 +40,7 @@ class CacheTest extends WP_UnitTestCase {
 		// 'hIncrBy' isn't a typo here — Redis doesn't support decrBy on groups
 		self::$decrBy_key = WP_Object_Cache::USE_GROUPS ? 'hIncrBy' : 'decrBy';
 		self::$delete_key = WP_Object_Cache::USE_GROUPS ? 'hDel' : 'del';
+		self::$flush_all_key = 'flushAll';
 
 	}
 
@@ -283,11 +286,6 @@ class CacheTest extends WP_UnitTestCase {
 	}
 
 	public function test_flush() {
-		global $_wp_using_ext_object_cache;
-
-		if ( $_wp_using_ext_object_cache ) {
-			return;
-		}
 
 		$key = rand_str();
 		$val = rand_str();
@@ -304,8 +302,10 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 1, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals( array(
-				self::$exists_key     => 2,
+				self::$exists_key     => 1,
 				self::$set_key        => 1,
+				self::$get_key        => 1,
+				self::$flush_all_key  => 1,
 			), $this->cache->redis_calls );
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
