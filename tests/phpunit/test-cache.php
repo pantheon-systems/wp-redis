@@ -539,6 +539,42 @@ class CacheTest extends WP_UnitTestCase {
 		}
 	}
 
+	public function test_incr_separate_groups() {
+		$key = rand_str();
+		$group1 = 'group1';
+		$group2 = 'group2';
+
+		$this->assertFalse( $this->cache->incr( $key, 1, $group1 ) );
+		$this->assertFalse( $this->cache->incr( $key, 1, $group2 ) );
+		$this->assertEquals( 0, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
+
+		$this->cache->set( $key, 0, $group1 );
+		$this->cache->incr( $key, 1, $group1 );
+		$this->cache->set( $key, 0, $group2 );
+		$this->cache->incr( $key, 1, $group2 );
+		$this->assertEquals( 1, $this->cache->get( $key, $group1 ) );
+		$this->assertEquals( 1, $this->cache->get( $key, $group2 ) );
+		$this->assertEquals( 2, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
+
+		$this->cache->incr( $key, 2, $group1 );
+		$this->cache->incr( $key, 1, $group2 );
+		$this->assertEquals( 3, $this->cache->get( $key, $group1 ) );
+		$this->assertEquals( 2, $this->cache->get( $key, $group2 ) );
+		$this->assertEquals( 4, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
+		if ( $this->cache->is_redis_connected ) {
+			$this->assertEquals( array(
+				self::$exists_key     => 2,
+				self::$set_key        => 2,
+				self::$incrBy_key     => 4,
+			), $this->cache->redis_calls );
+		} else {
+			$this->assertEmpty( $this->cache->redis_calls );
+		}
+	}
+
 	public function test_incr_never_below_zero() {
 		$key = rand_str();
 		$this->cache->set( $key, 1 );
@@ -625,6 +661,51 @@ class CacheTest extends WP_UnitTestCase {
 				self::$exists_key     => 1,
 				self::$set_key        => 3,
 				self::$decrBy_key     => 3,
+			), $this->cache->redis_calls );
+		} else {
+			$this->assertEmpty( $this->cache->redis_calls );
+		}
+	}
+
+	public function test_decr_separate_groups() {
+		$key = rand_str();
+		$group1 = 'group1';
+		$group2 = 'group2';
+
+		$this->assertFalse( $this->cache->decr( $key, 1, $group1 ) );
+		$this->assertFalse( $this->cache->decr( $key, 1, $group2 ) );
+		$this->assertEquals( 0, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
+
+		$this->cache->set( $key, 0, $group1 );
+		$this->cache->decr( $key, 1, $group1 );
+		$this->cache->set( $key, 0, $group2 );
+		$this->cache->decr( $key, 1, $group2 );
+		$this->assertEquals( 0, $this->cache->get( $key, $group1 ) );
+		$this->assertEquals( 0, $this->cache->get( $key, $group2 ) );
+		$this->assertEquals( 2, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
+
+		$this->cache->set( $key, 3, $group1 );
+		$this->cache->decr( $key, 1, $group1 );
+		$this->cache->set( $key, 2, $group2 );
+		$this->cache->decr( $key, 1, $group2 );
+		$this->assertEquals( 2, $this->cache->get( $key, $group1 ) );
+		$this->assertEquals( 1, $this->cache->get( $key, $group2 ) );
+		$this->assertEquals( 4, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
+
+		$this->cache->decr( $key, 2, $group1 );
+		$this->cache->decr( $key, 2, $group2 );
+		$this->assertEquals( 0, $this->cache->get( $key, $group1 ) );
+		$this->assertEquals( 0, $this->cache->get( $key, $group2 ) );
+		$this->assertEquals( 6, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
+		if ( $this->cache->is_redis_connected ) {
+			$this->assertEquals( array(
+				self::$exists_key     => 2,
+				self::$set_key        => 7,
+				self::$decrBy_key     => 6,
 			), $this->cache->redis_calls );
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
