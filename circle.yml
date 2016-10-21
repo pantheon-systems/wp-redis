@@ -21,7 +21,12 @@ dependencies:
     # Set the PHP timezone so that Behat script does not fail.
     # Using > instead of >> will overwrite the file and disable xdebug.
     # xdebug makes composer slower.
-    - echo "date.timezone = 'US/Central'"  >  /opt/circleci/php/5.6.22/etc/conf.d/xdebug.ini    
+    - echo "date.timezone = 'US/Central'"  >  /opt/circleci/php/5.6.22/etc/conf.d/xdebug.ini
+    - echo "Setting GitHub OAuth token with suppressed ouput"
+    - |
+      {
+        composer config -g github-oauth.github.com $GITHUB_TOKEN
+      } &> /dev/null
   override:
     - |
       if [ -z "$TERMINUS_TOKEN" ]; then
