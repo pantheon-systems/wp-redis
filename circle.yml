@@ -37,7 +37,7 @@ dependencies:
         echo "TERMINUS_TOKEN environment variables missing; assuming unauthenticated build"
         exit 0
       fi
-      composer global require pantheon-systems/terminus "<0.13.0"
+      composer global require pantheon-systems/terminus ">=0.13.3"
       composer install
       terminus auth login --machine-token=$TERMINUS_TOKEN
 
