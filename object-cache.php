@@ -937,6 +937,16 @@ class WP_Object_Cache {
 	}
 
 	/**
+	 * Clear internal cache for alloptions. Avoids race conditions when
+	 * updating options in the alloptions concurrently.
+	 *
+	 * @param string $option
+	 */
+	public function _unset_internal_alloptions( $option ) {
+		$this->_unset_internal( 'alloptions', 'options' );
+	}
+
+	/**
 	 * Utility function to generate the redis key for a given key and group.
 	 *
 	 * @param  string $key   The cache key.
@@ -1181,6 +1191,10 @@ class WP_Object_Cache {
 
 		$this->multisite = is_multisite();
 		$this->blog_prefix = $this->multisite ? $blog_id . ':' : '';
+
+		add_action( 'update_option', array( $this, '_unset_internal_alloptions' ), 10, 1 );
+		add_action( 'add_option', array( $this, '_unset_internal_alloptions' ), 10, 1 );
+		add_action( 'delete_option', array( $this, '_unset_internal_alloptions' ), 10, 1 );
 
 		if ( ! $this->_connect_redis() && function_exists( 'add_action' ) ) {
 			add_action( 'admin_notices', array( $this, 'wp_action_admin_notices_warn_missing_redis' ) );
