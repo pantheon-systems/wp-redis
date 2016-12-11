@@ -1001,9 +1001,12 @@ class WP_Object_Cache {
 					'auth' => $_SERVER['CACHE_PASSWORD'],
 				);
 			} else {
+				$host = defined( 'WP_REDIS_BACKEND_HOST' ) ? WP_REDIS_BACKEND_HOST : '127.0.0.1';
+				$port = defined( 'WP_REDIS_BACKEND_PORT' ) ? WP_REDIS_BACKEND_PORT : 6379;
+
 				$redis_server = array(
-					'host' => '127.0.0.1',
-					'port' => 6379,
+					'host' => $host,
+					'port' => $port,
 				);
 			}
 		}
