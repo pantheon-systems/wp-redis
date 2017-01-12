@@ -34,7 +34,7 @@ services:
 
 before_install:
     # Workaround from https://github.com/travis-ci/travis-ci/issues/6961#issuecomment-264283390
-    - mysql -u root -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('')"
+    - mysql --protocol=tcp -u root -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('')"
 
 before_script:
     - |
