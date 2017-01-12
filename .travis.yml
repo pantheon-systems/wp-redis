@@ -30,7 +30,6 @@ matrix:
       env: WP_TRAVISCI=phpcs
 
 services:
-    - mysql
     - redis-server
 
 before_install:
