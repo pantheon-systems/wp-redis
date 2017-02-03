@@ -4,7 +4,7 @@
 # Delete the Pantheon site environment after the Behat test suite has run.
 ###
 
-terminus auth whoami > /dev/null
+terminus whoami > /dev/null
 if [ $? -ne 0 ]; then
 	echo "Terminus unauthenticated; assuming unauthenticated build"
 	exit 0
@@ -20,4 +20,4 @@ fi
 ###
 # Delete the environment used for this test run.
 ###
-yes | terminus site delete-env --remove-branch
+terminus multidev:delete $SITE_ENV --delete-branch --yes
