@@ -27,14 +27,20 @@ matrix:
       env: WP_VERSION=nightly PHP_REDIS=enabled
     - php: 5.6
       env: WP_TRAVISCI=phpcs
+    - php: 7.0
+      env: WP_VERSION=latest PHP_REDIS=enabled
 
 services:
     - redis-server
 
+before_install:
+    # Workaround from https://github.com/travis-ci/travis-ci/issues/6961#issuecomment-264283390
+    - mysql --protocol=tcp -u root -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('')"
+
 before_script:
     - |
       if [[ ! -z "$WP_VERSION" ]] ; then
-        bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
+        bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 $WP_VERSION
       fi
     - |
       if [[ "$WP_TRAVISCI" == "phpcs" ]] ; then
