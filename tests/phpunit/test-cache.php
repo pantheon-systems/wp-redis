@@ -1034,7 +1034,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 'connected', $data['status'] );
 		$this->assertInternalType( 'int', $data['key_count'] );
 		$this->assertRegExp( '/[\d]+\/sec/', $data['instantaneous_ops'] );
-		$this->assertRegExp( '/[\d]+\sdays/', $data['uptime'] );
+		$this->assertRegExp( '/[\d]+\sdays?/', $data['uptime'] );
 	}
 
 	public function tearDown() {
