@@ -13,5 +13,7 @@
 		<exclude name="WordPress.VIP.SlowDBQuery" />
 		<exclude name="WordPress.VIP.SuperGlobalInputUsage" />
 		<exclude name="WordPress.VIP.ValidatedSanitizedInput" />
+		<exclude name="WordPress.VIP.RestrictedFunctions.error_log" />
+		<exclude name="WordPress.VIP.RestrictedFunctions.serialize" />
 	</rule>
 </ruleset>
