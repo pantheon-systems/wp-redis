@@ -1075,7 +1075,7 @@ class WP_Object_Cache {
 			} catch ( RedisException $e ) {
 				// PhpRedis throws an Exception when it fails a server call.
 				// To prevent WordPress from fataling, we catch the Exception.
-				$retry_exception_messages = array( 'socket error on read socket', 'Connection closed', 'Redis server went away' );
+				$retry_exception_messages = array( 'socket error on read socket', 'Connection closed', 'Redis server went away', 'Connection refused' );
 				$retry_exception_messages = apply_filters( 'wp_redis_retry_exception_messages', $retry_exception_messages );
 				if ( in_array( $e->getMessage(), $retry_exception_messages, true ) ) {
 					try {
