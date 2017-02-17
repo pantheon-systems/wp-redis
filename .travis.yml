@@ -11,6 +11,10 @@ branches:
   only:
     - master
 
+cache:
+  - composer
+  - $HOME/.composer/cache
+
 matrix:
   include:
     - php: 7.1
