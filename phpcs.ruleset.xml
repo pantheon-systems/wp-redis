@@ -2,6 +2,8 @@
 <ruleset name="WP Redis">
 	<description>Sniffs for the coding standards of the WP Redis plugin</description>
 
+	<exclude-pattern>vendor</exclude-pattern>
+
 	<rule ref="WordPress-VIP">
 		<exclude name="WordPress.NamingConventions.ValidVariableName" />
 		<exclude name="Squiz.PHP.CommentedOutCode" />
