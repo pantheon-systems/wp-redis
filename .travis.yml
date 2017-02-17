@@ -42,8 +42,8 @@ before_script:
       fi
     - |
       if [[ "$WP_TRAVISCI" == "phpcs" ]] ; then
-        npm install
-        composer install
+        composer global require wp-coding-standards/wpcs
+        phpcs --config-set installed_paths $HOME/.composer/vendor/wp-coding-standards/wpcs
       fi
 
 script:
@@ -57,5 +57,5 @@ script:
       fi
     - |
       if [[ "$WP_TRAVISCI" == "phpcs" ]] ; then
-        grunt phpcs
+        phpcs --standard=phpcs.ruleset.xml $(find . -name '*.php')
       fi
