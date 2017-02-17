@@ -549,7 +549,7 @@ class WP_Object_Cache {
 			if ( 1 !== $result ) {
 				return false;
 			}
-		} else if ( ! $this->_should_persist( $group ) && ! isset( $this->cache[ $multisite_safe_group ] ) ) {
+		} elseif ( ! $this->_should_persist( $group ) && ! isset( $this->cache[ $multisite_safe_group ] ) ) {
 			return false;
 		}
 		unset( $this->cache[ $multisite_safe_group ] );
@@ -1165,7 +1165,7 @@ class WP_Object_Cache {
 	private function is_redis_failback_flush_enabled() {
 		if ( defined( 'WP_INSTALLING' ) && WP_INSTALLING ) {
 			return false;
-		} else if ( defined( 'WP_REDIS_DISABLE_FAILBACK_FLUSH' ) && WP_REDIS_DISABLE_FAILBACK_FLUSH ) {
+		} elseif ( defined( 'WP_REDIS_DISABLE_FAILBACK_FLUSH' ) && WP_REDIS_DISABLE_FAILBACK_FLUSH ) {
 			return false;
 		}
 		return true;
