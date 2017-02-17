@@ -1016,13 +1016,7 @@ class WP_Object_Cache {
 		} else { //tcp connection
 			$port = ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379;
 		}
-		try {
-			$this->redis->connect( $redis_server['host'], $port, 1, null, 100 ); # 1s timeout, 100ms delay between reconnections
-		} catch ( PHPUnit_Framework_Error_Warning $e ) {
-			// PHPUnit throws an Exception when `trigger_error()` is called.
-			// To ensure our tests (which expect Exceptions to be caught) continue to run,
-			// we catch the PHPUnit exception and let code execution continue
-		}
+		$this->redis->connect( $redis_server['host'], $port, 1, null, 100 ); # 1s timeout, 100ms delay between reconnections
 		foreach ( array( 'auth' => 'auth', 'database' => 'select' ) as $k => $method ) {
 			if ( ! isset( $redis_server[ $k ] ) ) {
 				continue;

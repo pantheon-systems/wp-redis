@@ -106,11 +106,7 @@ class CacheTest extends WP_UnitTestCase {
 		// Force a bad connection
 		$redis_server['host'] = '127.0.0.1';
 		$redis_server['port'] = 9999;
-		try {
-			$this->cache->redis->connect( $redis_server['host'], $redis_server['port'], 1, null, 100 );
-		} catch ( Exception $e ) {
-			$this->assertEquals( 'Redis::connect(): connect() failed: Connection refused', $e->getMessage() );
-		}
+		$this->cache->redis->connect( $redis_server['host'], $redis_server['port'], 1, null, 100 );
 		// Setting cache value when redis connection fails saves wakeup flush
 		$this->cache->set( 'foo', 'bar' );
 		$this->assertEquals( 'WP Redis: Redis server went away', $this->cache->last_triggered_error );
