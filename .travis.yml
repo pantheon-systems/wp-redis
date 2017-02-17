@@ -13,7 +13,9 @@ branches:
 
 matrix:
   include:
-    - php: 5.3
+    - php: 7.1
+      env: WP_VERSION=latest PHP_REDIS=enabled
+    - php: 7.0
       env: WP_VERSION=latest PHP_REDIS=enabled
     - php: 5.6
       env: WP_VERSION=latest PHP_REDIS=enabled
@@ -27,6 +29,8 @@ matrix:
       env: WP_VERSION=nightly PHP_REDIS=enabled
     - php: 5.6
       env: WP_TRAVISCI=phpcs
+    - php: 5.3
+      env: WP_VERSION=latest PHP_REDIS=enabled
 
 services:
     - redis-server
