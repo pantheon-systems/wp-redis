@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f4a266a7cba79fe3e048a8162e0fe7df",
-    "content-hash": "9e19e55db473ce8ff9316868a6627599",
+    "hash": "8a8fb77591a83d66587a71425d732513",
+    "content-hash": "d0c798df53f6f2758bfc5b3bb7b7ff0e",
     "packages": [],
     "packages-dev": [
         {
@@ -852,80 +852,6 @@
             "time": "2016-10-10 12:19:37"
         },
         {
-            "name": "squizlabs/php_codesniffer",
-            "version": "2.3.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "11a2545c44a5915f883e2e5ec12e14ed345e3ab2"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/11a2545c44a5915f883e2e5ec12e14ed345e3ab2",
-                "reference": "11a2545c44a5915f883e2e5ec12e14ed345e3ab2",
-                "shasum": ""
-            },
-            "require": {
-                "ext-tokenizer": "*",
-                "ext-xmlwriter": "*",
-                "php": ">=5.1.2"
-            },
-            "bin": [
-                "scripts/phpcs",
-                "scripts/phpcbf"
-            ],
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.0.x-dev"
-                }
-            },
-            "autoload": {
-                "classmap": [
-                    "CodeSniffer.php",
-                    "CodeSniffer/CLI.php",
-                    "CodeSniffer/Exception.php",
-                    "CodeSniffer/File.php",
-                    "CodeSniffer/Fixer.php",
-                    "CodeSniffer/Report.php",
-                    "CodeSniffer/Reporting.php",
-                    "CodeSniffer/Sniff.php",
-                    "CodeSniffer/Tokens.php",
-                    "CodeSniffer/Reports/",
-                    "CodeSniffer/Tokenizers/",
-                    "CodeSniffer/DocGenerators/",
-                    "CodeSniffer/Standards/AbstractPatternSniff.php",
-                    "CodeSniffer/Standards/AbstractScopeSniff.php",
-                    "CodeSniffer/Standards/AbstractVariableSniff.php",
-                    "CodeSniffer/Standards/IncorrectPatternException.php",
-                    "CodeSniffer/Standards/Generic/Sniffs/",
-                    "CodeSniffer/Standards/MySource/Sniffs/",
-                    "CodeSniffer/Standards/PEAR/Sniffs/",
-                    "CodeSniffer/Standards/PSR1/Sniffs/",
-                    "CodeSniffer/Standards/PSR2/Sniffs/",
-                    "CodeSniffer/Standards/Squiz/Sniffs/",
-                    "CodeSniffer/Standards/Zend/Sniffs/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Greg Sherwood",
-                    "role": "lead"
-                }
-            ],
-            "description": "PHP_CodeSniffer tokenizes PHP, JavaScript and CSS files and detects violations of a defined set of coding standards.",
-            "homepage": "http://www.squizlabs.com/php-codesniffer",
-            "keywords": [
-                "phpcs",
-                "standards"
-            ],
-            "time": "2015-09-09 00:18:50"
-        },
-        {
             "name": "symfony/browser-kit",
             "version": "v3.2.4",
             "source": {
@@ -1672,42 +1598,6 @@
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
             "time": "2017-02-16 22:46:52"
-        },
-        {
-            "name": "wp-coding-standards/wpcs",
-            "version": "0.9.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards.git",
-                "reference": "b415094aa5fd24da6eba2295323bcff840902dd3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/WordPress-Coding-Standards/WordPress-Coding-Standards/zipball/b415094aa5fd24da6eba2295323bcff840902dd3",
-                "reference": "b415094aa5fd24da6eba2295323bcff840902dd3",
-                "shasum": ""
-            },
-            "require": {
-                "squizlabs/php_codesniffer": "~2.2"
-            },
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Contributors",
-                    "homepage": "https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/graphs/contributors"
-                }
-            ],
-            "description": "PHP_CodeSniffer rules (sniffs) to enforce WordPress coding conventions",
-            "keywords": [
-                "phpcs",
-                "standards",
-                "wordpress"
-            ],
-            "time": "2016-02-01 16:14:59"
         }
     ],
     "aliases": [],
