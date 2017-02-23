@@ -9,7 +9,7 @@ require_once $_tests_dir . '/includes/functions.php';
 
 if ( getenv( 'WP_CORE_DIR' ) ) {
 	$_core_dir = getenv( 'WP_CORE_DIR' );
-} else if ( getenv( 'WP_DEVELOP_DIR' ) ) {
+} elseif ( getenv( 'WP_DEVELOP_DIR' ) ) {
 	$_core_dir = getenv( 'WP_DEVELOP_DIR' ) . '/src/';
 } else {
 	$_core_dir = '/tmp/wordpress';
