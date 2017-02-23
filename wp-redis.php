@@ -67,3 +67,99 @@ function wp_redis_get_info() {
 		'redis_database'    => $database,
 	);
 }
+
+/**
+ * Check if the object-cache file is symlinked correctly, warn if not
+ *
+ * @action admin_notices
+ */
+function admin_check() {
+
+	if ( ! defined( 'WP_REDIS_OBJECT_CACHE' ) && ! file_exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
+
+		printf(
+			'<div class="updated error"><p>%s %s</p></div>',
+			esc_html__( 'Redis cache drop-in is not installed.', 'wp-redis' ),
+			'<a href="javascript:" onclick="wp.ajax.post(\'wpredis_install_dropin\').always(alert.bind(window)) ">' . esc_html__( 'Click here to install it.', 'wp-redis' ) . '</a>'
+		);
+
+		add_action( 'wp_footer', __NAMESPACE__ . '\\enqueue_js' );
+
+	} elseif ( false === symlink_status() ) {
+
+		printf(
+			'<div class="updated error"><p>%s</p></div>',
+			sprintf(
+				/* translators: %s: path to object-cache.php file */
+				esc_html__( 'ERROR: Redis cache drop-in symlink at %s is no longer pointing to the correct location.', 'wp-redis' ),
+				'<code>' . esc_html( WP_CONTENT_DIR . '/object-cache.php' ) . '</code>'
+			)
+		);
+
+		add_action( 'wp_footer', __NAMESPACE__ . '\\enqueue_js' );
+
+	}
+}
+
+add_action( 'admin_notices', __NAMESPACE__ . '\\admin_check' );
+
+/**
+ * Install the drop-in file
+ *
+ * @action wp_ajax_wpredis_install_dropin
+ */
+function dropin_install_ajax() {
+
+	$source = plugin_dir_path( __FILE__ ) . 'object-cache.php';
+	$dest   = WP_CONTENT_DIR . '/object-cache.php';
+
+	if ( ! wp_is_writable( WP_CONTENT_DIR ) ) {
+		wp_send_json_error( __( 'ERROR: Folder is not writable, cannot install the drop-in. Please copy/symlink the file manually.' . 'wp-redis' ) );
+	}
+
+	if ( function_exists( 'symlink' ) ) {
+		// @codingStandardsIgnoreStart
+		if ( symlink( $source, $dest ) ) {
+			wp_send_json_success( __( 'SUCCESS: File has been symlink successfully.', 'wp-redis' ) );
+		} else {
+			wp_send_json_success( __( 'ERROR: Could not symlink the file, please copy/symlink the file manually.', 'wp-redis' ) );
+		}
+		// @codingStandardsIgnoreEnd
+	} else {
+		// @codingStandardsIgnoreStart
+		if ( copy( $source, $dest ) ) {
+			wp_send_json_success( __( 'SUCCESS: File has been copied successfully, symlinking is not available on your environment.', 'wp-redis' ) );
+		} else {
+			wp_send_json_success( __( 'ERROR: Could not copy the file, please copy/symlink the file manually.', 'wp-redis' ) );
+		}
+		// @codingStandardsIgnoreEnd
+	}
+}
+
+add_action( 'wp_ajax_wpredis_install_dropin', __NAMESPACE__ . '\\dropin_install_ajax' );
+
+/**
+ * Check symlink status of the object-cache.php file
+ *
+ *
+ * @return bool|int Returns -1 if the file is not symlinked, false if symlink is broken, true if linked correctly
+ */
+function symlink_status() {
+
+	$dest = WP_CONTENT_DIR . '/object-cache.php';
+	$src  = plugin_dir_path( __FILE__ ) . 'object-cache.php';
+
+	if ( ! is_link( $dest ) ) {
+
+		return -1;
+
+	} elseif ( readlink( $dest ) === $src ) {
+
+		return true;
+
+	} else {
+
+		return false;
+
+	}
+}
