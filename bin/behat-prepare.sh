@@ -53,7 +53,6 @@ rm -rf $PREPARE_DIR/wp-content/object-cache.php
 cd $BASH_DIR/..
 rsync -av --exclude='vendor/' --exclude='node_modules/' --exclude='tests/' ./* $PREPARE_DIR/wp-content/plugins/wp-redis
 rm -rf $PREPARE_DIR/wp-content/plugins/wp-redis/.git
-cp object-cache.php $PREPARE_DIR/wp-content/object-cache.php
 
 ###
 # Add the debugging plugin to the environment

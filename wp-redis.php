@@ -22,8 +22,122 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+namespace WPRedis;
+
 if ( defined( 'WP_CLI' ) && WP_CLI && ! class_exists( 'WP_Redis_CLI_Command' ) ) {
 	require_once dirname( __FILE__ ) . '/cli.php';
+}
+
+/**
+ * On activation: Check symlink status on plugin activation, disable the plugin if the file exists already
+ * and is not symlinked properly
+ */
+function activation() {
+
+	if ( file_exists( $db = WP_CONTENT_DIR . '/object-cache.php' ) ) {
+
+		$status = symlink_status();
+
+		if ( false === $status ) {
+
+			$error = sprintf(
+				/* translators: %s: path to object-cache.php file */
+				esc_html__( 'The symlink at %s is no longer pointing to the correct location. Please remove the symlink, then reactivate wp-redis plugin.', 'wp-redis' ),
+				'<code>' . esc_html( WP_CONTENT_DIR . '/object-cache.php' ) . '</code>'
+			);
+
+			deactivate_plugins( __FILE__ );
+			wp_die( wp_kses( $error, array( 'code' => array() ) ) );
+
+		} elseif ( -1 === $status ) {
+
+			$error = sprintf(
+				/* translators: %s: path to object-cache.php file */
+				esc_html__( 'The file at %s is not a symlink. Please remove the file, then reactivate wp-redis plugin again to create the symlink.', 'wp-redis' ),
+				'<code>' . esc_html( WP_CONTENT_DIR . '/object-cache.php' ) . '</code>'
+			);
+
+			deactivate_plugins( __FILE__ );
+			wp_die( wp_kses( $error, array( 'code' => array() ) ) );
+
+		}
+	} else {
+
+		if ( function_exists( 'symlink' ) ) {
+			// @codingStandardsIgnoreStart
+			@symlink( plugin_dir_path( __FILE__ ) . 'object-cache.php', $db );
+			// @codingStandardsIgnoreEnd
+		}
+	}
+}
+
+/**
+ * On deactivation: remove the symlinked file if found and is pointing to the correct file
+ */
+function deactivation() {
+	// @codingStandardsIgnoreStart
+	if ( true === symlink_status() ) {
+		unlink( WP_CONTENT_DIR . '/object-cache.php' );
+	}
+	// @codingStandardsIgnoreEnd
+}
+
+/**
+ * Check if the object-cache file is symlinked correctly, warn if not
+ *
+ * @action admin_notices
+ */
+function admin_check() {
+
+	if ( ! defined( 'WP_REDIS_OBJECT_CACHE' ) && ! file_exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
+
+		printf(
+			'<div class="updated error"><p>%s</p></div>',
+			sprintf(
+				/* translators: %s: path to object-cache.php file */
+				esc_html__( 'No file/symlink was found at %s. Please deactivate and reactivate wp-redis plugin to install the required drop-in.', 'wp-redis' ),
+				'<code>' . esc_html( WP_CONTENT_DIR . '/object-cache.php' ) . '</code>'
+			)
+		);
+
+	} elseif ( false === symlink_status() ) {
+
+		printf(
+			'<div class="updated error"><p>%s</p></div>',
+			sprintf(
+				/* translators: %s: path to object-cache.php file */
+				esc_html__( 'The symlink at %s is no longer pointing to the correct location. Please remove the symlink, then deactivate and reactivate wp-redis plugin.', 'wp-redis' ),
+				'<code>' . esc_html( WP_CONTENT_DIR . '/object-cache.php' ) . '</code>'
+			)
+		);
+
+	}
+}
+
+/**
+ * Check symlink status of the object-cache.php file
+ *
+ *
+ * @return bool|int Returns -1 if the file is not symlinked, false if symlink is broken, true if linked correctly
+ */
+function symlink_status() {
+
+	$dest = WP_CONTENT_DIR . '/object-cache.php';
+	$src  = plugin_dir_path( __FILE__ ) . 'object-cache.php';
+
+	if ( ! is_link( $dest ) ) {
+
+		return -1;
+
+	} elseif ( readlink( $dest ) === $src ) {
+
+		return true;
+
+	} else {
+
+		return false;
+
+	}
 }
 
 /**
@@ -66,4 +180,10 @@ function wp_redis_get_info() {
 		'redis_auth'        => ! empty( $redis_server['auth'] ) ? $redis_server['auth'] : '',
 		'redis_database'    => $database,
 	);
+}
+
+if ( ! defined( 'WP_REDIS_NO_SYMLINK' ) ) {
+	register_activation_hook( __FILE__, __NAMESPACE__ . '\\activation' );
+	register_deactivation_hook( __FILE__, __NAMESPACE__ . '\\deactivation' );
+	add_action( 'admin_notices', __NAMESPACE__ . '\\admin_check' );
 }
