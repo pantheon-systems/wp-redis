@@ -408,7 +408,7 @@ class CacheTest extends WP_UnitTestCase {
 		}
 		$key = rand_str();
 		$this->cache->set( $key, false );
-		$this->cache->cache_hits = = 0; // reset everything
+		$this->cache->cache_hits = 0; // reset everything
 		$this->cache->cache_misses = 0; // reset everything
 		$this->cache->redis_calls = array(); // reset everything
 		$this->cache->cache = array(); // reset everything
