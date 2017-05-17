@@ -7,7 +7,7 @@
 # examine this debug output.
 #####################
 
-add_action( 'wp_footer', function(){
+add_action( 'wp_footer', function () {
 	if ( isset( $_GET['redis_debug'] ) ) {
 		$GLOBALS['wp_object_cache']->stats();
 	}

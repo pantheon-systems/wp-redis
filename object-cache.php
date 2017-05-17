@@ -121,8 +121,7 @@ function wp_cache_flush() {
  * @param string $group Where the cache contents are grouped
  * @param bool $force Whether to force an update of the local cache from the persistent cache (default is false)
  * @param &bool $found Whether key was found in the cache. Disambiguates a return of false, a storable value.
- * @return bool|mixed False on failure to retrieve contents or the cache
- *		contents on success
+ * @return bool|mixed False on failure to retrieve contents or the cache contents on success
  */
 function wp_cache_get( $key, $group = '', $force = false, &$found = null ) {
 	global $wp_object_cache;
@@ -372,7 +371,7 @@ class WP_Object_Cache {
 	 *
 	 * @uses WP_Object_Cache::_exists Checks to see if the cache already has data.
 	 * @uses WP_Object_Cache::set Sets the data after the checking the cache
-	 *		contents existence.
+	 *     contents existence.
 	 *
 	 * @param int|string $key What to call the contents in the cache
 	 * @param mixed $data The contents to store in the cache
@@ -501,7 +500,7 @@ class WP_Object_Cache {
 	 * @param int|string $key What the contents in the cache are called
 	 * @param string $group Where the cache contents are grouped
 	 * @param bool $force Optional. Whether to force the unsetting of the cache
-	 *		key in the group
+	 *     key in the group
 	 * @return bool False if the contents weren't deleted and true on success
 	 */
 	public function delete( $key, $group = 'default', $force = false ) {
@@ -590,8 +589,7 @@ class WP_Object_Cache {
 	 * @param string $group Where the cache contents are grouped
 	 * @param string $force Whether to force a refetch rather than relying on the local cache (default is false)
 	 * @param bool $found Optional. Whether the key was found in the cache. Disambiguates a return of false, a storable value. Passed by reference. Default null.
-	 * @return bool|mixed False on failure to retrieve contents or the cache
-	 *		contents on success
+	 * @return bool|mixed False on failure to retrieve contents or the cache contents on success
 	 */
 	public function get( $key, $group = 'default', $force = false, &$found = null ) {
 
@@ -1017,7 +1015,11 @@ class WP_Object_Cache {
 			$port = ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379;
 		}
 		$this->redis->connect( $redis_server['host'], $port, 1, null, 100 ); # 1s timeout, 100ms delay between reconnections
-		foreach ( array( 'auth' => 'auth', 'database' => 'select' ) as $k => $method ) {
+		$keys_methods = array(
+			'auth'     => 'auth',
+			'database' => 'select',
+		);
+		foreach ( $keys_methods as $k => $method ) {
 			if ( ! isset( $redis_server[ $k ] ) ) {
 				continue;
 			}
@@ -1099,7 +1101,7 @@ class WP_Object_Cache {
 					throw $e;
 				}
 			}
-		}
+		} // End if().
 
 		if ( $this->is_redis_failback_flush_enabled() && ! $this->do_redis_failback_flush && ! empty( $wpdb ) ) {
 			if ( $this->multisite ) {
