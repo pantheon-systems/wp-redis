@@ -30,7 +30,8 @@ class CacheTest extends WP_UnitTestCase {
 		// create two cache objects with a shared cache dir
 		// this simulates a typical cache situation, two separate requests interacting
 		$this->cache =& $this->init_cache();
-		$this->cache->cache_hits = $this->cache->cache_misses = 0;
+		$this->cache->cache_hits = 0;
+		$this->cache->cache_misses = 0;
 		$this->cache->redis_calls = array();
 
 		self::$exists_key = WP_Object_Cache::USE_GROUPS ? 'hExists' : 'exists';
@@ -407,8 +408,10 @@ class CacheTest extends WP_UnitTestCase {
 		}
 		$key = rand_str();
 		$this->cache->set( $key, false );
-		$this->cache->cache_hits = $this->cache->cache_misses = 0; // reset everything
-		$this->cache->redis_calls = $this->cache->cache = array(); // reset everything
+		$this->cache->cache_hits = = 0; // reset everything
+		$this->cache->cache_misses = 0; // reset everything
+		$this->cache->redis_calls = array(); // reset everything
+		$this->cache->cache = array(); // reset everything
 		$found = null;
 		$this->assertFalse( $this->cache->get( $key, 'default', false, $found ) );
 		$this->assertTrue( $found );
@@ -429,8 +432,10 @@ class CacheTest extends WP_UnitTestCase {
 		}
 		$key = rand_str();
 		$this->cache->set( $key, true );
-		$this->cache->cache_hits = $this->cache->cache_misses = 0; // reset everything
-		$this->cache->redis_calls = $this->cache->cache = array(); // reset everything
+		$this->cache->cache_hits = 0; // reset everything
+		$this->cache->cache_misses = 0; // reset everything
+		$this->cache->redis_calls = array(); // reset everything
+		$this->cache->cache = array(); // reset everything
 		$found = null;
 		$this->assertTrue( $this->cache->get( $key, 'default', false, $found ) );
 		$this->assertTrue( $found );
@@ -451,8 +456,10 @@ class CacheTest extends WP_UnitTestCase {
 		}
 		$key = rand_str();
 		$this->cache->set( $key, null );
-		$this->cache->cache_hits = $this->cache->cache_misses = 0; // reset everything
-		$this->cache->redis_calls = $this->cache->cache = array(); // reset everything
+		$this->cache->cache_hits = 0; // reset everything
+		$this->cache->cache_misses = 0; // reset everything
+		$this->cache->redis_calls = array(); // reset everything
+		$this->cache->cache = array(); // reset everything
 		$found = null;
 		// Redis coherses `null` to an empty string
 		$this->assertEquals( '', $this->cache->get( $key, 'default', false, $found ) );
