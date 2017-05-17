@@ -1015,11 +1015,11 @@ class WP_Object_Cache {
 			$port = ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379;
 		}
 		$this->redis->connect( $redis_server['host'], $port, 1, null, 100 ); # 1s timeout, 100ms delay between reconnections
-		$key_methods = array(
+		$keys_methods = array(
 			'auth'     => 'auth',
 			'database' => 'select',
 		);
-		foreach ( $key_methods as $k => $method ) {
+		foreach ( $keys_methods as $k => $method ) {
 			if ( ! isset( $redis_server[ $k ] ) ) {
 				continue;
 			}
