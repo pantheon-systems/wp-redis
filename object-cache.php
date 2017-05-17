@@ -454,7 +454,7 @@ class WP_Object_Cache {
 
 		$offset = (int) $offset;
 
-		# If this isn't a persistant group, we have to sort this out ourselves, grumble grumble
+		// If this isn't a persistant group, we have to sort this out ourselves, grumble grumble
 		if ( ! $this->_should_persist( $group ) ) {
 			$existing = $this->_get_internal( $key, $group );
 			if ( empty( $existing ) || ! is_numeric( $existing ) ) {
@@ -661,7 +661,7 @@ class WP_Object_Cache {
 
 		$offset = (int) $offset;
 
-		# If this isn't a persistant group, we have to sort this out ourselves, grumble grumble
+		// If this isn't a persistant group, we have to sort this out ourselves, grumble grumble
 		if ( ! $this->_should_persist( $group ) ) {
 			$existing = $this->_get_internal( $key, $group );
 			if ( empty( $existing ) || ! is_numeric( $existing ) ) {
@@ -764,7 +764,7 @@ class WP_Object_Cache {
 			return true;
 		}
 
-		# If this is an integer, store it as such. Otherwise, serialize it.
+		// If this is an integer, store it as such. Otherwise, serialize it.
 		if ( ! is_numeric( $data ) || intval( $data ) !== $data ) {
 			$data = serialize( $data );
 		}
@@ -993,7 +993,7 @@ class WP_Object_Cache {
 		}
 
 		if ( empty( $redis_server ) ) {
-			# Attempt to automatically load Pantheon's Redis config from the env.
+			// Attempt to automatically load Pantheon's Redis config from the env.
 			if ( isset( $_SERVER['CACHE_HOST'] ) ) {
 				$redis_server = array(
 					'host' => $_SERVER['CACHE_HOST'],
