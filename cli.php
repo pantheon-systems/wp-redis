@@ -9,7 +9,7 @@ class WP_Redis_CLI_Command {
 		global $redis_server;
 
 		if ( empty( $redis_server ) ) {
-			# Attempt to automatically load Pantheon's Redis config from the env.
+			// Attempt to automatically load Pantheon's Redis config from the env.
 			if ( isset( $_SERVER['CACHE_HOST'] ) ) {
 				$redis_server = array(
 					'host' => $_SERVER['CACHE_HOST'],
