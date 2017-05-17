@@ -202,29 +202,28 @@ class WP_Redis_CLI_Command {
 
 		$from     = explode( '/', $from );
 		$to       = explode( '/', $to );
-		$relPath  = $to;
+		$rel_path = $to;
 
 		foreach ( $from as $depth => $dir ) {
 			// find first non-matching dir
 			if ( $dir === $to[ $depth ] ) {
 				// ignore this directory
-				array_shift( $relPath );
+				array_shift( $rel_path );
 			} else {
 				// get number of remaining dirs to $from
 				$remaining = count( $from ) - $depth;
 				if ( $remaining > 1 ) {
 					// add traversals up to first matching dir
-					$padLength = ( count( $relPath ) + $remaining - 1 ) * -1;
-					$relPath = array_pad( $relPath, $padLength, '..' );
+					$pad_length = ( count( $rel_path ) + $remaining - 1 ) * -1;
+					$rel_path = array_pad( $rel_path, $pad_length, '..' );
 					break;
 				} else {
-					$relPath[0] = './' . $relPath[0];
+					$rel_path[0] = './' . $rel_path[0];
 				}
 			}
 		}
-		return implode( '/', $relPath );
+		return implode( '/', $rel_path );
 	}
-
 
 }
 

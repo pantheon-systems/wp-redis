@@ -13,9 +13,9 @@ class CacheTest extends WP_UnitTestCase {
 
 	private static $set_key;
 
-	private static $incrBy_key;
+	private static $incr_by_key;
 
-	private static $decrBy_key;
+	private static $decr_by_key;
 
 	private static $delete_key;
 
@@ -36,9 +36,9 @@ class CacheTest extends WP_UnitTestCase {
 		self::$exists_key = WP_Object_Cache::USE_GROUPS ? 'hExists' : 'exists';
 		self::$get_key = WP_Object_Cache::USE_GROUPS ? 'hGet' : 'get';
 		self::$set_key = WP_Object_Cache::USE_GROUPS ? 'hSet' : 'set';
-		self::$incrBy_key = WP_Object_Cache::USE_GROUPS ? 'hIncrBy' : 'incrBy';
+		self::$incr_by_key = WP_Object_Cache::USE_GROUPS ? 'hIncrBy' : 'incrBy';
 		// 'hIncrBy' isn't a typo here — Redis doesn't support decrBy on groups
-		self::$decrBy_key = WP_Object_Cache::USE_GROUPS ? 'hIncrBy' : 'decrBy';
+		self::$decr_by_key = WP_Object_Cache::USE_GROUPS ? 'hIncrBy' : 'decrBy';
 		self::$delete_key = WP_Object_Cache::USE_GROUPS ? 'hDel' : 'del';
 		self::$flush_all_key = 'flushAll';
 
@@ -541,7 +541,7 @@ class CacheTest extends WP_UnitTestCase {
 			$this->assertEquals( array(
 				self::$exists_key     => 1,
 				self::$set_key        => 1,
-				self::$incrBy_key     => 2,
+				self::$incr_by_key    => 2,
 			), $this->cache->redis_calls );
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -577,7 +577,7 @@ class CacheTest extends WP_UnitTestCase {
 			$this->assertEquals( array(
 				self::$exists_key     => 2,
 				self::$set_key        => 2,
-				self::$incrBy_key     => 4,
+				self::$incr_by_key    => 4,
 			), $this->cache->redis_calls );
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -596,7 +596,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals( array(
-				self::$incrBy_key     => 1,
+				self::$incr_by_key    => 1,
 				self::$set_key        => 2,
 			), $this->cache->redis_calls );
 		} else {
@@ -669,7 +669,7 @@ class CacheTest extends WP_UnitTestCase {
 			$this->assertEquals( array(
 				self::$exists_key     => 1,
 				self::$set_key        => 3,
-				self::$decrBy_key     => 3,
+				self::$decr_by_key    => 3,
 			), $this->cache->redis_calls );
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -714,7 +714,7 @@ class CacheTest extends WP_UnitTestCase {
 			$this->assertEquals( array(
 				self::$exists_key     => 2,
 				self::$set_key        => 7,
-				self::$decrBy_key     => 6,
+				self::$decr_by_key    => 6,
 			), $this->cache->redis_calls );
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -733,7 +733,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals( array(
-				self::$decrBy_key     => 1,
+				self::$decr_by_key    => 1,
 				self::$set_key        => 2,
 			), $this->cache->redis_calls );
 		} else {

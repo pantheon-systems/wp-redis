@@ -1099,7 +1099,7 @@ class WP_Object_Cache {
 					throw $e;
 				}
 			}
-		}
+		} // End if().
 
 		if ( $this->is_redis_failback_flush_enabled() && ! $this->do_redis_failback_flush && ! empty( $wpdb ) ) {
 			if ( $this->multisite ) {
