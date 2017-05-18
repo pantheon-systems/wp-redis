@@ -16,4 +16,19 @@
 		<exclude name="WordPress.VIP.RestrictedFunctions.error_log" />
 		<exclude name="WordPress.VIP.RestrictedFunctions.serialize" />
 	</rule>
+	<rule ref="WordPress.PHP.DevelopmentFunctions">
+		<properties>
+			<property name="exclude" value="error_log" />
+		</properties>
+	</rule>
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions">
+		<properties>
+			<property name="exclude" type="array" value="serialize,unserialize" />
+		</properties>
+	</rule>
+	<rule ref="WordPress.Files.FileName">
+		<properties>
+			<property name="strict_class_file_names" value="false" />
+		</properties>
+	</rule>
 </ruleset>
