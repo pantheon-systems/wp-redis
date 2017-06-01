@@ -493,9 +493,9 @@ class CacheTest extends WP_UnitTestCase {
 		$this->cache->redis_calls = array(); // reset everything
 		$this->cache->cache = array(); // reset everything
 		// Should be upgraded to more strict comparison if change proposed in issue #181 is merged.
-		$this->assertEquals( 123, $this->cache->get( $key1 ) );
-		$this->assertEquals( 4106465292, $this->cache->get( $key2 ) );
-		$this->assertEquals( 1337, $this->cache->get( $key3 ) );
+		$this->assertSame( 123, $this->cache->get( $key1 ) );
+		$this->assertSame( 4106465292, $this->cache->get( $key2 ) );
+		$this->assertSame( 1337, $this->cache->get( $key3 ) );
 		$this->assertEquals( 3, $this->cache->cache_hits );
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
