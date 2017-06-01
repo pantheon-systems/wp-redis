@@ -484,10 +484,8 @@ class CacheTest extends WP_UnitTestCase {
 		}
 		$key1 = rand_str();
 		$key2 = rand_str();
-		$key3 = rand_str();
 		$this->cache->set( $key1, 123 );
 		$this->cache->set( $key2, 0xf4c3b00c );
-		$this->cache->set( $key3, 0b10100111001 );
 		$this->cache->cache_hits = 0; // reset everything
 		$this->cache->cache_misses = 0; // reset everything
 		$this->cache->redis_calls = array(); // reset everything
@@ -495,12 +493,11 @@ class CacheTest extends WP_UnitTestCase {
 		// Should be upgraded to more strict comparison if change proposed in issue #181 is merged.
 		$this->assertSame( 123, $this->cache->get( $key1 ) );
 		$this->assertSame( 4106465292, $this->cache->get( $key2 ) );
-		$this->assertSame( 1337, $this->cache->get( $key3 ) );
-		$this->assertEquals( 3, $this->cache->cache_hits );
+		$this->assertEquals( 2, $this->cache->cache_hits );
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals( array(
-				self::$get_key           => 3,
+				self::$get_key           => 2,
 			), $this->cache->redis_calls );
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
