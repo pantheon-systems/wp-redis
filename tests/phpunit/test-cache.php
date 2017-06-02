@@ -133,7 +133,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->cache = $this->init_cache();
 		$this->assertFalse( $this->cache->do_redis_failback_flush );
 		$this->assertEquals( "DELETE FROM {$table} WHERE {$col1}='wp_redis_do_redis_failback_flush'", $wpdb->last_query );
-		$this->assertEquals( null, $this->cache->get( 'foo' ) );
+		$this->assertFalse( $this->cache->get( 'foo' ) );
 		// Cache load, but Redis shouldn't be flushed again
 		$this->cache = $this->init_cache();
 		$this->assertFalse( $this->cache->do_redis_failback_flush );
@@ -162,7 +162,7 @@ class CacheTest extends WP_UnitTestCase {
 	}
 
 	public function test_miss() {
-		$this->assertEquals( null, $this->cache->get( rand_str() ) );
+		$this->assertFalse( $this->cache->get( rand_str() ) );
 		$this->assertEquals( 0, $this->cache->cache_hits );
 		$this->assertEquals( 1, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
