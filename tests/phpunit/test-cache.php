@@ -216,8 +216,7 @@ class CacheTest extends WP_UnitTestCase {
 		$val = null;
 
 		$this->assertTrue( $this->cache->add( $key, $val ) );
-		// null is converted to empty string
-		$this->assertEquals( '', $this->cache->get( $key ) );
+		$this->assertNull( $this->cache->get( $key ) );
 		$this->assertEquals( 1, $this->cache->cache_hits );
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
@@ -464,8 +463,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->cache->redis_calls = array(); // reset everything
 		$this->cache->cache = array(); // reset everything
 		$found = null;
-		// Redis coherses `null` to an empty string
-		$this->assertEquals( '', $this->cache->get( $key, 'default', false, $found ) );
+		$this->assertNull( $this->cache->get( $key, 'default', false, $found ) );
 		$this->assertTrue( $found );
 		$this->assertEquals( 1, $this->cache->cache_hits );
 		$this->assertEquals( 0, $this->cache->cache_misses );
