@@ -855,10 +855,10 @@ class WP_Object_Cache {
 	protected function _isset_internal( $key, $group ) {
 		if ( $this->_should_use_redis_hashes( $group ) ) {
 			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
-			return isset( $this->cache[ $multisite_safe_group ][ $key ] );
+			return isset( $this->cache[ $multisite_safe_group ] ) && array_key_exists( $key, $this->cache[ $multisite_safe_group ] );
 		} else {
 			$key = $this->_key( $key, $group );
-			return isset( $this->cache[ $key ] );
+			return array_key_exists( $key, $this->cache );
 		}
 	}
 
@@ -873,12 +873,12 @@ class WP_Object_Cache {
 		$value = null;
 		if ( $this->_should_use_redis_hashes( $group ) ) {
 			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
-			if ( isset( $this->cache[ $multisite_safe_group ][ $key ] ) ) {
+			if ( isset( $this->cache[ $multisite_safe_group ] ) && array_key_exists( $key, $this->cache[ $multisite_safe_group ] ) ) {
 				$value = $this->cache[ $multisite_safe_group ][ $key ];
 			}
 		} else {
 			$key = $this->_key( $key, $group );
-			if ( isset( $this->cache[ $key ] ) ) {
+			if ( array_key_exists( $key, $this->cache ) ) {
 				$value = $this->cache[ $key ];
 			}
 		}
@@ -896,10 +896,6 @@ class WP_Object_Cache {
 	 * @param mixed $value
 	 */
 	protected function _set_internal( $key, $group, $value ) {
-		// Redis converts null to an empty string
-		if ( is_null( $value ) ) {
-			$value = '';
-		}
 		if ( $this->_should_use_redis_hashes( $group ) ) {
 			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
 			if ( ! isset( $this->cache[ $multisite_safe_group ] ) ) {
@@ -921,12 +917,12 @@ class WP_Object_Cache {
 	protected function _unset_internal( $key, $group ) {
 		if ( $this->_should_use_redis_hashes( $group ) ) {
 			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
-			if ( isset( $this->cache[ $multisite_safe_group ][ $key ] ) ) {
+			if ( isset( $this->cache[ $multisite_safe_group ] ) && array_key_exists( $key, $this->cache[ $multisite_safe_group ] ) ) {
 				unset( $this->cache[ $multisite_safe_group ][ $key ] );
 			}
 		} else {
 			$key = $this->_key( $key, $group );
-			if ( isset( $this->cache[ $key ] ) ) {
+			if ( array_key_exists( $key, $this->cache ) ) {
 				unset( $this->cache[ $key ] );
 			}
 		}
