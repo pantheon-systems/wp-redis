@@ -628,9 +628,7 @@ class WP_Object_Cache {
 		}
 
 		// All non-numeric values are serialized
-		if ( ! is_numeric( $value ) ) {
-			$value = unserialize( $value );
-		}
+		$value = is_numeric( $value ) ? intval( $value ) : unserialize( $value );
 
 		$this->_set_internal( $key, $group, $value );
 		$this->cache_hits += 1;

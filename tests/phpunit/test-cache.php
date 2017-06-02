@@ -478,6 +478,137 @@ class CacheTest extends WP_UnitTestCase {
 		}
 	}
 
+	public function test_get_int_values_persistent_cache() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
+		$key1 = rand_str();
+		$key2 = rand_str();
+		$this->cache->set( $key1, 123 );
+		$this->cache->set( $key2, 0xf4c3b00c );
+		$this->cache->cache_hits = 0; // reset everything
+		$this->cache->cache_misses = 0; // reset everything
+		$this->cache->redis_calls = array(); // reset everything
+		$this->cache->cache = array(); // reset everything
+		// Should be upgraded to more strict comparison if change proposed in issue #181 is merged.
+		$this->assertSame( 123, $this->cache->get( $key1 ) );
+		$this->assertSame( 4106465292, $this->cache->get( $key2 ) );
+		$this->assertEquals( 2, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
+		if ( $this->cache->is_redis_connected ) {
+			$this->assertEquals( array(
+				self::$get_key           => 2,
+			), $this->cache->redis_calls );
+		} else {
+			$this->assertEmpty( $this->cache->redis_calls );
+		}
+	}
+
+	public function test_get_float_values_persistent_cache() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
+		$key1 = rand_str();
+		$key2 = rand_str();
+		$this->cache->set( $key1, 123.456 );
+		$this->cache->set( $key2, + 0123.45e6 );
+		$this->cache->cache_hits = 0; // reset everything
+		$this->cache->cache_misses = 0; // reset everything
+		$this->cache->redis_calls = array(); // reset everything
+		$this->cache->cache = array(); // reset everything
+		$this->assertSame( 123.456, $this->cache->get( $key1 ) );
+		$this->assertSame( 123450000.0, $this->cache->get( $key2 ) );
+		$this->assertEquals( 2, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
+		if ( $this->cache->is_redis_connected ) {
+			$this->assertEquals( array(
+				self::$get_key           => 2,
+			), $this->cache->redis_calls );
+		} else {
+			$this->assertEmpty( $this->cache->redis_calls );
+		}
+	}
+
+	public function test_get_string_values_persistent_cache() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
+		$key1 = rand_str();
+		$key2 = rand_str();
+		$key3 = rand_str();
+		$key4 = rand_str();
+		$this->cache->set( $key1, 'a plain old string' );
+		// To ensure numeric strings are not converted to integers.
+		$this->cache->set( $key2, '42' );
+		$this->cache->set( $key3, '123.456' );
+		$this->cache->set( $key4, '+0123.45e6' );
+		$this->cache->cache_hits = 0; // reset everything
+		$this->cache->cache_misses = 0; // reset everything
+		$this->cache->redis_calls = array(); // reset everything
+		$this->cache->cache = array(); // reset everything
+		$this->assertEquals( 'a plain old string', $this->cache->get( $key1 ) );
+		$this->assertSame( '42', $this->cache->get( $key2 ) );
+		$this->assertSame( '123.456', $this->cache->get( $key3 ) );
+		$this->assertSame( '+0123.45e6', $this->cache->get( $key4 ) );
+		$this->assertEquals( 4, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
+		if ( $this->cache->is_redis_connected ) {
+			$this->assertEquals( array(
+				self::$get_key           => 4,
+			), $this->cache->redis_calls );
+		} else {
+			$this->assertEmpty( $this->cache->redis_calls );
+		}
+	}
+
+	public function test_get_array_values_persistent_cache() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
+		$key = rand_str();
+		$value = array( 'one', 2, true );
+		$this->cache->set( $key, $value );
+		$this->cache->cache_hits = 0; // reset everything
+		$this->cache->cache_misses = 0; // reset everything
+		$this->cache->redis_calls = array(); // reset everything
+		$this->cache->cache = array(); // reset everything
+		$this->assertEquals( $value, $this->cache->get( $key ) );
+		$this->assertEquals( 1, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
+		if ( $this->cache->is_redis_connected ) {
+			$this->assertEquals( array(
+				self::$get_key           => 1,
+			), $this->cache->redis_calls );
+		} else {
+			$this->assertEmpty( $this->cache->redis_calls );
+		}
+	}
+
+	public function test_get_object_values_persistent_cache() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
+		$key = rand_str();
+		$value = new stdClass;
+		$value->one = 'two';
+		$value->three = 'four';
+		$this->cache->set( $key, $value );
+		$this->cache->cache_hits = 0; // reset everything
+		$this->cache->cache_misses = 0; // reset everything
+		$this->cache->redis_calls = array(); // reset everything
+		$this->cache->cache = array(); // reset everything
+		$this->assertEquals( $value, $this->cache->get( $key ) );
+		$this->assertEquals( 1, $this->cache->cache_hits );
+		$this->assertEquals( 0, $this->cache->cache_misses );
+		if ( $this->cache->is_redis_connected ) {
+			$this->assertEquals( array(
+				self::$get_key           => 1,
+			), $this->cache->redis_calls );
+		} else {
+			$this->assertEmpty( $this->cache->redis_calls );
+		}
+	}
+
 	public function test_get_force() {
 		if ( ! class_exists( 'Redis' ) ) {
 			$this->markTestSkipped( 'PHPRedis extension not available.' );
