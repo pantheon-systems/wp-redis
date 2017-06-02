@@ -37,6 +37,7 @@ matrix:
       env: WP_VERSION=latest PHP_REDIS=enabled
 
 services:
+    - mysql
     - redis-server
 
 before_script:
