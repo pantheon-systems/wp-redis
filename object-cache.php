@@ -2,7 +2,7 @@
 /**
  * To disable WP Redis define WP_REDIS_DISABLE in your wp-config.php
  */
-if ( ! defined( 'WP_REDIS_DISABLE' ) ) {
+if ( ! defined( 'WP_REDIS_DISABLE' ) || ( defined( 'WP_REDIS_DISABLE' ) && WP_REDIS_DISABLE === false ) ) {
 
 	// WP Redis
 	// This file needs to be symlinked or copied to wp-content/object-cache.php
