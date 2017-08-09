@@ -978,9 +978,17 @@ class WP_Object_Cache {
 	protected function _connect_redis() {
 		global $redis_server;
 
-		if ( ! class_exists( 'Redis' ) ) {
+		// TODO update $redis_server to include 'adapter' key
+		$adapter = (
+			isset( $redis_server['adapter'] )
+			&& is_a( $redis_server['adapter'], WP_Redis_Redis_Adapter_Interface )
+		)
+			? $redis_server['adapter']
+			: new WP_Redis_Adapter_PHPRedis;
+
+		if ( ! $adapter->check_dependencies() ) {
 			$this->is_redis_connected = false;
-			$this->missing_redis_message = 'Warning! PHPRedis module is unavailable, which is required by WP Redis object cache.';
+			$this->missing_redis_message = $adapter->dependencies_failure_message();
 			return $this->is_redis_connected;
 		}
 
@@ -1000,41 +1008,45 @@ class WP_Object_Cache {
 			}
 		}
 
-		$this->redis = new Redis;
-
+		// TODO standardize connecting to local sockets
 		if ( file_exists( $redis_server['host'] ) && 'socket' === filetype( $redis_server['host'] ) ) { //unix socket connection
 			//port must be null or socket won't connect
 			$port = null;
 		} else { //tcp connection
 			$port = ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379;
 		}
-		$this->redis->connect( $redis_server['host'], $port, 1, null, 100 ); // 1s timeout, 100ms delay between reconnections
+
+		$connection_details = array(
+			'host' => $redis_server['host'],
+			'port' => $port,
+			'timeout' => 1000,
+			'retry_interval' => 100,
+		);
+		// 1s timeout, 100ms delay between reconnections
+
+		$this->redis = $adapter->redis_connection( $connection_details );
+
 		$keys_methods = array(
 			'auth'     => 'auth',
 			'database' => 'select',
 		);
-		foreach ( $keys_methods as $k => $method ) {
-			if ( ! isset( $redis_server[ $k ] ) ) {
-				continue;
-			}
+
+		try {
+			$adapter->setup_connection( $this->redis, $redis_server, $keys_methods );
+		} catch ( WP_Redis_Connection_Exception $e ) {
 			try {
-				$this->redis->$method( $redis_server[ $k ] );
-			} catch ( RedisException $e ) {
-				// PhpRedis throws an Exception when it fails a server call.
-				// To prevent WordPress from fataling, we catch the Exception.
-				try {
-					$this->last_triggered_error = 'WP Redis: ' . $e->getMessage();
-					// Be friendly to developers debugging production servers by triggering an error
-					// @codingStandardsIgnoreStart
-					trigger_error( $this->last_triggered_error, E_USER_WARNING );
-					// @codingStandardsIgnoreEnd
-				} catch ( PHPUnit_Framework_Error_Warning $e ) {
-					// PHPUnit throws an Exception when `trigger_error()` is called.
-					// To ensure our tests (which expect Exceptions to be caught) continue to run,
-					// we catch the PHPUnit exception and inspect the RedisException message
-				}
+				$this->last_triggered_error = 'WP Redis: ' . $e->getMessage();
+				// Be friendly to developers debugging production servers by triggering an error
+				// @codingStandardsIgnoreStart
+				trigger_error( $this->last_triggered_error, E_USER_WARNING );
+				// @codingStandardsIgnoreEnd
+			} catch ( PHPUnit_Framework_Error_Warning $e ) {
+				// PHPUnit throws an Exception when `trigger_error()` is called.
+				// To ensure our tests (which expect Exceptions to be caught) continue to run,
+				// we catch the PHPUnit exception and inspect the RedisException message
 			}
 		}
+
 		$this->is_redis_connected = $this->redis->isConnected();
 		if ( ! $this->is_redis_connected ) {
 			$this->missing_redis_message = 'Warning! WP Redis object cache cannot connect to Redis server.';
@@ -1226,3 +1238,64 @@ class WP_Object_Cache {
 		return true;
 	}
 }
+
+interface WP_Redis_Redis_Adapter_Interface {
+	public function check_dependencies();
+	public function dependencies_failure_message();
+	public function redis_connection( $connection_details );
+	public function setup_connection( $redis, $settings, $key_methods );
+}
+
+class WP_Redis_Adapter_PHPRedis implements WP_Redis_Redis_Adapter_Interface {
+	protected $dependencies_failure_message;
+	protected $redis_client = null;
+
+	public function check_dependencies() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->dependencies_failure_message = 'Warning! PHPRedis module is unavailable, which is required by WP Redis object cache.';
+			return false;
+		}
+		return true;
+	}
+
+	public function dependencies_failure_message() {
+		return $this->dependencies_failure_message;
+	}
+
+	public function redis_connection( $connection_details ) {
+		$redis = new Redis;
+
+		// TODO should we cache this connection?
+		$redis->connect(
+			$connection_details['host'],
+			$connection_details['port'],
+			$connection_details['timeout'],
+			null,
+			$connection_details['retry_interval']
+		);
+
+		return $redis;
+	}
+
+	public function setup_connection( $redis, $settings, $keys_methods ) {
+		foreach ( $keys_methods as $k => $method ) {
+			if ( ! isset( $settings[ $k ] ) ) {
+				continue;
+			}
+			try {
+				$redis->$method( $settings[ $k ] );
+			} catch ( RedisException $e ) {
+
+				// PhpRedis throws an Exception when it fails a server call.
+				// To prevent WordPress from fataling, we catch the Exception.
+				// TODO Perhaps we catch and rethrow? or return instance of
+				// WP_Error?
+				throw new WP_Redis_Connection_Exception( $e->getMessage(), $e->getCode(), $e );
+			}
+		}
+		return true;
+	}
+}
+
+class WP_Redis_Exception extends Exception {}
+class WP_Redis_Connection_Exception extends WP_Redis_Exception {}
