@@ -49,7 +49,7 @@ class AdapterTest extends WP_UnitTestCase {
 			$this->markTestSkipped( 'PHPRedis extension not available.' );
 		}
 
-		$redis = $this->getMockBuilder( Redis::class )->getMock();
+		$redis = $this->getMockBuilder( 'Redis' )->getMock();
 		$redis->method( 'select' )
 			->will( $this->throwException( new RedisException ) );
 
@@ -66,7 +66,7 @@ class AdapterTest extends WP_UnitTestCase {
 		$keys_methods = array(
 			'database' => 'select',
 		);
-		$this->setExpectedException( WP_Redis_Connection_Exception::class );
+		$this->setExpectedException( 'WP_Redis_Connection_Exception' );
 		$this->adapter->setup_connection( $redis, $settings, $keys_methods );
 	}
 }
