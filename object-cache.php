@@ -1019,7 +1019,7 @@ class WP_Object_Cache {
 		$connection_details = array(
 			'host' => $redis_server['host'],
 			'port' => $port,
-			'timeout' => 1000,
+			'timeout' => 1000, // TODO I multiplied this by 1000 so we'd have a common measure of ms instead of s and ms, need to make sure this gets divided by 1000
 			'retry_interval' => 100,
 		);
 		// 1s timeout, 100ms delay between reconnections
@@ -1269,7 +1269,9 @@ class WP_Redis_Adapter_PHPRedis implements WP_Redis_Redis_Adapter_Interface {
 		$redis->connect(
 			$connection_details['host'],
 			$connection_details['port'],
-			$connection_details['timeout'],
+			// $connection_details['timeout'] is sent in milliseconds,
+			// connect() takes seconds, so divide by 1000
+			$connection_details['timeout'] / 1000,
 			null,
 			$connection_details['retry_interval']
 		);
