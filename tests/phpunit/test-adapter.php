@@ -35,12 +35,20 @@ class AdapterTest extends WP_UnitTestCase {
 	}
 
 	public function test_setup_connection() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
+
 		$redis = $this->adapter->redis_connection( $this->connection_details );
 		$isSetUp = $this->adapter->setup_connection( $redis, [], [] );
 		$this->assertTrue( $isSetUp );
 	}
 
 	public function test_setup_connection_throws_exception() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
+
 		$redis = $this->getMockBuilder( Redis::class )->getMock();
 		$redis->method( 'select' )
 			->will( $this->throwException( new RedisException ) );
