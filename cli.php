@@ -196,7 +196,7 @@ class WP_Redis_CLI_Command {
 	private static function get_relative_path( $from, $to ) {
 		// some compatibility fixes for Windows paths
 		$from = is_dir( $from ) ? rtrim( $from, '\/' ) . '/' : $from;
-		$to   = is_dir( $to )   ? rtrim( $to, '\/' ) . '/'   : $to;
+		$to   = is_dir( $to ) ? rtrim( $to, '\/' ) . '/' : $to;
 		$from = str_replace( '\\', '/', $from );
 		$to   = str_replace( '\\', '/', $to );
 
