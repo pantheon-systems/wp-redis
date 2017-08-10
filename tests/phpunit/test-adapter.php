@@ -41,7 +41,7 @@ class AdapterTest extends WP_UnitTestCase {
 	}
 
 	public function test_setup_connection_throws_exception() {
-		$redis = $this->createMock( Redis::class );
+		$redis = $this->getMockBuilder( Redis::class )->getMock();
 		$redis->method( 'select' )
 			->will( $this->throwException( new RedisException ) );
 
