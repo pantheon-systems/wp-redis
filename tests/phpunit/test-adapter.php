@@ -40,7 +40,7 @@ class AdapterTest extends WP_UnitTestCase {
 		}
 
 		$redis = $this->adapter->redis_connection( $this->connection_details );
-		$isSetUp = $this->adapter->setup_connection( $redis, [], [] );
+		$isSetUp = $this->adapter->setup_connection( $redis, array(), array() );
 		$this->assertTrue( $isSetUp );
 	}
 
