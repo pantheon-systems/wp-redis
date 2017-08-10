@@ -58,7 +58,7 @@ class AdapterTest extends WP_UnitTestCase {
 		$keys_methods = array(
 			'database' => 'select',
 		);
-		$this->expectException( WP_Redis_Connection_Exception::class );
+		$this->setExpectedException( WP_Redis_Connection_Exception::class );
 		$this->adapter->setup_connection( $redis, $settings, $keys_methods );
 	}
 }
