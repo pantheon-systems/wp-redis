@@ -16,7 +16,7 @@ class AdapterTest extends WP_UnitTestCase {
 		if ( class_exists( 'Redis' ) ) {
 			$this->assertTrue( $result );
 		} else {
-			$this->assertFalse( $result );
+			$this->assertTrue( is_string( $result ) );
 		}
 	}
 
