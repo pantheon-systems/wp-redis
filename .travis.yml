@@ -54,9 +54,9 @@ before_script:
       fi
     - |
       if [[ "$WP_TRAVISCI" == "phpcs" ]] ; then
-        export PATH="/home/travis/.config/composer/vendor/bin:$PATH"
+        export PATH="$COMPOSER_HOME/vendor/bin:$PATH"
         composer global require wp-coding-standards/wpcs
-        phpcs --config-set installed_paths $HOME/.composer/vendor/wp-coding-standards/wpcs
+        phpcs --config-set installed_paths $COMPOSER_HOME/vendor/wp-coding-standards/wpcs
       fi
 
 script:
