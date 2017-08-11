@@ -1076,7 +1076,7 @@ class WP_Object_Cache {
 
 		try {
 			wp_redis_client_setup_connection( $this->redis, $redis_server, $keys_methods );
-		} catch ( WP_Redis_Connection_Exception $e ) {
+		} catch ( Exception $e ) {
 			try {
 				$this->last_triggered_error = 'WP Redis: ' . $e->getMessage();
 				// Be friendly to developers debugging production servers by triggering an error
