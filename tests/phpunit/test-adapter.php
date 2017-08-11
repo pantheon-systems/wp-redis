@@ -11,13 +11,8 @@ class AdapterTest extends WP_UnitTestCase {
 		'retry_interval' => 100,
 	);
 
-	public function setUp() {
-		parent::setUp();
-		$this->adapter = new WP_Redis_Adapter_PHPRedis;
-	}
-
 	public function test_dependencies() {
-		$result = $this->adapter->check_dependencies();
+		$result = wp_redis_client_check_dependencies();
 		if ( class_exists( 'Redis' ) ) {
 			$this->assertTrue( $result );
 		} else {
@@ -30,7 +25,7 @@ class AdapterTest extends WP_UnitTestCase {
 			$this->markTestSkipped( 'PHPRedis extension not available.' );
 		}
 
-		$redis = $this->adapter->redis_connection( $this->connection_details );
+		$redis = wp_redis_client_connection( $this->connection_details );
 		$this->assertTrue( $redis->isConnected() );
 	}
 
@@ -39,8 +34,8 @@ class AdapterTest extends WP_UnitTestCase {
 			$this->markTestSkipped( 'PHPRedis extension not available.' );
 		}
 
-		$redis = $this->adapter->redis_connection( $this->connection_details );
-		$isSetUp = $this->adapter->setup_connection( $redis, array(), array() );
+		$redis = wp_redis_client_connection( $this->connection_details );
+		$isSetUp = wp_redis_client_setup_connection( $redis, array(), array() );
 		$this->assertTrue( $isSetUp );
 	}
 
@@ -66,7 +61,7 @@ class AdapterTest extends WP_UnitTestCase {
 		$keys_methods = array(
 			'database' => 'select',
 		);
-		$this->setExpectedException( 'WP_Redis_Connection_Exception' );
-		$this->adapter->setup_connection( $redis, $settings, $keys_methods );
+		$this->setExpectedException( 'Exception' );
+		wp_redis_client_setup_connection( $redis, $settings, $keys_methods );
 	}
 }
