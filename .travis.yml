@@ -55,7 +55,7 @@ before_script:
     - |
       if [[ "$WP_TRAVISCI" == "phpcs" ]] ; then
         export PATH="/home/travis/.config/composer/vendor/bin:$PATH"
-        sudo composer global require wp-coding-standards/wpcs
+        composer global require wp-coding-standards/wpcs
         phpcs --config-set installed_paths $HOME/.composer/vendor/wp-coding-standards/wpcs
       fi
 
