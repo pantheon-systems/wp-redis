@@ -979,7 +979,7 @@ class WP_Object_Cache {
 		global $redis_server;
 
 		$check_dependencies = apply_filters( 'wp_redis_check_client_dependencies_callback', array( $this, 'check_client_dependencies' ) );
-		$dependencies_ok = call_user_func_array( $check_dependencies, array() );
+		$dependencies_ok = call_user_func( $check_dependencies );
 		if ( true !== $dependencies_ok ) {
 			$this->is_redis_connected = false;
 			$this->missing_redis_message = $dependencies_ok;
