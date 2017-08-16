@@ -1068,7 +1068,7 @@ class WP_Object_Cache {
 		$defaults = array(
 			'host' => $redis_server['host'],
 			'port' => $port,
-			'timeout' => 1000, // TODO I multiplied this by 1000 so we'd have a common measure of ms instead of s and ms, need to make sure this gets divided by 1000
+			'timeout' => 1000, // I multiplied this by 1000 so we'd have a common measure of ms instead of s and ms, need to make sure this gets divided by 1000
 			'retry_interval' => 100,
 		);
 		// 1s timeout, 100ms delay between reconnections
