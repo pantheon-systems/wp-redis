@@ -17,55 +17,6 @@ if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) ) {
 	define( 'WP_REDIS_USE_CACHE_GROUPS', false );
 }
 
-if ( ! function_exists( 'wp_redis_client_check_dependencies' ) ) {
-	function wp_redis_client_check_dependencies() {
-		if ( ! class_exists( 'Redis' ) ) {
-			return 'Warning! PHPRedis module is unavailable, which is required by WP Redis object cache.';
-		}
-		return true;
-	}
-}
-
-if ( ! function_exists( 'wp_redis_client_connection' ) ) {
-	function wp_redis_client_connection( $connection_details ) {
-		$redis = new Redis;
-
-		// TODO should we cache this connection?
-		$redis->connect(
-			$connection_details['host'],
-			$connection_details['port'],
-			// $connection_details['timeout'] is sent in milliseconds,
-			// connect() takes seconds, so divide by 1000
-			$connection_details['timeout'] / 1000,
-			null,
-			$connection_details['retry_interval']
-		);
-
-		return $redis;
-	}
-}
-
-if ( ! function_exists( 'wp_redis_client_setup_connection' ) ) {
-	function wp_redis_client_setup_connection( $redis, $settings, $keys_methods ) {
-		foreach ( $keys_methods as $k => $method ) {
-			if ( ! isset( $settings[ $k ] ) ) {
-				continue;
-			}
-			try {
-				$redis->$method( $settings[ $k ] );
-			} catch ( RedisException $e ) {
-
-				// PhpRedis throws an Exception when it fails a server call.
-				// To prevent WordPress from fataling, we catch the Exception.
-				// TODO Perhaps we catch and rethrow? or return instance of
-				// WP_Error?
-				throw new Exception( $e->getMessage(), $e->getCode(), $e );
-			}
-		}
-		return true;
-	}
-}
-
 /**
  * Adds data to the cache, if the cache key doesn't already exist.
  *
@@ -1027,8 +978,8 @@ class WP_Object_Cache {
 	protected function _connect_redis() {
 		global $redis_server;
 
-		// TODO update $redis_server to include 'adapter' key
-		$dependencies_ok = wp_redis_client_check_dependencies();
+		$check_dependencies = apply_filters( 'wp_redis_check_client_dependencies_callback', array( $this, 'check_client_dependencies' ) );
+		$dependencies_ok = call_user_func_array( $check_dependencies, array() );
 		if ( true !== $dependencies_ok ) {
 			$this->is_redis_connected = false;
 			$this->missing_redis_message = $dependencies_ok;
@@ -1037,7 +988,8 @@ class WP_Object_Cache {
 
 		$client_parameters = $this->build_client_parameters( $redis_server );
 
-		$this->redis = wp_redis_client_connection( $client_parameters );
+		$client_connection = apply_filters( 'wp_redis_client_connection_callback', array( $this, 'client_connection' ) );
+		$this->redis = call_user_func_array( $client_connection, array( $client_parameters ) );
 
 		$keys_methods = array(
 			'auth'     => 'auth',
@@ -1045,7 +997,8 @@ class WP_Object_Cache {
 		);
 
 		try {
-			wp_redis_client_setup_connection( $this->redis, $redis_server, $keys_methods );
+			$setup_connection = apply_filters( 'wp_redis_setup_client_connection_callback', array( $this, 'setup_client_connection' ) );
+			call_user_func_array( $setup_connection, array( $this->redis, $redis_server, $keys_methods ) );
 		} catch ( Exception $e ) {
 			try {
 				$this->last_triggered_error = 'WP Redis: ' . $e->getMessage();
@@ -1065,6 +1018,13 @@ class WP_Object_Cache {
 			$this->missing_redis_message = 'Warning! WP Redis object cache cannot connect to Redis server.';
 		}
 		return $this->is_redis_connected;
+	}
+
+	public function check_client_dependencies() {
+		if ( ! class_exists( 'Redis' ) ) {
+			return 'Warning! PHPRedis module is unavailable, which is required by WP Redis object cache.';
+		}
+		return true;
 	}
 
 	public function build_client_parameters( $redis_server ) {
@@ -1102,6 +1062,42 @@ class WP_Object_Cache {
 		// merging the defaults with the original $redis_server enables any
 		// custom parameters to get sent downstream to the redis client.
 		return array_replace_recursive( $redis_server, $defaults );
+	}
+
+	public function client_connection( $connection_details ) {
+		$redis = new Redis;
+
+		// TODO should we cache this connection?
+		$redis->connect(
+			$connection_details['host'],
+			$connection_details['port'],
+			// $connection_details['timeout'] is sent in milliseconds,
+			// connect() takes seconds, so divide by 1000
+			$connection_details['timeout'] / 1000,
+			null,
+			$connection_details['retry_interval']
+		);
+
+		return $redis;
+	}
+
+	function setup_client_connection( $redis, $settings, $keys_methods ) {
+		foreach ( $keys_methods as $k => $method ) {
+			if ( ! isset( $settings[ $k ] ) ) {
+				continue;
+			}
+			try {
+				$redis->$method( $settings[ $k ] );
+			} catch ( RedisException $e ) {
+
+				// PhpRedis throws an Exception when it fails a server call.
+				// To prevent WordPress from fataling, we catch the Exception.
+				// TODO Perhaps we catch and rethrow? or return instance of
+				// WP_Error?
+				throw new Exception( $e->getMessage(), $e->getCode(), $e );
+			}
+		}
+		return true;
 	}
 
 	/**

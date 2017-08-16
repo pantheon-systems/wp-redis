@@ -21,6 +21,13 @@ class CacheTest extends WP_UnitTestCase {
 
 	private static $flush_all_key;
 
+	private static $connection_details = array(
+		'host' => 'localhost',
+		'port' => 6379,
+		'timeout' => 1000,
+		'retry_interval' => 100,
+	);
+
 	public function setUp() {
 		parent::setUp();
 		$GLOBALS['redis_server'] = array(
@@ -1206,6 +1213,60 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertInternalType( 'int', $data['key_count'] );
 		$this->assertRegExp( '/[\d]+\/sec/', $data['instantaneous_ops'] );
 		$this->assertRegExp( '/[\d]+\sdays?/', $data['uptime'] );
+	}
+
+	public function test_dependencies() {
+		$result = $this->cache->check_client_dependencies();
+		if ( class_exists( 'Redis' ) ) {
+			$this->assertTrue( $result );
+		} else {
+			$this->assertTrue( is_string( $result ) );
+		}
+	}
+
+	public function test_redis_client_connection() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
+
+		$redis = $this->cache->client_connection( self::$connection_details );
+		$this->assertTrue( $redis->isConnected() );
+	}
+
+	public function test_setup_connection() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
+
+		$redis = $this->cache->client_connection( self::$connection_details );
+		$isSetUp = $this->cache->setup_client_connection( $redis, array(), array() );
+		$this->assertTrue( $isSetUp );
+	}
+
+	public function test_setup_connection_throws_exception() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
+
+		$redis = $this->getMockBuilder( 'Redis' )->getMock();
+		$redis->method( 'select' )
+			->will( $this->throwException( new RedisException ) );
+
+		$redis->connect(
+			self::$connection_details['host'],
+			self::$connection_details['port'],
+			self::$connection_details['timeout'],
+			null,
+			self::$connection_details['retry_interval']
+		);
+		$settings = array(
+			'database' => 2,
+		);
+		$keys_methods = array(
+			'database' => 'select',
+		);
+		$this->setExpectedException( 'Exception' );
+		$this->cache->setup_client_connection( $redis, $settings, $keys_methods );
 	}
 
 	public function tearDown() {
