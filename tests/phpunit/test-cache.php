@@ -21,7 +21,7 @@ class CacheTest extends WP_UnitTestCase {
 
 	private static $flush_all_key;
 
-	private static $connection_details = array(
+	private static $client_parameters = array(
 		'host' => 'localhost',
 		'port' => 6379,
 		'timeout' => 1000,
@@ -1229,7 +1229,7 @@ class CacheTest extends WP_UnitTestCase {
 			$this->markTestSkipped( 'PHPRedis extension not available.' );
 		}
 
-		$redis = $this->cache->client_connection( self::$connection_details );
+		$redis = $this->cache->client_connection( self::$client_parameters );
 		$this->assertTrue( $redis->isConnected() );
 	}
 
@@ -1238,7 +1238,7 @@ class CacheTest extends WP_UnitTestCase {
 			$this->markTestSkipped( 'PHPRedis extension not available.' );
 		}
 
-		$redis = $this->cache->client_connection( self::$connection_details );
+		$redis = $this->cache->client_connection( self::$client_parameters );
 		$isSetUp = $this->cache->setup_client_connection( $redis, array(), array() );
 		$this->assertTrue( $isSetUp );
 	}
@@ -1253,11 +1253,11 @@ class CacheTest extends WP_UnitTestCase {
 			->will( $this->throwException( new RedisException ) );
 
 		$redis->connect(
-			self::$connection_details['host'],
-			self::$connection_details['port'],
-			self::$connection_details['timeout'],
+			self::$client_parameters['host'],
+			self::$client_parameters['port'],
+			self::$client_parameters['timeout'],
 			null,
-			self::$connection_details['retry_interval']
+			self::$client_parameters['retry_interval']
 		);
 		$settings = array(
 			'database' => 2,

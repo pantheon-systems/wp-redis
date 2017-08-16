@@ -1020,6 +1020,12 @@ class WP_Object_Cache {
 		return $this->is_redis_connected;
 	}
 
+	/**
+	 * Are the required dependencies for connecting to Redis available?
+	 *
+	 * @return mixed True if the required dependencies are present, string if
+	 *               not with a message describing the issue.
+	 */
 	public function check_client_dependencies() {
 		if ( ! class_exists( 'Redis' ) ) {
 			return 'Warning! PHPRedis module is unavailable, which is required by WP Redis object cache.';
@@ -1027,6 +1033,14 @@ class WP_Object_Cache {
 		return true;
 	}
 
+	/**
+	 * Builds an array to be passed to a function that will set up the Redis
+	 * client.
+	 *
+	 * @param array $redis_server Parameters used to construct a Redis client.
+	 * @return array Final parameters to use to contruct a Redis client with
+	 *               with defaults applied.
+	 */
 	public function build_client_parameters( $redis_server ) {
 		if ( empty( $redis_server ) ) {
 			// Attempt to automatically load Pantheon's Redis config from the env.
@@ -1064,30 +1078,45 @@ class WP_Object_Cache {
 		return array_replace_recursive( $redis_server, $defaults );
 	}
 
-	public function client_connection( $connection_details ) {
+	/**
+	 * Constructs a PHPRedis Redis client.
+	 *
+	 * @param array $client_parameters Parameters used to construct a Redis client.
+	 * @return Redis Redis client.
+	 */
+	public function client_connection( $client_parameters ) {
 		$redis = new Redis;
 
 		// TODO should we cache this connection?
 		$redis->connect(
-			$connection_details['host'],
-			$connection_details['port'],
-			// $connection_details['timeout'] is sent in milliseconds,
+			$client_parameters['host'],
+			$client_parameters['port'],
+			// $client_parameters['timeout'] is sent in milliseconds,
 			// connect() takes seconds, so divide by 1000
-			$connection_details['timeout'] / 1000,
+			$client_parameters['timeout'] / 1000,
 			null,
-			$connection_details['retry_interval']
+			$client_parameters['retry_interval']
 		);
 
 		return $redis;
 	}
 
-	function setup_client_connection( $redis, $settings, $keys_methods ) {
+	/**
+	 * Sets up the Redis connection (ie authentication and specific database).
+	 *
+	 * @param Redis $redis Redis client.
+	 * @param array $client_parameters Parameters used to configure Redis.
+	 * @param array $keys_methods Associative array of keys from
+	 *              $client_parameters to use as method arguments for $redis.
+	 * @return bool True if successful.
+	 */
+	function setup_client_connection( $redis, $client_parameters, $keys_methods ) {
 		foreach ( $keys_methods as $k => $method ) {
-			if ( ! isset( $settings[ $k ] ) ) {
+			if ( ! isset( $client_parameters[ $k ] ) ) {
 				continue;
 			}
 			try {
-				$redis->$method( $settings[ $k ] );
+				$redis->$method( $client_parameters[ $k ] );
 			} catch ( RedisException $e ) {
 
 				// PhpRedis throws an Exception when it fails a server call.
