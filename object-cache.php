@@ -1110,7 +1110,7 @@ class WP_Object_Cache {
 	 *              $client_parameters to use as method arguments for $redis.
 	 * @return bool True if successful.
 	 */
-	function setup_client_connection( $redis, $client_parameters, $keys_methods ) {
+	public function setup_client_connection( $redis, $client_parameters, $keys_methods ) {
 		foreach ( $keys_methods as $k => $method ) {
 			if ( ! isset( $client_parameters[ $k ] ) ) {
 				continue;
