@@ -55,6 +55,29 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertTrue( WP_REDIS_OBJECT_CACHE );
 	}
 
+	public function test_connection_details() {
+		$redis_server = array(
+			'host' => '127.0.0.1',
+			'port' => 6379,
+			'extra' => true,
+			'recursive' => array(
+				'child' => true,
+			),
+		);
+		$expected = array(
+			'host' => '127.0.0.1',
+			'port' => 6379,
+			'extra' => true,
+			'recursive' => array(
+				'child' => true,
+			),
+			'timeout' => 1000,
+			'retry_interval' => 100,
+		);
+		$actual = $this->cache->build_client_parameters( $redis_server );
+		$this->assertEquals( $expected, $actual );
+	}
+
 	public function test_redis_connected() {
 		if ( ! class_exists( 'Redis' ) ) {
 			$this->markTestSkipped( 'PHPRedis extension not available.' );

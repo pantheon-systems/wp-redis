@@ -1035,39 +1035,9 @@ class WP_Object_Cache {
 			return $this->is_redis_connected;
 		}
 
-		if ( empty( $redis_server ) ) {
-			// Attempt to automatically load Pantheon's Redis config from the env.
-			if ( isset( $_SERVER['CACHE_HOST'] ) ) {
-				$redis_server = array(
-					'host' => $_SERVER['CACHE_HOST'],
-					'port' => $_SERVER['CACHE_PORT'],
-					'auth' => $_SERVER['CACHE_PASSWORD'],
-				);
-			} else {
-				$redis_server = array(
-					'host' => '127.0.0.1',
-					'port' => 6379,
-				);
-			}
-		}
+		$client_parameters = $this->build_client_parameters( $redis_server );
 
-		// TODO standardize connecting to local sockets
-		if ( file_exists( $redis_server['host'] ) && 'socket' === filetype( $redis_server['host'] ) ) { //unix socket connection
-			//port must be null or socket won't connect
-			$port = null;
-		} else { //tcp connection
-			$port = ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379;
-		}
-
-		$connection_details = array(
-			'host' => $redis_server['host'],
-			'port' => $port,
-			'timeout' => 1000, // TODO I multiplied this by 1000 so we'd have a common measure of ms instead of s and ms, need to make sure this gets divided by 1000
-			'retry_interval' => 100,
-		);
-		// 1s timeout, 100ms delay between reconnections
-
-		$this->redis = wp_redis_client_connection( $connection_details );
+		$this->redis = wp_redis_client_connection( $client_parameters );
 
 		$keys_methods = array(
 			'auth'     => 'auth',
@@ -1095,6 +1065,43 @@ class WP_Object_Cache {
 			$this->missing_redis_message = 'Warning! WP Redis object cache cannot connect to Redis server.';
 		}
 		return $this->is_redis_connected;
+	}
+
+	public function build_client_parameters( $redis_server ) {
+		if ( empty( $redis_server ) ) {
+			// Attempt to automatically load Pantheon's Redis config from the env.
+			if ( isset( $_SERVER['CACHE_HOST'] ) ) {
+				$redis_server = array(
+					'host' => $_SERVER['CACHE_HOST'],
+					'port' => $_SERVER['CACHE_PORT'],
+					'auth' => $_SERVER['CACHE_PASSWORD'],
+				);
+			} else {
+				$redis_server = array(
+					'host' => '127.0.0.1',
+					'port' => 6379,
+				);
+			}
+		}
+
+		if ( file_exists( $redis_server['host'] ) && 'socket' === filetype( $redis_server['host'] ) ) { //unix socket connection
+			//port must be null or socket won't connect
+			$port = null;
+		} else { //tcp connection
+			$port = ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379;
+		}
+
+		$defaults = array(
+			'host' => $redis_server['host'],
+			'port' => $port,
+			'timeout' => 1000, // TODO I multiplied this by 1000 so we'd have a common measure of ms instead of s and ms, need to make sure this gets divided by 1000
+			'retry_interval' => 100,
+		);
+		// 1s timeout, 100ms delay between reconnections
+
+		// merging the defaults with the original $redis_server enables any
+		// custom parameters to get sent downstream to the redis client.
+		return array_replace_recursive( $redis_server, $defaults );
 	}
 
 	/**
