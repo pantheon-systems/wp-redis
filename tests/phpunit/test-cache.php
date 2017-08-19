@@ -98,7 +98,7 @@ class CacheTest extends WP_UnitTestCase {
 			$this->markTestSkipped( 'PHPRedis extension not available.' );
 		}
 		if ( version_compare( PHP_VERSION, '7.0.0' ) >= 0 ) {
-			$this->markTestSkipped( 'Test fails unexpectedly in PHP 7' );
+			// $this->markTestSkipped( 'Test fails unexpectedly in PHP 7' );
 		}
 		// Connection is live
 		$this->cache->set( 'foo', 'bar' );
@@ -144,10 +144,15 @@ class CacheTest extends WP_UnitTestCase {
 		// Force a bad connection
 		$redis_server['host'] = '127.0.0.1';
 		$redis_server['port'] = 9999;
-		$this->cache->redis->connect( $redis_server['host'], $redis_server['port'], 1, null, 100 );
+		$this->cache->build_client_connection( $this->cache->build_client_parameters( $redis_server ) );
 		// Setting cache value when redis connection fails saves wakeup flush
 		$this->cache->set( 'foo', 'bar' );
-		$this->assertEquals( 'WP Redis: Redis server went away', $this->cache->last_triggered_error );
+		$this->assertTrue(
+			$this->cache->message_matches(
+				str_replace( 'WP Redis: ', '', $this->cache->last_triggered_error ),
+				$this->cache->retry_exception_messages()
+			)
+		);
 		// @codingStandardsIgnoreStart
 		$this->assertEquals( "INSERT IGNORE INTO {$table} ({$col1},{$col2}) VALUES ('wp_redis_do_redis_failback_flush',1)", $wpdb->last_query );
 		$this->assertTrue( (bool) $wpdb->get_results( "SELECT {$col2} FROM {$table} WHERE {$col1}='wp_redis_do_redis_failback_flush'" ) );
@@ -184,7 +189,12 @@ class CacheTest extends WP_UnitTestCase {
 		$redis_server['port'] = 9999;
 		$redis_server['auth'] = 'foobar';
 		$cache = new WP_Object_Cache;
-		$this->assertEquals( 'WP Redis: Redis server went away', $cache->last_triggered_error );
+		$this->assertTrue(
+			$this->cache->message_matches(
+				str_replace( 'WP Redis: ', '', $this->cache->last_triggered_error ),
+				$this->cache->retry_exception_messages()
+			)
+		);
 		$this->assertFalse( $cache->is_redis_connected );
 		// Fails back to the internal object cache
 		$cache->set( 'foo', 'bar' );

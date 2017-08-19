@@ -988,8 +988,8 @@ class WP_Object_Cache {
 
 		$client_parameters = $this->build_client_parameters( $redis_server );
 
-		$client_connection = apply_filters( 'wp_redis_client_connection_callback', array( $this, 'client_connection' ) );
-		$this->redis = call_user_func_array( $client_connection, array( $client_parameters ) );
+		// Sets $this->redis
+		$this->build_client_connection( $client_parameters );
 
 		$keys_methods = array(
 			'auth'     => 'auth',
@@ -1000,17 +1000,7 @@ class WP_Object_Cache {
 			$setup_connection = apply_filters( 'wp_redis_setup_client_connection_callback', array( $this, 'setup_client_connection' ) );
 			call_user_func_array( $setup_connection, array( $this->redis, $redis_server, $keys_methods ) );
 		} catch ( Exception $e ) {
-			try {
-				$this->last_triggered_error = 'WP Redis: ' . $e->getMessage();
-				// Be friendly to developers debugging production servers by triggering an error
-				// @codingStandardsIgnoreStart
-				trigger_error( $this->last_triggered_error, E_USER_WARNING );
-				// @codingStandardsIgnoreEnd
-			} catch ( PHPUnit_Framework_Error_Warning $e ) {
-				// PHPUnit throws an Exception when `trigger_error()` is called.
-				// To ensure our tests (which expect Exceptions to be caught) continue to run,
-				// we catch the PHPUnit exception and inspect the RedisException message
-			}
+			$this->_exception_handler( $e );
 		}
 
 		$this->is_redis_connected = $this->redis->isConnected();
@@ -1076,6 +1066,11 @@ class WP_Object_Cache {
 		// merging the defaults with the original $redis_server enables any
 		// custom parameters to get sent downstream to the redis client.
 		return array_replace_recursive( $redis_server, $defaults );
+	}
+
+	public function build_client_connection( $client_parameters ) {
+		$client_connection = apply_filters( 'wp_redis_client_connection_callback', array( $this, 'client_connection' ) );
+		$this->redis = call_user_func_array( $client_connection, array( $client_parameters ) );
 	}
 
 	/**
@@ -1155,23 +1150,14 @@ class WP_Object_Cache {
 				$this->redis_calls[ $method ]++;
 				$retval = call_user_func_array( array( $this->redis, $method ), $arguments );
 				return $retval;
-			} catch ( RedisException $e ) {
+			} catch ( Exception $e ) {
+				$retry_exception_messages = $this->retry_exception_messages();
 				// PhpRedis throws an Exception when it fails a server call.
 				// To prevent WordPress from fataling, we catch the Exception.
-				$retry_exception_messages = array( 'socket error on read socket', 'Connection closed', 'Redis server went away' );
-				$retry_exception_messages = apply_filters( 'wp_redis_retry_exception_messages', $retry_exception_messages );
-				if ( in_array( $e->getMessage(), $retry_exception_messages, true ) ) {
-					try {
-						$this->last_triggered_error = 'WP Redis: ' . $e->getMessage();
-						// Be friendly to developers debugging production servers by triggering an error
-						// @codingStandardsIgnoreStart
-						trigger_error( $this->last_triggered_error, E_USER_WARNING );
-						// @codingStandardsIgnoreEnd
-					} catch ( PHPUnit_Framework_Error_Warning $e ) {
-						// PHPUnit throws an Exception when `trigger_error()` is called.
-						// To ensure our tests (which expect Exceptions to be caught) continue to run,
-						// we catch the PHPUnit exception and inspect the RedisException message
-					}
+				if ( $this->message_matches( $e->getMessage(), $retry_exception_messages ) ) {
+
+					$this->_exception_handler( $e );
+
 					// Attempt to refresh the connection if it was successfully established once
 					// $this->is_redis_connected will be set inside _connect_redis()
 					if ( $this->_connect_redis() ) {
@@ -1228,6 +1214,43 @@ class WP_Object_Cache {
 				return false;
 		}
 
+	}
+
+	public function retry_exception_messages() {
+		$retry_exception_messages = array( 'socket error on read socket', 'Connection closed', 'Redis server went away' );
+		return apply_filters( 'wp_redis_retry_exception_messages', $retry_exception_messages );
+	}
+
+	public function message_matches( $error, $errors ) {
+		foreach ( $errors as $message ) {
+			$pattern = $this->_format_message_for_pattern( $message );
+			$matches = (bool) preg_match( $pattern, $error );
+			if ( $matches ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected function _format_message_for_pattern( $message ) {
+		$var = $message;
+		$var = '/' === $var[0] ? $var : '/' . $var;
+		$var = '/' === $var[ strlen( $var ) - 1 ] ? $var : $var . '/';
+		return $var;
+	}
+
+	protected function _exception_handler( $exception ) {
+		try {
+			$this->last_triggered_error = 'WP Redis: ' . $exception->getMessage();
+			// Be friendly to developers debugging production servers by triggering an error
+			// @codingStandardsIgnoreStart
+			trigger_error( $this->last_triggered_error, E_USER_WARNING );
+			// @codingStandardsIgnoreEnd
+		} catch ( PHPUnit_Framework_Error_Warning $e ) {
+			// PHPUnit throws an Exception when `trigger_error()` is called.
+			// To ensure our tests (which expect Exceptions to be caught) continue to run,
+			// we catch the PHPUnit exception and inspect the RedisException message
+		}
 	}
 
 	/**
