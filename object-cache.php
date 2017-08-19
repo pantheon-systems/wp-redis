@@ -1160,6 +1160,7 @@ class WP_Object_Cache {
 
 					// Attempt to refresh the connection if it was successfully established once
 					// $this->is_redis_connected will be set inside _connect_redis()
+					// TODO we should test to see if Redis is already connected
 					if ( $this->_connect_redis() ) {
 						return call_user_func_array( array( $this, '_call_redis' ), array_merge( array( $method ), $arguments ) );
 					}
@@ -1216,11 +1217,23 @@ class WP_Object_Cache {
 
 	}
 
+	/**
+	 * Returns a filterable array of expected Exception messages that may be thrown
+	 *
+	 * @return array Array of expected exception messages
+	 */
 	public function retry_exception_messages() {
 		$retry_exception_messages = array( 'socket error on read socket', 'Connection closed', 'Redis server went away' );
 		return apply_filters( 'wp_redis_retry_exception_messages', $retry_exception_messages );
 	}
 
+	/**
+	 * Compares individual message to list of messages.
+	 *
+	 * @param string $error Message to compare
+	 * @param array $errors Array of messages to compare to
+	 * @return bool whether $error matches any items in $errors
+	 */
 	public function message_matches( $error, $errors ) {
 		foreach ( $errors as $message ) {
 			$pattern = $this->_format_message_for_pattern( $message );
@@ -1232,6 +1245,12 @@ class WP_Object_Cache {
 		return false;
 	}
 
+	/**
+	 * Prepends and appends '/' if not present in a string
+	 *
+	 * @param string $message Potential regex string that may need '/'
+	 * @return string Regex pattern
+	 */
 	protected function _format_message_for_pattern( $message ) {
 		$var = $message;
 		$var = '/' === $var[0] ? $var : '/' . $var;
@@ -1239,6 +1258,12 @@ class WP_Object_Cache {
 		return $var;
 	}
 
+	/**
+	 * Handles exceptions by triggering a php error.
+	 *
+	 * @param Exception $exception
+	 * @return null
+	 */
 	protected function _exception_handler( $exception ) {
 		try {
 			$this->last_triggered_error = 'WP Redis: ' . $exception->getMessage();
