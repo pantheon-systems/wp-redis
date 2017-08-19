@@ -985,7 +985,7 @@ class WP_Object_Cache {
 			$this->missing_redis_message = $dependencies_ok;
 			return $this->is_redis_connected;
 		}
-
+		// var_dump( $redis_server );
 		$client_parameters = $this->build_client_parameters( $redis_server );
 
 		// Sets $this->redis
