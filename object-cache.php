@@ -985,7 +985,6 @@ class WP_Object_Cache {
 			$this->missing_redis_message = $dependencies_ok;
 			return $this->is_redis_connected;
 		}
-		// var_dump( $redis_server );
 		$client_parameters = $this->build_client_parameters( $redis_server );
 
 		// Sets $this->redis
@@ -1082,7 +1081,6 @@ class WP_Object_Cache {
 	public function client_connection( $client_parameters ) {
 		$redis = new Redis;
 
-		// TODO should we cache this connection?
 		$redis->connect(
 			$client_parameters['host'],
 			$client_parameters['port'],
@@ -1116,8 +1114,6 @@ class WP_Object_Cache {
 
 				// PhpRedis throws an Exception when it fails a server call.
 				// To prevent WordPress from fataling, we catch the Exception.
-				// TODO Perhaps we catch and rethrow? or return instance of
-				// WP_Error?
 				throw new Exception( $e->getMessage(), $e->getCode(), $e );
 			}
 		}
@@ -1160,7 +1156,6 @@ class WP_Object_Cache {
 
 					// Attempt to refresh the connection if it was successfully established once
 					// $this->is_redis_connected will be set inside _connect_redis()
-					// TODO we should test to see if Redis is already connected
 					if ( $this->_connect_redis() ) {
 						return call_user_func_array( array( $this, '_call_redis' ), array_merge( array( $method ), $arguments ) );
 					}
