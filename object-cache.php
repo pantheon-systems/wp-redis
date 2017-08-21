@@ -987,8 +987,8 @@ class WP_Object_Cache {
 		}
 		$client_parameters = $this->build_client_parameters( $redis_server );
 
-		// Sets $this->redis
-		$this->build_client_connection( $client_parameters );
+		$client_connection = apply_filters( 'wp_redis_client_connection_callback', array( $this, 'client_connection' ) );
+		$this->redis = call_user_func_array( $client_connection, array( $client_parameters ) );
 
 		$keys_methods = array(
 			'auth'     => 'auth',
@@ -1065,11 +1065,6 @@ class WP_Object_Cache {
 		// merging the defaults with the original $redis_server enables any
 		// custom parameters to get sent downstream to the redis client.
 		return array_replace_recursive( $redis_server, $defaults );
-	}
-
-	public function build_client_connection( $client_parameters ) {
-		$client_connection = apply_filters( 'wp_redis_client_connection_callback', array( $this, 'client_connection' ) );
-		$this->redis = call_user_func_array( $client_connection, array( $client_parameters ) );
 	}
 
 	/**
