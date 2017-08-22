@@ -1000,7 +1000,7 @@ class WP_Object_Cache {
 		 *
 		 * @param callable $client_connection Callback to execute.
 		 */
-		$client_connection = apply_filters( 'wp_redis_client_connection_callback', $client_connection );
+		$client_connection = apply_filters( 'wp_redis_prepare_client_connection_callback', $client_connection );
 		$this->redis = call_user_func_array( $client_connection, array( $client_parameters ) );
 
 		$keys_methods = array(
@@ -1009,13 +1009,13 @@ class WP_Object_Cache {
 		);
 
 		try {
-			$setup_connection = array( $this, 'setup_client_connection' );
+			$setup_connection = array( $this, 'perform_client_connection' );
 			/**
 			 * Permits alternate setup client connection mechanism to be used.
 			 *
 			 * @param callable $setup_connection Callback to execute.
 			 */
-			$setup_connection = apply_filters( 'wp_redis_setup_client_connection_callback', $setup_connection );
+			$setup_connection = apply_filters( 'wp_redis_perform_client_connection_callback', $setup_connection );
 			call_user_func_array( $setup_connection, array( $this->redis, $redis_server, $keys_methods ) );
 		} catch ( Exception $e ) {
 			$this->_exception_handler( $e );
@@ -1117,7 +1117,7 @@ class WP_Object_Cache {
 	 *              $client_parameters to use as method arguments for $redis.
 	 * @return bool True if successful.
 	 */
-	public function setup_client_connection( $redis, $client_parameters, $keys_methods ) {
+	public function perform_client_connection( $redis, $client_parameters, $keys_methods ) {
 		foreach ( $keys_methods as $k => $method ) {
 			if ( ! isset( $client_parameters[ $k ] ) ) {
 				continue;

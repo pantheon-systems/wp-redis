@@ -1249,7 +1249,7 @@ class CacheTest extends WP_UnitTestCase {
 		}
 
 		$redis = $this->cache->prepare_client_connection( self::$client_parameters );
-		$isSetUp = $this->cache->setup_client_connection( $redis, array(), array() );
+		$isSetUp = $this->cache->perform_client_connection( $redis, array(), array() );
 		$this->assertTrue( $isSetUp );
 	}
 
@@ -1276,7 +1276,7 @@ class CacheTest extends WP_UnitTestCase {
 			'database' => 'select',
 		);
 		$this->setExpectedException( 'Exception' );
-		$this->cache->setup_client_connection( $redis, $settings, $keys_methods );
+		$this->cache->perform_client_connection( $redis, $settings, $keys_methods );
 	}
 
 	public function tearDown() {
