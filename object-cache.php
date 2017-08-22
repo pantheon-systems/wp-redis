@@ -979,7 +979,13 @@ class WP_Object_Cache {
 	protected function _connect_redis() {
 		global $redis_server;
 
-		$check_dependencies = apply_filters( 'wp_redis_check_client_dependencies_callback', array( $this, 'check_client_dependencies' ) );
+		$check_dependencies = array( $this, 'check_client_dependencies' );
+		/**
+		 * Permits alternate dependency check mechanism to be used.
+		 *
+		 * @param callable $check_dependencies Callback to execute.
+		 */
+		$check_dependencies = apply_filters( 'wp_redis_check_client_dependencies_callback', $check_dependencies );
 		$dependencies_ok = call_user_func( $check_dependencies );
 		if ( true !== $dependencies_ok ) {
 			$this->is_redis_connected = false;
@@ -988,7 +994,13 @@ class WP_Object_Cache {
 		}
 		$client_parameters = $this->build_client_parameters( $redis_server );
 
-		$client_connection = apply_filters( 'wp_redis_client_connection_callback', array( $this, 'client_connection' ) );
+		$client_connection = array( $this, 'client_connection' );
+		/**
+		 * Permits alternate initial client connection mechanism to be used.
+		 *
+		 * @param callable $client_connection Callback to execute.
+		 */
+		$client_connection = apply_filters( 'wp_redis_client_connection_callback', $client_connection );
 		$this->redis = call_user_func_array( $client_connection, array( $client_parameters ) );
 
 		$keys_methods = array(
@@ -997,7 +1009,13 @@ class WP_Object_Cache {
 		);
 
 		try {
-			$setup_connection = apply_filters( 'wp_redis_setup_client_connection_callback', array( $this, 'setup_client_connection' ) );
+			$setup_connection = array( $this, 'setup_client_connection' );
+			/**
+			 * Permits alternate setup client connection mechanism to be used.
+			 *
+			 * @param callable $setup_connection Callback to execute.
+			 */
+			$setup_connection = apply_filters( 'wp_redis_setup_client_connection_callback', $setup_connection );
 			call_user_func_array( $setup_connection, array( $this->redis, $redis_server, $keys_methods ) );
 		} catch ( Exception $e ) {
 			$this->_exception_handler( $e );
