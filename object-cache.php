@@ -1016,7 +1016,7 @@ class WP_Object_Cache {
 			 * @param callable $setup_connection Callback to execute.
 			 */
 			$setup_connection = apply_filters( 'wp_redis_perform_client_connection_callback', $setup_connection );
-			call_user_func_array( $setup_connection, array( $this->redis, $redis_server, $keys_methods ) );
+			call_user_func_array( $setup_connection, array( $this->redis, $client_parameters, $keys_methods ) );
 		} catch ( Exception $e ) {
 			$this->_exception_handler( $e );
 		}
@@ -1118,12 +1118,12 @@ class WP_Object_Cache {
 	 * @return bool True if successful.
 	 */
 	public function perform_client_connection( $redis, $client_parameters, $keys_methods ) {
-		foreach ( $keys_methods as $k => $method ) {
-			if ( ! isset( $client_parameters[ $k ] ) ) {
+		foreach ( $keys_methods as $key => $method ) {
+			if ( ! isset( $client_parameters[ $key ] ) ) {
 				continue;
 			}
 			try {
-				$redis->$method( $client_parameters[ $k ] );
+				$redis->$method( $client_parameters[ $key ] );
 			} catch ( RedisException $e ) {
 
 				// PhpRedis throws an Exception when it fails a server call.
