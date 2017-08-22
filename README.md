@@ -3,7 +3,7 @@
 **Tags:** cache, plugin, redis  
 **Requires at least:** 3.0.1  
 **Tested up to:** 4.8  
-**Stable tag:** 0.6.2  
+**Stable tag:** 0.7.0  
 **License:** GPLv2 or later  
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -102,6 +102,9 @@ A page load with 2,000 Redis calls can be 2 full seonds of object cache transact
 This declaration means use of `wp_cache_set( 'foo', 'bar', 'bad-actor' );` and `wp_cache_get( 'foo', 'bad-actor' );` will not use Redis, and instead fall back to WordPress' default runtime object cache.
 
 ## Changelog ##
+
+### 0.7.0 (August 22, 2017) ###
+* Adds filterable connection methods to permit use of Predis. See [humanmade/wp-redis-predis-client](https://github.com/humanmade/wp-redis-predis-client) for more details.
 
 ### 0.6.2 (June 5, 2017) ###
 * Bug fix: Preserves null values in internal cache.
