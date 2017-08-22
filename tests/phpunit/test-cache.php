@@ -21,6 +21,13 @@ class CacheTest extends WP_UnitTestCase {
 
 	private static $flush_all_key;
 
+	private static $client_parameters = array(
+		'host' => 'localhost',
+		'port' => 6379,
+		'timeout' => 1000,
+		'retry_interval' => 100,
+	);
+
 	public function setUp() {
 		parent::setUp();
 		$GLOBALS['redis_server'] = array(
@@ -55,6 +62,29 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertTrue( WP_REDIS_OBJECT_CACHE );
 	}
 
+	public function test_connection_details() {
+		$redis_server = array(
+			'host' => '127.0.0.1',
+			'port' => 6379,
+			'extra' => true,
+			'recursive' => array(
+				'child' => true,
+			),
+		);
+		$expected = array(
+			'host' => '127.0.0.1',
+			'port' => 6379,
+			'extra' => true,
+			'recursive' => array(
+				'child' => true,
+			),
+			'timeout' => 1000,
+			'retry_interval' => 100,
+		);
+		$actual = $this->cache->build_client_parameters( $redis_server );
+		$this->assertEquals( $expected, $actual );
+	}
+
 	public function test_redis_connected() {
 		if ( ! class_exists( 'Redis' ) ) {
 			$this->markTestSkipped( 'PHPRedis extension not available.' );
@@ -81,7 +111,6 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertFalse( $this->cache->redis->IsConnected() );
 		// Reload occurs with set()
 		$this->cache->set( 'foo', 'banana' );
-		$this->assertEquals( 'WP Redis: Connection closed', $this->cache->last_triggered_error );
 		$this->assertEquals( 'banana', $this->cache->get( 'foo' ) );
 		$this->assertTrue( $this->cache->is_redis_connected );
 		$this->assertTrue( $this->cache->redis->IsConnected() );
@@ -114,10 +143,17 @@ class CacheTest extends WP_UnitTestCase {
 		// Force a bad connection
 		$redis_server['host'] = '127.0.0.1';
 		$redis_server['port'] = 9999;
-		$this->cache->redis->connect( $redis_server['host'], $redis_server['port'], 1, null, 100 );
+		$client_parameters = $this->cache->build_client_parameters( $redis_server );
+		$client_connection = apply_filters( 'wp_redis_client_connection_callback', array( $this->cache, 'prepare_client_connection' ) );
+		$this->cache->redis = call_user_func_array( $client_connection, array( $client_parameters ) );
 		// Setting cache value when redis connection fails saves wakeup flush
 		$this->cache->set( 'foo', 'bar' );
-		$this->assertEquals( 'WP Redis: Redis server went away', $this->cache->last_triggered_error );
+		$this->assertTrue(
+			$this->cache->exception_message_matches(
+				str_replace( 'WP Redis: ', '', $this->cache->last_triggered_error ),
+				$this->cache->retry_exception_messages()
+			)
+		);
 		// @codingStandardsIgnoreStart
 		$this->assertEquals( "INSERT IGNORE INTO {$table} ({$col1},{$col2}) VALUES ('wp_redis_do_redis_failback_flush',1)", $wpdb->last_query );
 		$this->assertTrue( (bool) $wpdb->get_results( "SELECT {$col2} FROM {$table} WHERE {$col1}='wp_redis_do_redis_failback_flush'" ) );
@@ -149,12 +185,16 @@ class CacheTest extends WP_UnitTestCase {
 		if ( version_compare( PHP_VERSION, '7.0.0' ) >= 0 ) {
 			$this->markTestSkipped( 'Test fails unexpectedly in PHP 7' );
 		}
-
 		$redis_server['host'] = '127.0.0.1';
 		$redis_server['port'] = 9999;
 		$redis_server['auth'] = 'foobar';
 		$cache = new WP_Object_Cache;
-		$this->assertEquals( 'WP Redis: Redis server went away', $cache->last_triggered_error );
+		$this->assertTrue(
+			$cache->exception_message_matches(
+				str_replace( 'WP Redis: ', '', $cache->last_triggered_error ),
+				$cache->retry_exception_messages()
+			)
+		);
 		$this->assertFalse( $cache->is_redis_connected );
 		// Fails back to the internal object cache
 		$cache->set( 'foo', 'bar' );
@@ -1183,6 +1223,60 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertInternalType( 'int', $data['key_count'] );
 		$this->assertRegExp( '/[\d]+\/sec/', $data['instantaneous_ops'] );
 		$this->assertRegExp( '/[\d]+\sdays?/', $data['uptime'] );
+	}
+
+	public function test_dependencies() {
+		$result = $this->cache->check_client_dependencies();
+		if ( class_exists( 'Redis' ) ) {
+			$this->assertTrue( $result );
+		} else {
+			$this->assertTrue( is_string( $result ) );
+		}
+	}
+
+	public function test_redis_client_connection() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
+
+		$redis = $this->cache->prepare_client_connection( self::$client_parameters );
+		$this->assertTrue( $redis->isConnected() );
+	}
+
+	public function test_setup_connection() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
+
+		$redis = $this->cache->prepare_client_connection( self::$client_parameters );
+		$isSetUp = $this->cache->perform_client_connection( $redis, array(), array() );
+		$this->assertTrue( $isSetUp );
+	}
+
+	public function test_setup_connection_throws_exception() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'PHPRedis extension not available.' );
+		}
+
+		$redis = $this->getMockBuilder( 'Redis' )->getMock();
+		$redis->method( 'select' )
+			->will( $this->throwException( new RedisException ) );
+
+		$redis->connect(
+			self::$client_parameters['host'],
+			self::$client_parameters['port'],
+			self::$client_parameters['timeout'],
+			null,
+			self::$client_parameters['retry_interval']
+		);
+		$settings = array(
+			'database' => 2,
+		);
+		$keys_methods = array(
+			'database' => 'select',
+		);
+		$this->setExpectedException( 'Exception' );
+		$this->cache->perform_client_connection( $redis, $settings, $keys_methods );
 	}
 
 	public function tearDown() {
