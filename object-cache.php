@@ -1118,12 +1118,12 @@ class WP_Object_Cache {
 	 * @return bool True if successful.
 	 */
 	public function perform_client_connection( $redis, $client_parameters, $keys_methods ) {
-		foreach ( $keys_methods as $method ) {
-			if ( ! isset( $client_parameters[ $method ] ) ) {
+		foreach ( $keys_methods as $key => $method ) {
+			if ( ! isset( $client_parameters[ $key ] ) ) {
 				continue;
 			}
 			try {
-				$redis->$method( $client_parameters[ $method ] );
+				$redis->$method( $client_parameters[ $key ] );
 			} catch ( RedisException $e ) {
 
 				// PhpRedis throws an Exception when it fails a server call.
