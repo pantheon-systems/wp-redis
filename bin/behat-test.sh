@@ -10,6 +10,8 @@ if [ $? -ne 0 ]; then
 	exit 0
 fi
 
+exit 0;
+
 if [ -z "$TERMINUS_SITE" ] || [ -z "$TERMINUS_ENV" ]; then
 	echo "TERMINUS_SITE and TERMINUS_ENV environment variables must be set"
 	exit 1

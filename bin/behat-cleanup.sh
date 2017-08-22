@@ -10,6 +10,8 @@ if [ $? -ne 0 ]; then
 	exit 0
 fi
 
+exit 0;
+
 set -ex
 
 if [ -z "$TERMINUS_SITE" ] || [ -z "$TERMINUS_ENV" ]; then
