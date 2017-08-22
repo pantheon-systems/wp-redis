@@ -1164,7 +1164,7 @@ class WP_Object_Cache {
 				$retry_exception_messages = $this->retry_exception_messages();
 				// PhpRedis throws an Exception when it fails a server call.
 				// To prevent WordPress from fataling, we catch the Exception.
-				if ( $this->message_matches( $e->getMessage(), $retry_exception_messages ) ) {
+				if ( $this->exception_message_matches( $e->getMessage(), $retry_exception_messages ) ) {
 
 					$this->_exception_handler( $e );
 
@@ -1243,7 +1243,7 @@ class WP_Object_Cache {
 	 * @param array $errors Array of messages to compare to
 	 * @return bool whether $error matches any items in $errors
 	 */
-	public function message_matches( $error, $errors ) {
+	public function exception_message_matches( $error, $errors ) {
 		foreach ( $errors as $message ) {
 			$pattern = $this->_format_message_for_pattern( $message );
 			$matches = (bool) preg_match( $pattern, $error );

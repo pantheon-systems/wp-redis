@@ -149,7 +149,7 @@ class CacheTest extends WP_UnitTestCase {
 		// Setting cache value when redis connection fails saves wakeup flush
 		$this->cache->set( 'foo', 'bar' );
 		$this->assertTrue(
-			$this->cache->message_matches(
+			$this->cache->exception_message_matches(
 				str_replace( 'WP Redis: ', '', $this->cache->last_triggered_error ),
 				$this->cache->retry_exception_messages()
 			)
@@ -190,7 +190,7 @@ class CacheTest extends WP_UnitTestCase {
 		$redis_server['auth'] = 'foobar';
 		$cache = new WP_Object_Cache;
 		$this->assertTrue(
-			$cache->message_matches(
+			$cache->exception_message_matches(
 				str_replace( 'WP Redis: ', '', $cache->last_triggered_error ),
 				$cache->retry_exception_messages()
 			)
