@@ -23,7 +23,7 @@ Go forth and make awesome! And, once you've built something great, [send us feat
 
 == Installation ==
 
-This assumes you have a PHP environment with the [required PhpRedis extension](https://github.com/phpredis/phpredis) and a working Redis server (e.g. Pantheon).
+This assumes you have a PHP environment with the [required PhpRedis extension](https://github.com/phpredis/phpredis) and a working Redis server (e.g. Pantheon). WP Redis also works with Predis via [humanmade/wp-redis-predis-client](https://github.com/humanmade/wp-redis-predis-client).
 
 1. Install `object-cache.php` to `wp-content/object-cache.php` with a symlink or by copying the file.
 2. If you're not running on Pantheon, edit wp-config.php to add your cache credentials, e.g.:
