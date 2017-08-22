@@ -994,7 +994,7 @@ class WP_Object_Cache {
 		}
 		$client_parameters = $this->build_client_parameters( $redis_server );
 
-		$client_connection = array( $this, 'client_connection' );
+		$client_connection = array( $this, 'prepare_client_connection' );
 		/**
 		 * Permits alternate initial client connection mechanism to be used.
 		 *
@@ -1092,7 +1092,7 @@ class WP_Object_Cache {
 	 * @param array $client_parameters Parameters used to construct a Redis client.
 	 * @return Redis Redis client.
 	 */
-	public function client_connection( $client_parameters ) {
+	public function prepare_client_connection( $client_parameters ) {
 		$redis = new Redis;
 
 		$redis->connect(
