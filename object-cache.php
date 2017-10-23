@@ -849,12 +849,14 @@ class WP_Object_Cache {
 	/**
 	 * Check whether there's a value in the internal object cache.
 	 *
-	 * @param string $key
-	 * @param string $group
+	 * @param string|bool $key
+	 * @param string      $group
 	 * @return boolean
 	 */
 	protected function _isset_internal( $key, $group ) {
-		if ( $this->_should_use_redis_hashes( $group ) ) {
+		if ( is_bool( $key ) ) {
+			return false;
+		} elseif ( $this->_should_use_redis_hashes( $group ) ) {
 			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
 			return isset( $this->cache[ $multisite_safe_group ] ) && array_key_exists( $key, $this->cache[ $multisite_safe_group ] );
 		} else {
