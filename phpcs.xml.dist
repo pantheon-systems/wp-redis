@@ -6,8 +6,8 @@
 	<arg name="extensions" value="php"/>
 	<file>.</file>
 
-	<!-- Show sniff codes in all reports -->
-	<arg value="s"/>
+	<!-- Show progress and sniff codes in all reports -->
+	<arg value="ps"/>
 
 	<exclude-pattern>*/vendor/*</exclude-pattern>
 	<exclude-pattern>*/node_modules/*</exclude-pattern>
