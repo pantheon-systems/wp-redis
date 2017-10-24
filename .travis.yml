@@ -1,4 +1,5 @@
 sudo: false
+dist: trusty
 
 language: php
 
@@ -35,6 +36,7 @@ matrix:
       env: WP_TRAVISCI=phpcs
     - php: 5.3
       env: WP_VERSION=latest PHP_REDIS=enabled
+      dist: precise
 
 services:
     - redis-server
