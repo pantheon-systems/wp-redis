@@ -144,7 +144,7 @@ class CacheTest extends WP_UnitTestCase {
 		$redis_server['host'] = '127.0.0.1';
 		$redis_server['port'] = 9999;
 		$client_parameters = $this->cache->build_client_parameters( $redis_server );
-		$client_connection = apply_filters( 'wp_redis_client_connection_callback', array( $this->cache, 'prepare_client_connection' ) );
+		$client_connection = apply_filters( 'wp_redis_prepare_client_connection_callback', array( $this->cache, 'prepare_client_connection' ) );
 		$this->cache->redis = call_user_func_array( $client_connection, array( $client_parameters ) );
 		// Setting cache value when redis connection fails saves wakeup flush
 		$this->cache->set( 'foo', 'bar' );
