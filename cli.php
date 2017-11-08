@@ -50,9 +50,9 @@ class WP_Redis_CLI_Command {
 		global $wp_object_cache;
 		$this->load_wordpress_with_template();
 		$data = array(
-			'cache_hits'      => $wp_object_cache->cache_hits,
-			'cache_misses'    => $wp_object_cache->cache_misses,
-			'redis_calls'     => $wp_object_cache->redis_calls,
+			'cache_hits'   => $wp_object_cache->cache_hits,
+			'cache_misses' => $wp_object_cache->cache_misses,
+			'redis_calls'  => $wp_object_cache->redis_calls,
 		);
 		WP_CLI::print_value( $data, $assoc_args );
 	}
@@ -70,7 +70,7 @@ class WP_Redis_CLI_Command {
 			WP_CLI::error( 'Unknown wp-content/object-cache.php already exists.' );
 		}
 		$object_cache = dirname( __FILE__ ) . '/object-cache.php';
-		$target = self::get_relative_path( $drop_in, $object_cache );
+		$target       = self::get_relative_path( $drop_in, $object_cache );
 		chdir( WP_CONTENT_DIR );
 		// @codingStandardsIgnoreStart
 		if ( symlink( $target, 'object-cache.php' ) ) {
@@ -171,11 +171,13 @@ class WP_Redis_CLI_Command {
 
 		define( 'WP_USE_THEMES', true );
 
-		add_filter( 'template_include', function( $template ) {
-			$display_template = str_replace( dirname( get_template_directory() ) . '/', '', $template );
-			WP_CLI::debug( "Theme template: {$display_template}", 'redis-debug' );
-			return $template;
-		}, 999 );
+		add_filter(
+			'template_include', function( $template ) {
+				$display_template = str_replace( dirname( get_template_directory() ) . '/', '', $template );
+				WP_CLI::debug( "Theme template: {$display_template}", 'redis-debug' );
+				return $template;
+			}, 999
+		);
 
 		// Template is normally loaded in global scope, so we need to replicate
 		foreach ( $GLOBALS as $key => $value ) {
@@ -215,7 +217,7 @@ class WP_Redis_CLI_Command {
 				if ( $remaining > 1 ) {
 					// add traversals up to first matching dir
 					$pad_length = ( count( $rel_path ) + $remaining - 1 ) * -1;
-					$rel_path = array_pad( $rel_path, $pad_length, '..' );
+					$rel_path   = array_pad( $rel_path, $pad_length, '..' );
 					break;
 				} else {
 					$rel_path[0] = './' . $rel_path[0];
