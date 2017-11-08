@@ -42,14 +42,14 @@ function wp_redis_get_info() {
 		return new WP_Error( 'wp-redis', $wp_object_cache->missing_redis_message );
 	}
 
-	$info = $wp_object_cache->redis->info();
+	$info           = $wp_object_cache->redis->info();
 	$uptime_in_days = $info['uptime_in_days'];
 	if ( 1 === $info['uptime_in_days'] ) {
 		$uptime_in_days .= ' day';
 	} else {
 		$uptime_in_days .= ' days';
 	}
-	$database = ! empty( $redis_server['database'] ) ? $redis_server['database'] : 0;
+	$database  = ! empty( $redis_server['database'] ) ? $redis_server['database'] : 0;
 	$key_count = 0;
 	if ( isset( $info[ 'db' . $database ] ) && preg_match( '#keys=([\d]+)#', $info[ 'db' . $database ], $matches ) ) {
 		$key_count = $matches[1];
