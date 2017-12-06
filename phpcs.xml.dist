@@ -2,7 +2,15 @@
 <ruleset name="WP Redis">
 	<description>Sniffs for the coding standards of the WP Redis plugin</description>
 
-	<exclude-pattern>vendor</exclude-pattern>
+	<!-- Check all PHP files in directory tree by default. -->
+	<arg name="extensions" value="php"/>
+	<file>.</file>
+
+	<!-- Show progress and sniff codes in all reports -->
+	<arg value="ps"/>
+
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
 
 	<rule ref="WordPress-VIP">
 		<exclude name="WordPress.NamingConventions.ValidVariableName" />

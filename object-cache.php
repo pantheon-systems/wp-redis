@@ -404,7 +404,7 @@ class WP_Object_Cache {
 	public function add_global_groups( $groups ) {
 		$groups = (array) $groups;
 
-		$groups = array_fill_keys( $groups, true );
+		$groups              = array_fill_keys( $groups, true );
 		$this->global_groups = array_merge( $this->global_groups, $groups );
 	}
 
@@ -416,7 +416,7 @@ class WP_Object_Cache {
 	public function add_non_persistent_groups( $groups ) {
 		$groups = (array) $groups;
 
-		$groups = array_fill_keys( $groups, true );
+		$groups                      = array_fill_keys( $groups, true );
 		$this->non_persistent_groups = array_merge( $this->non_persistent_groups, $groups );
 	}
 
@@ -428,7 +428,7 @@ class WP_Object_Cache {
 	public function add_redis_hash_groups( $groups ) {
 		$groups = (array) $groups;
 
-		$groups = array_fill_keys( $groups, true );
+		$groups                  = array_fill_keys( $groups, true );
 		$this->redis_hash_groups = array_merge( $this->redis_hash_groups, $groups );
 	}
 
@@ -470,13 +470,13 @@ class WP_Object_Cache {
 
 		if ( $this->_should_use_redis_hashes( $group ) ) {
 			$redis_safe_group = $this->_key( '', $group );
-			$result = $this->_call_redis( 'hIncrBy', $redis_safe_group, $key, -$offset, $group );
+			$result           = $this->_call_redis( 'hIncrBy', $redis_safe_group, $key, -$offset, $group );
 			if ( $result < 0 ) {
 				$result = 0;
 				$this->_call_redis( 'hSet', $redis_safe_group, $key, $result );
 			}
 		} else {
-			$id = $this->_key( $key, $group );
+			$id     = $this->_key( $key, $group );
 			$result = $this->_call_redis( 'decrBy', $id, $offset );
 			if ( $result < 0 ) {
 				$result = 0;
@@ -516,9 +516,9 @@ class WP_Object_Cache {
 		if ( $this->_should_persist( $group ) ) {
 			if ( $this->_should_use_redis_hashes( $group ) ) {
 				$redis_safe_group = $this->_key( '', $group );
-				$result = $this->_call_redis( 'hDel', $redis_safe_group, $key );
+				$result           = $this->_call_redis( 'hDel', $redis_safe_group, $key );
 			} else {
-				$id = $this->_key( $key, $group );
+				$id     = $this->_key( $key, $group );
 				$result = $this->_call_redis( 'del', $id );
 			}
 			if ( 1 !== $result ) {
@@ -542,7 +542,7 @@ class WP_Object_Cache {
 		}
 
 		$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
-		$redis_safe_group = $this->_key( '', $group );
+		$redis_safe_group     = $this->_key( '', $group );
 		if ( $this->_should_persist( $group ) ) {
 			$result = $this->_call_redis( 'del', $redis_safe_group );
 			if ( 1 !== $result ) {
@@ -600,7 +600,7 @@ class WP_Object_Cache {
 		// Key is set internally, so we can use this value
 		if ( $this->_isset_internal( $key, $group ) && ! $force ) {
 			$this->cache_hits += 1;
-			$found = true;
+			$found             = true;
 			return $this->_get_internal( $key, $group );
 		}
 
@@ -608,22 +608,22 @@ class WP_Object_Cache {
 		// internally
 		if ( ! $this->_should_persist( $group ) ) {
 			$this->cache_misses += 1;
-			$found = false;
+			$found               = false;
 			return false;
 		}
 
 		if ( $this->_should_use_redis_hashes( $group ) ) {
 			$redis_safe_group = $this->_key( '', $group );
-			$value = $this->_call_redis( 'hGet', $redis_safe_group, $key );
+			$value            = $this->_call_redis( 'hGet', $redis_safe_group, $key );
 		} else {
-			$id = $this->_key( $key, $group );
+			$id    = $this->_key( $key, $group );
 			$value = $this->_call_redis( 'get', $id );
 		}
 
 		// PhpRedis returns `false` when the key doesn't exist
 		if ( false === $value ) {
 			$this->cache_misses += 1;
-			$found = false;
+			$found               = false;
 			return false;
 		}
 
@@ -632,7 +632,7 @@ class WP_Object_Cache {
 
 		$this->_set_internal( $key, $group, $value );
 		$this->cache_hits += 1;
-		$found = true;
+		$found             = true;
 		return $value;
 	}
 
@@ -674,13 +674,13 @@ class WP_Object_Cache {
 
 		if ( $this->_should_use_redis_hashes( $group ) ) {
 			$redis_safe_group = $this->_key( '', $group );
-			$result = $this->_call_redis( 'hIncrBy', $redis_safe_group, $key, $offset, $group );
+			$result           = $this->_call_redis( 'hIncrBy', $redis_safe_group, $key, $offset, $group );
 			if ( $result < 0 ) {
 				$result = 0;
 				$this->_call_redis( 'hSet', $redis_safe_group, $key, $result );
 			}
 		} else {
-			$id = $this->_key( $key, $group );
+			$id     = $this->_key( $key, $group );
 			$result = $this->_call_redis( 'incrBy', $id, $offset );
 			if ( $result < 0 ) {
 				$result = 0;
@@ -792,10 +792,11 @@ class WP_Object_Cache {
 		foreach ( $this->redis_calls as $method => $calls ) {
 			$total_redis_calls += $calls;
 		}
-		$out = array();
+		$out   = array();
 		$out[] = '<p>';
 		$out[] = '<strong>Cache Hits:</strong>' . (int) $this->cache_hits . '<br />';
 		$out[] = '<strong>Cache Misses:</strong>' . (int) $this->cache_misses . '<br />';
+		$out[] = '<strong>Redis Client:</strong>' . get_class( $this->redis ) . '<br />';
 		$out[] = '<strong>Redis Calls:</strong>' . (int) $total_redis_calls . ':<br />';
 		foreach ( $this->redis_calls as $method => $calls ) {
 			$out[] = ' - ' . esc_html( $method ) . ': ' . (int) $calls . '<br />';
@@ -819,7 +820,7 @@ class WP_Object_Cache {
 	 * @param int $blog_id Blog ID
 	 */
 	public function switch_to_blog( $blog_id ) {
-		$blog_id = (int) $blog_id;
+		$blog_id           = (int) $blog_id;
 		$this->blog_prefix = $this->multisite ? $blog_id . ':' : '';
 	}
 
@@ -903,7 +904,7 @@ class WP_Object_Cache {
 			}
 			$this->cache[ $multisite_safe_group ][ $key ] = $value;
 		} else {
-			$key = $this->_key( $key, $group );
+			$key                 = $this->_key( $key, $group );
 			$this->cache[ $key ] = $value;
 		}
 	}
@@ -978,12 +979,77 @@ class WP_Object_Cache {
 	protected function _connect_redis() {
 		global $redis_server;
 
-		if ( ! class_exists( 'Redis' ) ) {
-			$this->is_redis_connected = false;
-			$this->missing_redis_message = 'Warning! PHPRedis module is unavailable, which is required by WP Redis object cache.';
+		$check_dependencies = array( $this, 'check_client_dependencies' );
+		/**
+		 * Permits alternate dependency check mechanism to be used.
+		 *
+		 * @param callable $check_dependencies Callback to execute.
+		 */
+		$check_dependencies = apply_filters( 'wp_redis_check_client_dependencies_callback', $check_dependencies );
+		$dependencies_ok    = call_user_func( $check_dependencies );
+		if ( true !== $dependencies_ok ) {
+			$this->is_redis_connected    = false;
+			$this->missing_redis_message = $dependencies_ok;
 			return $this->is_redis_connected;
 		}
+		$client_parameters = $this->build_client_parameters( $redis_server );
 
+		$client_connection = array( $this, 'prepare_client_connection' );
+		/**
+		 * Permits alternate initial client connection mechanism to be used.
+		 *
+		 * @param callable $client_connection Callback to execute.
+		 */
+		$client_connection = apply_filters( 'wp_redis_prepare_client_connection_callback', $client_connection );
+		$this->redis       = call_user_func_array( $client_connection, array( $client_parameters ) );
+
+		$keys_methods = array(
+			'auth'     => 'auth',
+			'database' => 'select',
+		);
+
+		try {
+			$setup_connection = array( $this, 'perform_client_connection' );
+			/**
+			 * Permits alternate setup client connection mechanism to be used.
+			 *
+			 * @param callable $setup_connection Callback to execute.
+			 */
+			$setup_connection = apply_filters( 'wp_redis_perform_client_connection_callback', $setup_connection );
+			call_user_func_array( $setup_connection, array( $this->redis, $client_parameters, $keys_methods ) );
+		} catch ( Exception $e ) {
+			$this->_exception_handler( $e );
+		}
+
+		$this->is_redis_connected = $this->redis->isConnected();
+		if ( ! $this->is_redis_connected ) {
+			$this->missing_redis_message = 'Warning! WP Redis object cache cannot connect to Redis server.';
+		}
+		return $this->is_redis_connected;
+	}
+
+	/**
+	 * Are the required dependencies for connecting to Redis available?
+	 *
+	 * @return mixed True if the required dependencies are present, string if
+	 *               not with a message describing the issue.
+	 */
+	public function check_client_dependencies() {
+		if ( ! class_exists( 'Redis' ) ) {
+			return 'Warning! PHPRedis module is unavailable, which is required by WP Redis object cache.';
+		}
+		return true;
+	}
+
+	/**
+	 * Builds an array to be passed to a function that will set up the Redis
+	 * client.
+	 *
+	 * @param array $redis_server Parameters used to construct a Redis client.
+	 * @return array Final parameters to use to contruct a Redis client with
+	 *               with defaults applied.
+	 */
+	public function build_client_parameters( $redis_server ) {
 		if ( empty( $redis_server ) ) {
 			// Attempt to automatically load Pantheon's Redis config from the env.
 			if ( isset( $_SERVER['CACHE_HOST'] ) ) {
@@ -1000,46 +1066,72 @@ class WP_Object_Cache {
 			}
 		}
 
-		$this->redis = new Redis;
-
 		if ( file_exists( $redis_server['host'] ) && 'socket' === filetype( $redis_server['host'] ) ) { //unix socket connection
 			//port must be null or socket won't connect
 			$port = null;
 		} else { //tcp connection
 			$port = ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379;
 		}
-		$this->redis->connect( $redis_server['host'], $port, 1, null, 100 ); // 1s timeout, 100ms delay between reconnections
-		$keys_methods = array(
-			'auth'     => 'auth',
-			'database' => 'select',
+
+		$defaults = array(
+			'host'           => $redis_server['host'],
+			'port'           => $port,
+			'timeout'        => 1000, // I multiplied this by 1000 so we'd have a common measure of ms instead of s and ms, need to make sure this gets divided by 1000
+			'retry_interval' => 100,
 		);
-		foreach ( $keys_methods as $k => $method ) {
-			if ( ! isset( $redis_server[ $k ] ) ) {
+		// 1s timeout, 100ms delay between reconnections
+
+		// merging the defaults with the original $redis_server enables any
+		// custom parameters to get sent downstream to the redis client.
+		return array_replace_recursive( $redis_server, $defaults );
+	}
+
+	/**
+	 * Constructs a PHPRedis Redis client.
+	 *
+	 * @param array $client_parameters Parameters used to construct a Redis client.
+	 * @return Redis Redis client.
+	 */
+	public function prepare_client_connection( $client_parameters ) {
+		$redis = new Redis;
+
+		$redis->connect(
+			$client_parameters['host'],
+			$client_parameters['port'],
+			// $client_parameters['timeout'] is sent in milliseconds,
+			// connect() takes seconds, so divide by 1000
+			$client_parameters['timeout'] / 1000,
+			null,
+			$client_parameters['retry_interval']
+		);
+
+		return $redis;
+	}
+
+	/**
+	 * Sets up the Redis connection (ie authentication and specific database).
+	 *
+	 * @param Redis $redis Redis client.
+	 * @param array $client_parameters Parameters used to configure Redis.
+	 * @param array $keys_methods Associative array of keys from
+	 *              $client_parameters to use as method arguments for $redis.
+	 * @return bool True if successful.
+	 */
+	public function perform_client_connection( $redis, $client_parameters, $keys_methods ) {
+		foreach ( $keys_methods as $key => $method ) {
+			if ( ! isset( $client_parameters[ $key ] ) ) {
 				continue;
 			}
 			try {
-				$this->redis->$method( $redis_server[ $k ] );
+				$redis->$method( $client_parameters[ $key ] );
 			} catch ( RedisException $e ) {
+
 				// PhpRedis throws an Exception when it fails a server call.
 				// To prevent WordPress from fataling, we catch the Exception.
-				try {
-					$this->last_triggered_error = 'WP Redis: ' . $e->getMessage();
-					// Be friendly to developers debugging production servers by triggering an error
-					// @codingStandardsIgnoreStart
-					trigger_error( $this->last_triggered_error, E_USER_WARNING );
-					// @codingStandardsIgnoreEnd
-				} catch ( PHPUnit_Framework_Error_Warning $e ) {
-					// PHPUnit throws an Exception when `trigger_error()` is called.
-					// To ensure our tests (which expect Exceptions to be caught) continue to run,
-					// we catch the PHPUnit exception and inspect the RedisException message
-				}
+				throw new Exception( $e->getMessage(), $e->getCode(), $e );
 			}
 		}
-		$this->is_redis_connected = $this->redis->isConnected();
-		if ( ! $this->is_redis_connected ) {
-			$this->missing_redis_message = 'Warning! WP Redis object cache cannot connect to Redis server.';
-		}
-		return $this->is_redis_connected;
+		return true;
 	}
 
 	/**
@@ -1068,23 +1160,14 @@ class WP_Object_Cache {
 				$this->redis_calls[ $method ]++;
 				$retval = call_user_func_array( array( $this->redis, $method ), $arguments );
 				return $retval;
-			} catch ( RedisException $e ) {
+			} catch ( Exception $e ) {
+				$retry_exception_messages = $this->retry_exception_messages();
 				// PhpRedis throws an Exception when it fails a server call.
 				// To prevent WordPress from fataling, we catch the Exception.
-				$retry_exception_messages = array( 'socket error on read socket', 'Connection closed', 'Redis server went away' );
-				$retry_exception_messages = apply_filters( 'wp_redis_retry_exception_messages', $retry_exception_messages );
-				if ( in_array( $e->getMessage(), $retry_exception_messages, true ) ) {
-					try {
-						$this->last_triggered_error = 'WP Redis: ' . $e->getMessage();
-						// Be friendly to developers debugging production servers by triggering an error
-						// @codingStandardsIgnoreStart
-						trigger_error( $this->last_triggered_error, E_USER_WARNING );
-						// @codingStandardsIgnoreEnd
-					} catch ( PHPUnit_Framework_Error_Warning $e ) {
-						// PHPUnit throws an Exception when `trigger_error()` is called.
-						// To ensure our tests (which expect Exceptions to be caught) continue to run,
-						// we catch the PHPUnit exception and inspect the RedisException message
-					}
+				if ( $this->exception_message_matches( $e->getMessage(), $retry_exception_messages ) ) {
+
+					$this->_exception_handler( $e );
+
 					// Attempt to refresh the connection if it was successfully established once
 					// $this->is_redis_connected will be set inside _connect_redis()
 					if ( $this->_connect_redis() ) {
@@ -1100,12 +1183,12 @@ class WP_Object_Cache {
 		if ( $this->is_redis_failback_flush_enabled() && ! $this->do_redis_failback_flush && ! empty( $wpdb ) ) {
 			if ( $this->multisite ) {
 				$table = $wpdb->sitemeta;
-				$col1 = 'meta_key';
-				$col2 = 'meta_value';
+				$col1  = 'meta_key';
+				$col2  = 'meta_value';
 			} else {
 				$table = $wpdb->options;
-				$col1 = 'option_name';
-				$col2 = 'option_value';
+				$col1  = 'option_name';
+				$col2  = 'option_value';
 			}
 			// @codingStandardsIgnoreStart
 			$wpdb->query( "INSERT IGNORE INTO {$table} ({$col1},{$col2}) VALUES ('wp_redis_do_redis_failback_flush',1)" );
@@ -1117,18 +1200,18 @@ class WP_Object_Cache {
 		switch ( $method ) {
 			case 'incr':
 			case 'incrBy':
-				$val = $this->cache[ $arguments[0] ];
+				$val    = $this->cache[ $arguments[0] ];
 				$offset = isset( $arguments[1] ) && 'incrBy' === $method ? $arguments[1] : 1;
-				$val = $val + $offset;
+				$val    = $val + $offset;
 				return $val;
 			case 'hIncrBy':
 				$val = $this->_get_internal( $arguments[1], $group );
 				return $val + $arguments[2];
 			case 'decrBy':
 			case 'decr':
-				$val = $this->cache[ $arguments[0] ];
+				$val    = $this->cache[ $arguments[0] ];
 				$offset = isset( $arguments[1] ) && 'decrBy' === $method ? $arguments[1] : 1;
-				$val = $val - $offset;
+				$val    = $val - $offset;
 				return $val;
 			case 'del':
 			case 'hDel':
@@ -1141,6 +1224,67 @@ class WP_Object_Cache {
 				return false;
 		}
 
+	}
+
+	/**
+	 * Returns a filterable array of expected Exception messages that may be thrown
+	 *
+	 * @return array Array of expected exception messages
+	 */
+	public function retry_exception_messages() {
+		$retry_exception_messages = array( 'socket error on read socket', 'Connection closed', 'Redis server went away' );
+		return apply_filters( 'wp_redis_retry_exception_messages', $retry_exception_messages );
+	}
+
+	/**
+	 * Compares individual message to list of messages.
+	 *
+	 * @param string $error Message to compare
+	 * @param array $errors Array of messages to compare to
+	 * @return bool whether $error matches any items in $errors
+	 */
+	public function exception_message_matches( $error, $errors ) {
+		foreach ( $errors as $message ) {
+			$pattern = $this->_format_message_for_pattern( $message );
+			$matches = (bool) preg_match( $pattern, $error );
+			if ( $matches ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Prepends and appends '/' if not present in a string
+	 *
+	 * @param string $message Potential regex string that may need '/'
+	 * @return string Regex pattern
+	 */
+	protected function _format_message_for_pattern( $message ) {
+		$var = $message;
+		$var = '/' === $var[0] ? $var : '/' . $var;
+		$var = '/' === $var[ strlen( $var ) - 1 ] ? $var : $var . '/';
+		return $var;
+	}
+
+	/**
+	 * Handles exceptions by triggering a php error.
+	 *
+	 * @param Exception $exception
+	 * @return null
+	 */
+	protected function _exception_handler( $exception ) {
+		try {
+			$this->last_triggered_error = 'WP Redis: ' . $exception->getMessage();
+			// Be friendly to developers debugging production servers by triggering an error
+			// @codingStandardsIgnoreStart
+			trigger_error( $this->last_triggered_error, E_USER_WARNING );
+			// @codingStandardsIgnoreEnd
+		} catch ( PHPUnit_Framework_Error_Warning $e ) {
+			// PHPUnit throws an Exception when `trigger_error()` is called.
+			// To ensure our tests (which expect Exceptions to be caught) continue to run,
+			// we catch the PHPUnit exception and inspect the RedisException message
+		}
 	}
 
 	/**
@@ -1175,7 +1319,7 @@ class WP_Object_Cache {
 	public function __construct() {
 		global $blog_id, $table_prefix, $wpdb;
 
-		$this->multisite = is_multisite();
+		$this->multisite   = is_multisite();
 		$this->blog_prefix = $this->multisite ? $blog_id . ':' : '';
 
 		if ( ! $this->_connect_redis() && function_exists( 'add_action' ) ) {
@@ -1185,12 +1329,12 @@ class WP_Object_Cache {
 		if ( $this->is_redis_failback_flush_enabled() && ! empty( $wpdb ) ) {
 			if ( $this->multisite ) {
 				$table = $wpdb->sitemeta;
-				$col1 = 'meta_key';
-				$col2 = 'meta_value';
+				$col1  = 'meta_key';
+				$col2  = 'meta_value';
 			} else {
 				$table = $wpdb->options;
-				$col1 = 'option_name';
-				$col2 = 'option_value';
+				$col1  = 'option_name';
+				$col2  = 'option_value';
 			}
 			// @codingStandardsIgnoreStart
 			$this->do_redis_failback_flush = (bool) $wpdb->get_results( "SELECT {$col2} FROM {$table} WHERE {$col1}='wp_redis_do_redis_failback_flush'" );

@@ -2,8 +2,8 @@
 Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh
 Tags: cache, plugin, redis
 Requires at least: 3.0.1
-Tested up to: 4.8
-Stable tag: 0.6.2
+Tested up to: 4.9
+Stable tag: 0.7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,7 +23,7 @@ Go forth and make awesome! And, once you've built something great, [send us feat
 
 == Installation ==
 
-This assumes you have a PHP environment with the [required PhpRedis extension](https://github.com/phpredis/phpredis) and a working Redis server (e.g. Pantheon).
+This assumes you have a PHP environment with the [required PhpRedis extension](https://github.com/phpredis/phpredis) and a working Redis server (e.g. Pantheon). WP Redis also works with Predis via [humanmade/wp-redis-predis-client](https://github.com/humanmade/wp-redis-predis-client).
 
 1. Install `object-cache.php` to `wp-content/object-cache.php` with a symlink or by copying the file.
 2. If you're not running on Pantheon, edit wp-config.php to add your cache credentials, e.g.:
@@ -102,6 +102,9 @@ A page load with 2,000 Redis calls can be 2 full seonds of object cache transact
 This declaration means use of `wp_cache_set( 'foo', 'bar', 'bad-actor' );` and `wp_cache_get( 'foo', 'bad-actor' );` will not use Redis, and instead fall back to WordPress' default runtime object cache.
 
 == Changelog ==
+
+= 0.7.0 (August 22, 2017) =
+* Adds filterable connection methods to permit use of Predis. See [humanmade/wp-redis-predis-client](https://github.com/humanmade/wp-redis-predis-client) for more details.
 
 = 0.6.2 (June 5, 2017) =
 * Bug fix: Preserves null values in internal cache.
