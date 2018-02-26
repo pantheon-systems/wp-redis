@@ -67,6 +67,7 @@ script:
       if [[ ! -z "$WP_VERSION" ]] ; then
         if [[ "$PHP_REDIS" == "enabled" ]] ; then
           echo 'extension = "redis.so"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+          redis-server --version
         fi
         phpunit
         phpunit -c multisite.xml
