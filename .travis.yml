@@ -60,7 +60,7 @@ before_script:
         sudo add-apt-repository -y ppa:chris-lea/redis-server
         sudo sed -e 's|trusty|wily|' -i /etc/apt/sources.list.d/chris-lea-redis-server-trusty.list
         sudo apt-get update -q
-        sudo apt-get download -y redis-server redis-tools libjemalloc1
+        sudo apt-get download -y redis-server/wily redis-tools/wily libjemalloc1/wily
         sudo dpkg -i --ignore-depends=init-system-helpers redis-server_*_amd64.deb redis-tools_*_amd64.deb libjemalloc1_*_amd64.deb
       fi
 
