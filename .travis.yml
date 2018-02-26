@@ -22,6 +22,9 @@ matrix:
       env: WP_VERSION=latest PHP_REDIS=enabled
     - php: 7.0
       env: WP_VERSION=latest PHP_REDIS=enabled
+    - php: 7.0
+      env: WP_VERSION=latest PHP_REDIS=enabled REDIS_VERSION=4
+      sudo: required
     - php: 5.6
       env: WP_VERSION=latest PHP_REDIS=enabled
     - php: 5.6
@@ -42,15 +45,21 @@ services:
     - redis-server
 
 before_script:
+    - export PATH="$HOME/.composer/vendor/bin:$HOME/.config/composer/vendor/bin:$PATH"
     - |
       if [[ ! -z "$WP_VERSION" ]] ; then
         bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
       fi
     - |
       if [[ "$WP_TRAVISCI" == "phpcs" ]] ; then
-        export PATH="$HOME/.composer/vendor/bin:$PATH"
         composer global require wp-coding-standards/wpcs
-        phpcs --config-set installed_paths $HOME/.composer/vendor/wp-coding-standards/wpcs
+        phpcs --config-set installed_paths $HOME/.config/composer/vendor/wp-coding-standards/wpcs
+      fi
+    - |
+      if [[ "$WP_TRAVISCI" == "phpcs" ]] ; then
+        sudo add-apt-repository -y ppa:chris-lea/redis-server
+        sudo apt-get update -q
+        sudo apt-get install -y redis-server libjemalloc1
       fi
 
 script:
@@ -58,6 +67,7 @@ script:
       if [[ ! -z "$WP_VERSION" ]] ; then
         if [[ "$PHP_REDIS" == "enabled" ]] ; then
           echo 'extension = "redis.so"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+          redis-server --version
         fi
         phpunit
         phpunit -c multisite.xml
