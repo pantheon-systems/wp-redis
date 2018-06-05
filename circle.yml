@@ -7,10 +7,6 @@ jobs:
     - image: circleci/php:7.1
     steps:
     - checkout
-    - restore_cache:
-        keys:
-        - v1-dep-{{ .Branch }}-
-        - v1-dep-master-
     - run: echo $(openssl rand -hex 8) > /tmp/WORDPRESS_ADMIN_PASSWORD
     - run: |
         echo 'export PATH=/tmp/terminus/bin:$PATH' >> $BASH_ENV
@@ -40,11 +36,6 @@ jobs:
         git clone --branch master https://github.com/pantheon-systems/terminus.git /tmp/terminus
         cd /tmp/terminus && composer install
         terminus auth:login --machine-token=$TERMINUS_TOKEN
-    - save_cache:
-        key: v1-dep-{{ .Branch }}-{{ epoch }}
-        paths:
-        - ./composer/cache
-        - ./node_modules
     - run: ./bin/behat-prepare.sh
     - run: ./bin/behat-test.sh --strict
     - run: ./bin/behat-cleanup.sh
