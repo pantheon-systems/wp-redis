@@ -4,7 +4,7 @@ jobs:
     working_directory: ~/pantheon-systems/pantheon-advanced-page-cache
     parallelism: 1
     docker:
-    - image: circleci/php:7.1
+    - image: quay.io/pantheon-public/build-tools-ci:1.x
     steps:
     - checkout
     - restore_cache:
@@ -37,8 +37,6 @@ jobs:
           exit 0
         fi
         composer install
-        git clone --branch master https://github.com/pantheon-systems/terminus.git /tmp/terminus
-        cd /tmp/terminus && composer install
         terminus auth:login --machine-token=$TERMINUS_TOKEN
     - save_cache:
         key: v1-dep-{{ .Branch }}-{{ epoch }}
