@@ -43,7 +43,7 @@ jobs:
     - save_cache:
         key: v1-dep-{{ .Branch }}-{{ epoch }}
         paths:
-        - /.composer/cache
+        - ./composer/cache
         - ./node_modules
     - run: ./bin/behat-prepare.sh
     - run: ./bin/behat-test.sh --strict
