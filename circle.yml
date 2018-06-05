@@ -1,7 +1,7 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/pantheon-systems/pantheon-advanced-page-cache
+    working_directory: ~/pantheon-systems/wp-redis
     parallelism: 1
     docker:
     - image: circleci/php:7.1
