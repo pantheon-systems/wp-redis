@@ -1,53 +1,41 @@
-machine:
-  php:
-    # https://circleci.com/docs/environment#php
-    version: 5.6.22
-  environment:
-    TERMINUS_ENV: ci-$CIRCLE_BUILD_NUM
-    TERMINUS_SITE: wp-redis
-    SITE_ENV: $TERMINUS_SITE.$TERMINUS_ENV
-    WORDPRESS_ADMIN_USERNAME: pantheon
-    # A random password is set in the dependencies:pre stage as a text file.
-    # This line reads the same file repeatedly. If the openssl call were used
-    # in this step, it would result in a different password being used in each
-    # line of other steps. Each CircleCI command runs in a separate shell.
-    WORDPRESS_ADMIN_PASSWORD: $(cat ~/WORDPRESS_ADMIN_PASSWORD)
-    PATH: $PATH:~/terminus/bin
-
-dependencies:
-  cache_directories:
-    - ~/.composer/cache
-  pre:
-    # The environment step uses this file to set a global variable.
-    - echo $(openssl rand -hex 8) > ~/WORDPRESS_ADMIN_PASSWORD
-    # Set the PHP timezone so that Behat script does not fail.
-    # Using > instead of >> will overwrite the file and disable xdebug.
-    # xdebug makes composer slower.
-    - echo "date.timezone = 'US/Central'"  >  /opt/circleci/php/5.6.22/etc/conf.d/xdebug.ini
-    - echo "Setting GitHub OAuth token with suppressed ouput"
-    - |
-      if [ -z "$GITHUB_TOKEN" ]; then
-        echo "GITHUB_TOKEN environment variables missing; assuming unauthenticated build"
-        exit 0
-      fi
-      {
-        composer config -g github-oauth.github.com $GITHUB_TOKEN
-      } &> /dev/null
-  override:
-    - |
-      if [ -z "$TERMINUS_TOKEN" ]; then
-        echo "TERMINUS_TOKEN environment variables missing; assuming unauthenticated build"
-        exit 0
-      fi
-      composer install
-      git clone --branch master https://github.com/pantheon-systems/terminus.git ~/terminus
-      cd ~/terminus && composer install
-      terminus auth:login --machine-token=$TERMINUS_TOKEN
-
-test:
-  pre:
-    - ./bin/behat-prepare.sh
-  override:
-    - ./bin/behat-test.sh --strict
-  post:
-    - ./bin/behat-cleanup.sh
+version: 2
+jobs:
+  build:
+    working_directory: ~/pantheon-systems/wp-redis
+    parallelism: 1
+    docker:
+    - image: circleci/php:7.1
+    steps:
+    - checkout
+    - run: echo $(openssl rand -hex 8) > /tmp/WORDPRESS_ADMIN_PASSWORD
+    - run: |
+        echo 'export PATH=/tmp/terminus/bin:$PATH' >> $BASH_ENV
+        echo 'export TERMINUS_ENV=ci-$CIRCLE_BUILD_NUM' >> $BASH_ENV
+        echo 'export TERMINUS_SITE=wp-redis' >> $BASH_ENV
+        echo 'export SITE_ENV=wp-redis.ci-$CIRCLE_BUILD_NUM' >> $BASH_ENV
+        echo 'export WORDPRESS_ADMIN_USERNAME=pantheon' >> $BASH_ENV
+        echo 'export WORDPRESS_ADMIN_EMAIL=no-reply@getpantheon.com' >> $BASH_ENV
+        echo 'export WORDPRESS_ADMIN_PASSWORD=$(cat /tmp/WORDPRESS_ADMIN_PASSWORD)' >> $BASH_ENV
+        source $BASH_ENV
+    - run: echo "StrictHostKeyChecking no" >> "$HOME/.ssh/config"
+    - run: |
+        if [ -z "$GITHUB_TOKEN" ]; then
+          echo "GITHUB_TOKEN environment variables missing; assuming unauthenticated build"
+          exit 0
+        fi
+        echo "Setting GitHub OAuth token with suppressed ouput"
+        {
+          composer config -g github-oauth.github.com $GITHUB_TOKEN
+        } &> /dev/null
+    - run: |
+        if [ -z "$TERMINUS_TOKEN" ]; then
+          echo "TERMINUS_TOKEN environment variables missing; assuming unauthenticated build"
+          exit 0
+        fi
+        composer install
+        git clone --branch master https://github.com/pantheon-systems/terminus.git /tmp/terminus
+        cd /tmp/terminus && composer install
+        terminus auth:login --machine-token=$TERMINUS_TOKEN
+    - run: ./bin/behat-prepare.sh
+    - run: ./bin/behat-test.sh --strict
+    - run: ./bin/behat-cleanup.sh
