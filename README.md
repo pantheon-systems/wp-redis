@@ -101,6 +101,10 @@ A page load with 2,000 Redis calls can be 2 full seonds of object cache transact
 
 This declaration means use of `wp_cache_set( 'foo', 'bar', 'bad-actor' );` and `wp_cache_get( 'foo', 'bad-actor' );` will not use Redis, and instead fall back to WordPress' default runtime object cache.
 
+### Why does the object cache sometimes get out of sync with the database? ###
+
+There's a known issue with WordPress `alloptions` cache design. Specifically, a race condition between two requests can cause the object cache to have stale values. If you think you might be impacted by this, [review this GitHub issue](https://github.com/pantheon-systems/wp-redis/issues/221) for links to more context, including a workaround.
+
 ## Changelog ##
 
 ### 0.7.0 (August 22, 2017) ###
