@@ -172,11 +172,13 @@ class WP_Redis_CLI_Command {
 		define( 'WP_USE_THEMES', true );
 
 		add_filter(
-			'template_include', function( $template ) {
+			'template_include',
+			function( $template ) {
 				$display_template = str_replace( dirname( get_template_directory() ) . '/', '', $template );
 				WP_CLI::debug( "Theme template: {$display_template}", 'redis-debug' );
 				return $template;
-			}, 999
+			},
+			999
 		);
 
 		// Template is normally loaded in global scope, so we need to replicate

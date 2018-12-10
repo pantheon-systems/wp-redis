@@ -209,7 +209,8 @@ class CacheTest extends WP_UnitTestCase {
 			$this->assertEquals(
 				array(
 					self::$get_key => 1,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -229,7 +230,8 @@ class CacheTest extends WP_UnitTestCase {
 				array(
 					self::$exists_key => 1,
 					self::$set_key    => 1,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -250,7 +252,8 @@ class CacheTest extends WP_UnitTestCase {
 				array(
 					self::$exists_key => 1,
 					self::$set_key    => 1,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -270,7 +273,8 @@ class CacheTest extends WP_UnitTestCase {
 				array(
 					self::$exists_key => 1,
 					self::$set_key    => 1,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -295,7 +299,8 @@ class CacheTest extends WP_UnitTestCase {
 				array(
 					self::$exists_key => 1,
 					self::$set_key    => 1,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -320,7 +325,8 @@ class CacheTest extends WP_UnitTestCase {
 					self::$exists_key => 2,
 					self::$set_key    => 2,
 					self::$get_key    => 1,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -344,7 +350,8 @@ class CacheTest extends WP_UnitTestCase {
 			$this->assertEquals(
 				array(
 					self::$set_key => 2,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -373,7 +380,8 @@ class CacheTest extends WP_UnitTestCase {
 					self::$set_key       => 1,
 					self::$get_key       => 1,
 					self::$flush_all_key => 1,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -410,7 +418,8 @@ class CacheTest extends WP_UnitTestCase {
 			$this->assertEquals(
 				array(
 					self::$set_key => 1,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -434,7 +443,8 @@ class CacheTest extends WP_UnitTestCase {
 			$this->assertEquals(
 				array(
 					self::$get_key => 2,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -483,7 +493,8 @@ class CacheTest extends WP_UnitTestCase {
 			$this->assertEquals(
 				array(
 					self::$get_key => 1,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -509,7 +520,8 @@ class CacheTest extends WP_UnitTestCase {
 			$this->assertEquals(
 				array(
 					self::$get_key => 1,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -535,7 +547,8 @@ class CacheTest extends WP_UnitTestCase {
 			$this->assertEquals(
 				array(
 					self::$get_key => 1,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -563,7 +576,8 @@ class CacheTest extends WP_UnitTestCase {
 			$this->assertEquals(
 				array(
 					self::$get_key => 2,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -590,7 +604,8 @@ class CacheTest extends WP_UnitTestCase {
 			$this->assertEquals(
 				array(
 					self::$get_key => 2,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -624,7 +639,8 @@ class CacheTest extends WP_UnitTestCase {
 			$this->assertEquals(
 				array(
 					self::$get_key => 4,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -649,7 +665,8 @@ class CacheTest extends WP_UnitTestCase {
 			$this->assertEquals(
 				array(
 					self::$get_key => 1,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -676,7 +693,8 @@ class CacheTest extends WP_UnitTestCase {
 			$this->assertEquals(
 				array(
 					self::$get_key => 1,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -719,7 +737,8 @@ class CacheTest extends WP_UnitTestCase {
 			array(
 				self::$get_key => 1,
 				self::$set_key => 1,
-			), $this->cache->redis_calls
+			),
+			$this->cache->redis_calls
 		);
 	}
 
@@ -760,7 +779,8 @@ class CacheTest extends WP_UnitTestCase {
 					self::$exists_key  => 1,
 					self::$set_key     => 1,
 					self::$incr_by_key => 2,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -798,7 +818,8 @@ class CacheTest extends WP_UnitTestCase {
 					self::$exists_key  => 2,
 					self::$set_key     => 2,
 					self::$incr_by_key => 4,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -820,7 +841,8 @@ class CacheTest extends WP_UnitTestCase {
 				array(
 					self::$incr_by_key => 1,
 					self::$set_key     => 2,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -894,7 +916,8 @@ class CacheTest extends WP_UnitTestCase {
 					self::$exists_key  => 1,
 					self::$set_key     => 3,
 					self::$decr_by_key => 3,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -941,7 +964,8 @@ class CacheTest extends WP_UnitTestCase {
 					self::$exists_key  => 2,
 					self::$set_key     => 7,
 					self::$decr_by_key => 6,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -963,7 +987,8 @@ class CacheTest extends WP_UnitTestCase {
 				array(
 					self::$decr_by_key => 1,
 					self::$set_key     => 2,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
@@ -1043,7 +1068,8 @@ class CacheTest extends WP_UnitTestCase {
 					self::$set_key    => 1,
 					self::$delete_key => 1,
 					self::$get_key    => 1,
-				), $this->cache->redis_calls
+				),
+				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
