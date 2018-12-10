@@ -9,6 +9,7 @@
 	<!-- Show progress and sniff codes in all reports -->
 	<arg value="ps"/>
 
+	<exclude-pattern>*/bin/*</exclude-pattern>
 	<exclude-pattern>*/vendor/*</exclude-pattern>
 	<exclude-pattern>*/node_modules/*</exclude-pattern>
 
@@ -17,6 +18,9 @@
 		<exclude name="Squiz.PHP.CommentedOutCode" />
 		<exclude name="WordPress.CSRF.NonceVerification" />
 		<exclude name="WordPress.WhiteSpace.ControlStructureSpacing" />
+		<exclude name="WordPress.Security.ValidatedSanitizedInput.MissingUnslash" />
+		<exclude name="WordPress.Security.ValidatedSanitizedInput.InputNotSanitized" />
+		<exclude name="WordPress.Security.ValidatedSanitizedInput.InputNotValidated" />
 		<exclude name="WordPress.VIP.DirectDatabaseQuery" />
 		<exclude name="WordPress.VIP.SlowDBQuery" />
 		<exclude name="WordPress.VIP.SuperGlobalInputUsage" />
