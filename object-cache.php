@@ -152,7 +152,11 @@ function wp_cache_incr( $key, $offset = 1, $group = '' ) {
  * @global WP_Object_Cache $wp_object_cache WordPress Object Cache
  */
 function wp_cache_init() {
-	$GLOBALS['wp_object_cache'] = new WP_Object_Cache();
+	global $wp_object_cache;
+
+	if ( ! ( $wp_object_cache instanceof WP_Object_Cache ) ) {
+		$wp_object_cache = new WP_Object_Cache;
+	}
 }
 
 /**
