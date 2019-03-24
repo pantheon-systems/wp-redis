@@ -1040,7 +1040,7 @@ class WP_Object_Cache {
 	 */
 	public function check_client_dependencies() {
 		if ( ! class_exists( 'Redis' ) ) {
-			return 'Warning! PHPRedis module is unavailable, which is required by WP Redis object cache.';
+			return 'Warning! PHPRedis extension is unavailable, which is required by WP Redis object cache.';
 		}
 		return true;
 	}
