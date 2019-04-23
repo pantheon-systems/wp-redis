@@ -56,9 +56,11 @@ before_script:
       fi
     - |
       if [[ "$WP_TRAVISCI" == "phpcs" ]] ; then
-        composer global require wp-coding-standards/wpcs
+        composer global require "wp-coding-standards/wpcs:^1.2.1"
         phpcs --config-set installed_paths $HOME/.config/composer/vendor/wp-coding-standards/wpcs
       fi
+    - |
+      composer global require "phpunit/phpunit:^7.5.9"
     - |
       if [[ "$REDIS_VERSION" == "3" ]] ; then
         sudo add-apt-repository -y ppa:chris-lea/redis-server
