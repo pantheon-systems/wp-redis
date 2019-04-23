@@ -18,27 +18,31 @@ cache:
 
 matrix:
   include:
+    - php: 7.3
+      env: WP_VERSION=latest PHP_REDIS=enabled
+    - php: 7.2
+      env: WP_VERSION=latest PHP_REDIS=enabled
+    - php: 7.2
+      env: WP_VERSION=latest PHP_REDIS=disabled
+    - php: 7.2
+      env: WP_VERSION=latest PHP_REDIS=disabled WP_REDIS_USE_CACHE_GROUPS=true
+    - php: 7.2
+      env: WP_VERSION=latest PHP_REDIS=enabled WP_REDIS_USE_CACHE_GROUPS=true
+    - php: 7.2
+      env: WP_VERSION=nightly PHP_REDIS=enabled
+    - php: 7.2
+      env: WP_TRAVISCI=phpcs
     - php: 7.1
       env: WP_VERSION=latest PHP_REDIS=enabled
     - php: 7.0
-      env: WP_VERSION=latest PHP_REDIS=enabled
+      env: WP_VERSION=latest PHP_REDIS=enabled CUSTOM_PHPUNIT=disabled
     - php: 7.0
-      env: WP_VERSION=latest PHP_REDIS=enabled REDIS_VERSION=3
+      env: WP_VERSION=latest PHP_REDIS=enabled REDIS_VERSION=3 CUSTOM_PHPUNIT=disabled
       sudo: required
     - php: 5.6
-      env: WP_VERSION=latest PHP_REDIS=enabled
-    - php: 5.6
-      env: WP_VERSION=latest PHP_REDIS=disabled
-    - php: 5.6
-      env: WP_VERSION=latest PHP_REDIS=disabled WP_REDIS_USE_CACHE_GROUPS=true
-    - php: 5.6
-      env: WP_VERSION=latest PHP_REDIS=enabled WP_REDIS_USE_CACHE_GROUPS=true
-    - php: 5.6
-      env: WP_VERSION=nightly PHP_REDIS=enabled
-    - php: 5.6
-      env: WP_TRAVISCI=phpcs
+      env: WP_VERSION=latest PHP_REDIS=enabled CUSTOM_PHPUNIT=disabled
     - php: 5.3
-      env: WP_VERSION=latest PHP_REDIS=enabled
+      env: WP_VERSION=latest PHP_REDIS=enabled CUSTOM_PHPUNIT=disabled
       dist: precise
 
 services:
@@ -52,8 +56,12 @@ before_script:
       fi
     - |
       if [[ "$WP_TRAVISCI" == "phpcs" ]] ; then
-        composer global require wp-coding-standards/wpcs
+        composer global require "wp-coding-standards/wpcs:^1.2.1"
         phpcs --config-set installed_paths $HOME/.config/composer/vendor/wp-coding-standards/wpcs
+      fi
+    - |
+      if [[ "$CUSTOM_PHPUNIT" != "disabled" ]] ; then
+        composer global require "phpunit/phpunit:^7.5.9"
       fi
     - |
       if [[ "$REDIS_VERSION" == "3" ]] ; then
