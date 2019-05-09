@@ -55,6 +55,12 @@ rsync -av --exclude='vendor/' --exclude='node_modules/' --exclude='tests/' ./* $
 rm -rf $PREPARE_DIR/wp-content/plugins/wp-redis/.git
 cp object-cache.php $PREPARE_DIR/wp-content/object-cache.php
 
+# Download the latest Classic Editor release from WordPress.org
+wget -O $PREPARE_DIR/classic-editor.zip https://downloads.wordpress.org/plugin/classic-editor.zip
+unzip $PREPARE_DIR/classic-editor.zip -d $PREPARE_DIR
+mv $PREPARE_DIR/classic-editor $PREPARE_DIR/wp-content/plugins/
+rm $PREPARE_DIR/classic-editor.zip
+
 ###
 # Add the debugging plugin to the environment
 ###
@@ -79,4 +85,6 @@ git push
   terminus wp $SITE_ENV -- core install --title=$TERMINUS_ENV-$TERMINUS_SITE --url=$PANTHEON_SITE_URL --admin_user=$WORDPRESS_ADMIN_USERNAME --admin_email=wp-redis@getpantheon.com --admin_password=$WORDPRESS_ADMIN_PASSWORD
 } &> /dev/null
 terminus wp $SITE_ENV -- cache flush
-terminus wp $SITE_ENV -- plugin activate wp-redis
+terminus wp $SITE_ENV -- plugin activate wp-redis classic-editor
+terminus wp $SITE_ENV -- theme activate twentyseventeen
+terminus wp $SITE_ENV -- rewrite structure '/%year%/%monthnum%/%day%/%postname%/'

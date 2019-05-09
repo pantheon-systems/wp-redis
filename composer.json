@@ -11,12 +11,15 @@
     "behat/behat": "^3.1",
     "behat/mink-extension": "^2.2",
     "behat/mink-goutte-driver": "^1.2",
-    "pantheon-systems/pantheon-wordpress-upstream-tests": "dev-master"
+    "pantheon-systems/pantheon-wordpress-upstream-tests": "dev-master",
+    "wp-coding-standards/wpcs": "^1",
+    "dealerdirect/phpcodesniffer-composer-installer": "^0.5.0",
+    "phpunit/phpunit": "^7"
   },
-  "repositories": {
-    "pantheon-wordpress-upstream-tests": {
-      "type": "vcs",
-      "url": "git@github.com:pantheon-systems/pantheon-wordpress-upstream-tests.git"
-    }
+  "scripts": {
+    "lint": "@phpcs",
+    "phpcs": "vendor/bin/phpcs",
+    "phpunit": "vendor/bin/phpunit",
+    "test": "@phpunit"
   }
 }
