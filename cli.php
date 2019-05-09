@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Various WP Redis utility commands.
+ */
 class WP_Redis_CLI_Command {
 
 	/**
