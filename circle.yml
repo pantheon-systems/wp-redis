@@ -18,7 +18,7 @@ jobs:
         echo 'export WORDPRESS_ADMIN_PASSWORD=$(cat /tmp/WORDPRESS_ADMIN_PASSWORD)' >> $BASH_ENV
         source $BASH_ENV
     - run: echo "StrictHostKeyChecking no" >> "$HOME/.ssh/config"
-    - run: sudo apt-get install -y rsync
+    - run: sudo apt-get update && apt-get install -y rsync
     - run: |
         if [ -z "$GITHUB_TOKEN" ]; then
           echo "GITHUB_TOKEN environment variables missing; assuming unauthenticated build"
