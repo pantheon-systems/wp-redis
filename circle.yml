@@ -19,6 +19,9 @@ jobs:
         source $BASH_ENV
     - run: echo "StrictHostKeyChecking no" >> "$HOME/.ssh/config"
     - run: |
+        sudo apt-get update
+        sudo apt-get install -y rsync
+    - run: |
         if [ -z "$GITHUB_TOKEN" ]; then
           echo "GITHUB_TOKEN environment variables missing; assuming unauthenticated build"
           exit 0
