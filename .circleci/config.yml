@@ -1,4 +1,19 @@
 version: 2
+workflows:
+  version: 2
+  main:
+    jobs:
+      - build
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - build
 jobs:
   build:
     working_directory: ~/pantheon-systems/wp-redis
