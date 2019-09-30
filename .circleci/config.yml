@@ -50,4 +50,6 @@ jobs:
         terminus auth:login --machine-token=$TERMINUS_TOKEN
     - run: ./bin/behat-prepare.sh
     - run: ./bin/behat-test.sh --strict
-    - run: ./bin/behat-cleanup.sh
+    - run:
+        command: ./bin/behat-cleanup.sh
+        when: always
