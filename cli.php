@@ -186,6 +186,7 @@ class WP_Redis_CLI_Command {
 
 		// Template is normally loaded in global scope, so we need to replicate
 		foreach ( $GLOBALS as $key => $value ) {
+			// phpcs:ignore PHPCompatibility.Variables.ForbiddenGlobalVariableVariable.NonBareVariableFound
 			global $$key;
 		}
 
