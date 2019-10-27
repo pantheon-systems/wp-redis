@@ -14,7 +14,8 @@
     "pantheon-systems/pantheon-wordpress-upstream-tests": "dev-master",
     "wp-coding-standards/wpcs": "^1",
     "dealerdirect/phpcodesniffer-composer-installer": "^0.5.0",
-    "phpunit/phpunit": "^7"
+    "phpunit/phpunit": "^7",
+    "phpcompatibility/php-compatibility": "^9.3"
   },
   "scripts": {
     "lint": "@phpcs",
