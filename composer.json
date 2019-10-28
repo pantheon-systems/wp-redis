@@ -15,11 +15,9 @@
     "wp-coding-standards/wpcs": "^1",
     "dealerdirect/phpcodesniffer-composer-installer": "^0.5.0",
     "phpunit/phpunit": "^7",
-    "phpcompatibility/php-compatibility": "^9.3",
-    "danielbachhuber/composer-lock-updater": "^0.8.1"
+    "phpcompatibility/php-compatibility": "^9.3"
   },
   "scripts": {
-    "clu": "vendor/bin/clu",
     "lint": "@phpcs",
     "phpcs": "vendor/bin/phpcs",
     "phpunit": "vendor/bin/phpunit",

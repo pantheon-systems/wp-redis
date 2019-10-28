@@ -69,5 +69,4 @@ jobs:
         {
           composer config -g github-oauth.github.com $GITHUB_TOKEN
         } &> /dev/null
-    - run: composer install
-    - run: composer clu
+    - run: clu
