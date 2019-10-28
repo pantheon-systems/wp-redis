@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0cee6df5e2b33b40e5ee7b9c042ef8ec",
+    "content-hash": "ab3f2327a164140a54a82e83fe868eeb",
     "packages": [],
     "packages-dev": [
         {
@@ -446,6 +446,47 @@
             "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
             "homepage": "https://github.com/container-interop/container-interop",
             "time": "2017-02-14T19:40:03+00:00"
+        },
+        {
+            "name": "danielbachhuber/composer-lock-updater",
+            "version": "v0.8.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/danielbachhuber/composer-lock-updater.git",
+                "reference": "e741f7499c69b319945090555f2ca17e392ace39"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/danielbachhuber/composer-lock-updater/zipball/e741f7499c69b319945090555f2ca17e392ace39",
+                "reference": "e741f7499c69b319945090555f2ca17e392ace39",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/php-code-coverage": "~2|~4",
+                "satooshi/php-coveralls": "~1",
+                "squizlabs/php_codesniffer": "^2.7"
+            },
+            "bin": [
+                "bin/clu"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "CLU\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Daniel Bachhuber",
+                    "email": "daniel@handbuilt.co"
+                }
+            ],
+            "description": "Run composer-lock-updater in your CI system for bot-powered composer.lock pull requests.",
+            "time": "2019-10-16T14:32:51+00:00"
         },
         {
             "name": "dealerdirect/phpcodesniffer-composer-installer",
@@ -3322,12 +3363,12 @@
             "version": "1.2.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards.git",
+                "url": "https://github.com/WordPress/WordPress-Coding-Standards.git",
                 "reference": "f328bcafd97377e8e5e5d7b244d5ddbf301a3a5c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WordPress-Coding-Standards/WordPress-Coding-Standards/zipball/f328bcafd97377e8e5e5d7b244d5ddbf301a3a5c",
+                "url": "https://api.github.com/repos/WordPress/WordPress-Coding-Standards/zipball/f328bcafd97377e8e5e5d7b244d5ddbf301a3a5c",
                 "reference": "f328bcafd97377e8e5e5d7b244d5ddbf301a3a5c",
                 "shasum": ""
             },

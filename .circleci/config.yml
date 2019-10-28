@@ -4,6 +4,7 @@ workflows:
   main:
     jobs:
       - build
+      - clu
   nightly:
     triggers:
       - schedule:
@@ -53,3 +54,20 @@ jobs:
     - run:
         command: ./bin/behat-cleanup.sh
         when: always
+  clu:
+    working_directory: ~/pantheon-systems/wp-redis
+    docker:
+    - image: quay.io/pantheon-public/build-tools-ci:6.x
+    steps:
+    - checkout
+    - run: |
+        if [ -z "$GITHUB_TOKEN" ]; then
+          echo "GITHUB_TOKEN environment variables missing; assuming unauthenticated build"
+          exit 0
+        fi
+        echo "Setting GitHub OAuth token with suppressed ouput"
+        {
+          composer config -g github-oauth.github.com $GITHUB_TOKEN
+        } &> /dev/null
+    - run: composer install
+    - run: composer clu
