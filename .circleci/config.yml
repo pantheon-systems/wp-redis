@@ -46,7 +46,7 @@ jobs:
           echo "TERMINUS_TOKEN environment variables missing; assuming unauthenticated build"
           exit 0
         fi
-        composer install
+        composer install --prefer-dist
         terminus auth:login --machine-token=$TERMINUS_TOKEN
     - run: ./bin/behat-prepare.sh
     - run: ./bin/behat-test.sh --strict
