@@ -48,7 +48,7 @@ class CacheTest extends WP_UnitTestCase {
 		// 'hIncrBy' isn't a typo here — Redis doesn't support decrBy on groups
 		self::$decr_by_key   = WP_Object_Cache::USE_GROUPS ? 'hIncrBy' : 'decrBy';
 		self::$delete_key    = WP_Object_Cache::USE_GROUPS ? 'hDel' : 'del';
-		self::$flush_all_key = 'flushAll';
+		self::$flush_all_key = 'flushdb';
 
 	}
 
@@ -1262,6 +1262,7 @@ class CacheTest extends WP_UnitTestCase {
 		}
 		$redis_server['database'] = 2;
 		$second_cache             = new WP_Object_Cache;
+		$second_cache->flush(); // Make sure it's in pristine state.
 		$this->cache->set( 'foo', 'bar' );
 		$this->assertEquals( 'bar', $this->cache->get( 'foo' ) );
 		$this->assertFalse( $second_cache->get( 'foo' ) );

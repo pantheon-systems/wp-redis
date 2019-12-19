@@ -574,7 +574,7 @@ class WP_Object_Cache {
 	public function flush( $redis = true ) {
 		$this->cache = array();
 		if ( $redis ) {
-			$this->_call_redis( 'flushAll' );
+			$this->_call_redis( 'flushdb' );
 		}
 
 		return true;
