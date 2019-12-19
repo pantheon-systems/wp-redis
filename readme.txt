@@ -107,6 +107,9 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 
 == Changelog ==
 
+= 0.8.0 (Unreleased) =
+* Uses `flushdb` instead of `flushAll` to avoid flushing the entire Redis instance [[#259](https://github.com/pantheon-systems/wp-redis/pull/259)].
+
 = 0.7.1 (December 14, 2018) =
 * Better support in `wp_cache_init()` for drop-ins like LudicrousDB [[#231](https://github.com/pantheon-systems/wp-redis/pull/231)].
 * Cleans up PHPCS issues.
