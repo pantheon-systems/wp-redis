@@ -3,7 +3,7 @@ Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh
 Tags: cache, plugin, redis
 Requires at least: 3.0.1
 Tested up to: 5.3
-Stable tag: 0.7.1
+Stable tag: 0.8.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -107,7 +107,7 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 
 == Changelog ==
 
-= 0.8.0 (Unreleased) =
+= 0.8.0 (January 6, 2020) =
 * Uses `flushdb` instead of `flushAll` to avoid flushing the entire Redis instance [[#259](https://github.com/pantheon-systems/wp-redis/pull/259)].
 
 = 0.7.1 (December 14, 2018) =
