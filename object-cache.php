@@ -574,7 +574,7 @@ class WP_Object_Cache {
 	public function flush( $redis = true ) {
 		$this->cache = array();
 		if ( $redis ) {
-			$this->_call_redis( 'flushAll' );
+			$this->_call_redis( 'flushdb' );
 		}
 
 		return true;
@@ -1225,6 +1225,7 @@ class WP_Object_Cache {
 			case 'hDel':
 				return 1;
 			case 'flushAll':
+			case 'flushdb':
 			case 'IsConnected':
 			case 'exists':
 			case 'get':
@@ -1348,7 +1349,7 @@ class WP_Object_Cache {
 			$this->do_redis_failback_flush = (bool) $wpdb->get_results( "SELECT {$col2} FROM {$table} WHERE {$col1}='wp_redis_do_redis_failback_flush'" );
 			// @codingStandardsIgnoreEnd
 			if ( $this->is_redis_connected && $this->do_redis_failback_flush ) {
-				$ret = $this->_call_redis( 'flushAll' );
+				$ret = $this->_call_redis( 'flushdb' );
 				if ( $ret ) {
 					// @codingStandardsIgnoreStart
 					$wpdb->query( "DELETE FROM {$table} WHERE {$col1}='wp_redis_do_redis_failback_flush'" );
