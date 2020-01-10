@@ -3,7 +3,7 @@
 **Tags:** cache, plugin, redis  
 **Requires at least:** 3.0.1  
 **Tested up to:** 5.3  
-**Stable tag:** 0.8.0  
+**Stable tag:** 0.8.1  
 **License:** GPLv2 or later  
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -106,6 +106,9 @@ This declaration means use of `wp_cache_set( 'foo', 'bar', 'bad-actor' );` and `
 There's a known issue with WordPress `alloptions` cache design. Specifically, a race condition between two requests can cause the object cache to have stale values. If you think you might be impacted by this, [review this GitHub issue](https://github.com/pantheon-systems/wp-redis/issues/221) for links to more context, including a workaround.
 
 ## Changelog ##
+
+### 0.8.1 (January 10, 2020) ###
+* Adds `WP_REDIS_DEFAULT_EXPIRE_SECONDS` constant to set default cache expire value [[#264](https://github.com/pantheon-systems/wp-redis/pull/264)].
 
 ### 0.8.0 (January 6, 2020) ###
 * Uses `flushdb` instead of `flushAll` to avoid flushing the entire Redis instance [[#259](https://github.com/pantheon-systems/wp-redis/pull/259)].
