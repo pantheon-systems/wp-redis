@@ -20,6 +20,7 @@
   "scripts": {
     "lint": "@phpcs",
     "phpcs": "vendor/bin/phpcs",
+    "phpcbf": "vendor/bin/phpcbf",
     "phpunit": "vendor/bin/phpunit",
     "test": "@phpunit"
   }
