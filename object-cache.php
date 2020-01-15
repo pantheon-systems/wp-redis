@@ -999,14 +999,14 @@ class WP_Object_Cache {
 		$client_parameters = $this->build_client_parameters( $redis_server );
 
 		try {
-			$client_connection = array($this, 'prepare_client_connection');
+			$client_connection = array( $this, 'prepare_client_connection' );
 			/**
 			 * Permits alternate initial client connection mechanism to be used.
 			 *
 			 * @param callable $client_connection Callback to execute.
 			 */
-			$client_connection = apply_filters('wp_redis_prepare_client_connection_callback', $client_connection);
-			$this->redis = call_user_func_array($client_connection, array($client_parameters));
+			$client_connection = apply_filters( 'wp_redis_prepare_client_connection_callback', $client_connection );
+			$this->redis       = call_user_func_array( $client_connection, array( $client_parameters ) );
 		} catch ( Exception $e ) {
 			$this->_exception_handler( $e );
 		}
