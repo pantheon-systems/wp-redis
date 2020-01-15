@@ -17,6 +17,10 @@ if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) ) {
 	define( 'WP_REDIS_USE_CACHE_GROUPS', false );
 }
 
+if ( ! defined( 'WP_REDIS_DEFAULT_EXPIRE_SECONDS' ) ) {
+	define( 'WP_REDIS_DEFAULT_EXPIRE_SECONDS', 0 );
+}
+
 /**
  * Adds data to the cache, if the cache key doesn't already exist.
  *
@@ -29,7 +33,7 @@ if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) ) {
  * @param int $expire When the cache data should be expired
  * @return bool False if cache key and group already exist, true on success
  */
-function wp_cache_add( $key, $data, $group = '', $expire = 0 ) {
+function wp_cache_add( $key, $data, $group = '', $expire = WP_REDIS_DEFAULT_EXPIRE_SECONDS ) {
 	global $wp_object_cache;
 
 	return $wp_object_cache->add( $key, $data, $group, (int) $expire );
@@ -171,7 +175,7 @@ function wp_cache_init() {
  * @param int $expire When to expire the cache contents
  * @return bool False if not exists, true if contents were replaced
  */
-function wp_cache_replace( $key, $data, $group = '', $expire = 0 ) {
+function wp_cache_replace( $key, $data, $group = '', $expire = WP_REDIS_DEFAULT_EXPIRE_SECONDS ) {
 	global $wp_object_cache;
 
 	return $wp_object_cache->replace( $key, $data, $group, (int) $expire );
@@ -189,7 +193,7 @@ function wp_cache_replace( $key, $data, $group = '', $expire = 0 ) {
  * @param int $expire When to expire the cache contents
  * @return bool False on failure, true on success
  */
-function wp_cache_set( $key, $data, $group = '', $expire = 0 ) {
+function wp_cache_set( $key, $data, $group = '', $expire = WP_REDIS_DEFAULT_EXPIRE_SECONDS ) {
 	global $wp_object_cache;
 
 	return $wp_object_cache->set( $key, $data, $group, (int) $expire );
@@ -383,7 +387,7 @@ class WP_Object_Cache {
 	 * @param int $expire When to expire the cache contents
 	 * @return bool False if cache key and group already exist, true on success
 	 */
-	public function add( $key, $data, $group = 'default', $expire = 0 ) {
+	public function add( $key, $data, $group = 'default', $expire = WP_REDIS_DEFAULT_EXPIRE_SECONDS ) {
 
 		if ( empty( $group ) ) {
 			$group = 'default';
@@ -708,7 +712,7 @@ class WP_Object_Cache {
 	 * @param int $expire When to expire the cache contents
 	 * @return bool False if not exists, true if contents were replaced
 	 */
-	public function replace( $key, $data, $group = 'default', $expire = 0 ) {
+	public function replace( $key, $data, $group = 'default', $expire = WP_REDIS_DEFAULT_EXPIRE_SECONDS ) {
 
 		if ( empty( $group ) ) {
 			$group = 'default';
@@ -748,7 +752,7 @@ class WP_Object_Cache {
 	 * @param int $expire TTL for the data, in seconds
 	 * @return bool Always returns true
 	 */
-	public function set( $key, $data, $group = 'default', $expire = 0 ) {
+	public function set( $key, $data, $group = 'default', $expire = WP_REDIS_DEFAULT_EXPIRE_SECONDS ) {
 
 		if ( empty( $group ) ) {
 			$group = 'default';
