@@ -23,6 +23,7 @@ class WP_Redis_CLI_Command {
 				$redis_server = array(
 					'host' => '127.0.0.1',
 					'port' => 6379,
+					'auth' => '',
 				);
 			}
 		}
@@ -31,9 +32,10 @@ class WP_Redis_CLI_Command {
 			$redis_server['database'] = 0;
 		}
 
-		$cmd = WP_CLI\Utils\esc_cmd( 'redis-cli -h "%s" -p "%s" -a "%s" -n "%d"', $redis_server['host'], $redis_server['port'], $redis_server['auth'], $redis_server['database'] );
-		WP_CLI::launch( $cmd );
-
+		$cmd     = WP_CLI\Utils\esc_cmd( 'redis-cli -h %s -p %s -a %s -n %s', $redis_server['host'], $redis_server['port'], $redis_server['auth'], $redis_server['database'] );
+		$process = WP_CLI\Utils\proc_open_compat( $cmd, array( STDIN, STDOUT, STDERR ), $pipes );
+		$r       = proc_close( $process );
+		exit( (int) $r );
 	}
 
 	/**
