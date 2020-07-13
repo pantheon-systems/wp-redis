@@ -11,6 +11,8 @@ class CacheTest extends WP_UnitTestCase {
 
 	private static $get_key;
 
+	private static $mget_key;
+
 	private static $set_key;
 
 	private static $incr_by_key;
@@ -43,6 +45,7 @@ class CacheTest extends WP_UnitTestCase {
 
 		self::$exists_key  = WP_Object_Cache::USE_GROUPS ? 'hExists' : 'exists';
 		self::$get_key     = WP_Object_Cache::USE_GROUPS ? 'hGet' : 'get';
+		self::$mget_key    = WP_Object_Cache::USE_GROUPS ? 'hmGet' : 'mget';
 		self::$set_key     = WP_Object_Cache::USE_GROUPS ? 'hSet' : 'set';
 		self::$incr_by_key = WP_Object_Cache::USE_GROUPS ? 'hIncrBy' : 'incrBy';
 		// 'hIncrBy' isn't a typo here — Redis doesn't support decrBy on groups
@@ -754,6 +757,53 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertTrue( $found );
 		$this->assertEquals( 1, $this->cache->cache_hits );
 		$this->assertEquals( 1, $this->cache->cache_misses );
+	}
+
+	public function test_get_multiple() {
+		$this->cache->set( 'foo1', 'bar', 'group1' );
+		$this->cache->set( 'foo2', 'bar', 'group1' );
+		$this->cache->set( 'foo1', 'bar', 'group2' );
+
+		$found = $this->cache->get_multiple( array( 'foo1', 'foo2', 'foo3' ), 'group1' );
+
+		$expected = array(
+			'foo1' => 'bar',
+			'foo2' => 'bar',
+			'foo3' => false,
+		);
+
+		$this->assertSame( $expected, $found );
+		$this->assertEquals( 2, $this->cache->cache_hits );
+		$this->assertEquals( 1, $this->cache->cache_misses );
+		if ( $this->cache->is_redis_connected ) {
+			$this->assertEquals(
+				array(
+					self::$mget_key => 1,
+					self::$set_key  => 3,
+				),
+				$this->cache->redis_calls
+			);
+		} else {
+			$this->assertEmpty( $this->cache->redis_calls );
+		}
+	}
+
+	public function test_get_multiple_non_persistent() {
+		$this->cache->add_non_persistent_groups( array( 'group1' ) );
+		$this->cache->set( 'foo1', 'bar', 'group1' );
+		$this->cache->set( 'foo2', 'bar', 'group1' );
+
+		$found = $this->cache->get_multiple( array( 'foo1', 'foo2', 'foo3' ), 'group1' );
+
+		$expected = array(
+			'foo1' => 'bar',
+			'foo2' => 'bar',
+			'foo3' => false,
+		);
+		$this->assertSame( $expected, $found );
+		$this->assertEquals( 2, $this->cache->cache_hits );
+		$this->assertEquals( 1, $this->cache->cache_misses );
+		$this->assertEmpty( $this->cache->redis_calls );
 	}
 
 	public function test_incr() {
