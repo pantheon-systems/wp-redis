@@ -1013,6 +1013,8 @@ class WP_Object_Cache {
 			$this->redis       = call_user_func_array( $client_connection, array( $client_parameters ) );
 		} catch ( Exception $e ) {
 			$this->_exception_handler( $e );
+			$this->is_redis_connected = false;
+			return $this->is_redis_connected;
 		}
 
 		$keys_methods = array(
@@ -1031,6 +1033,8 @@ class WP_Object_Cache {
 			call_user_func_array( $setup_connection, array( $this->redis, $client_parameters, $keys_methods ) );
 		} catch ( Exception $e ) {
 			$this->_exception_handler( $e );
+			$this->is_redis_connected = false;
+			return $this->is_redis_connected;
 		}
 
 		$this->is_redis_connected = $this->redis->isConnected();
