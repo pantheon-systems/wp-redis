@@ -788,6 +788,40 @@ class CacheTest extends WP_UnitTestCase {
 		}
 	}
 
+	public function test_get_multiple_partial_cache_miss() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'Requires an active persistent object cache connection' );
+		}
+		$this->cache->set( 'foo1', 'bar', 'group1' );
+		$this->cache->set( 'foo2', 'baz', 'group1' );
+		$this->cache->set( 'foo3', 'bap', 'group1' );
+		// Reset the internal cache.
+		$this->cache->cache = array();
+		// Prime the second item into the internal cache.
+		$this->cache->get( 'foo2', 'group1' );
+
+		$found = $this->cache->get_multiple( array( 'foo1', 'foo2', 'foo3', 'foo4' ), 'group1' );
+
+		$expected = array(
+			'foo1' => 'bar',
+			'foo2' => 'baz',
+			'foo3' => 'bap',
+			'foo4' => false,
+		);
+
+		$this->assertSame( $expected, $found );
+		$this->assertEquals( 4, $this->cache->cache_hits );
+		$this->assertEquals( 1, $this->cache->cache_misses );
+		$this->assertEquals(
+			array(
+				self::$get_key  => 1,
+				self::$mget_key => 1,
+				self::$set_key  => 3,
+			),
+			$this->cache->redis_calls
+		);
+	}
+
 	public function test_get_multiple_non_persistent() {
 		$this->cache->add_non_persistent_groups( array( 'group1' ) );
 		$this->cache->set( 'foo1', 'bar', 'group1' );
