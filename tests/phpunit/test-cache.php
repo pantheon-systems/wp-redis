@@ -789,6 +789,9 @@ class CacheTest extends WP_UnitTestCase {
 	}
 
 	public function test_get_multiple_partial_cache_miss() {
+		if ( ! class_exists( 'Redis' ) ) {
+			$this->markTestSkipped( 'Requires an active persistent object cache connection' );
+		}
 		$this->cache->set( 'foo1', 'bar', 'group1' );
 		$this->cache->set( 'foo2', 'baz', 'group1' );
 		$this->cache->set( 'foo3', 'bap', 'group1' );
@@ -809,18 +812,14 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertSame( $expected, $found );
 		$this->assertEquals( 4, $this->cache->cache_hits );
 		$this->assertEquals( 1, $this->cache->cache_misses );
-		if ( $this->cache->is_redis_connected ) {
-			$this->assertEquals(
-				array(
-					self::$get_key  => 1,
-					self::$mget_key => 1,
-					self::$set_key  => 3,
-				),
-				$this->cache->redis_calls
-			);
-		} else {
-			$this->assertEmpty( $this->cache->redis_calls );
-		}
+		$this->assertEquals(
+			array(
+				self::$get_key  => 1,
+				self::$mget_key => 1,
+				self::$set_key  => 3,
+			),
+			$this->cache->redis_calls
+		);
 	}
 
 	public function test_get_multiple_non_persistent() {
