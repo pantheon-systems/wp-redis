@@ -694,7 +694,7 @@ class WP_Object_Cache {
 				}
 			}
 		}
-		$remaining_keys = array_values(array_diff( $keys, array_keys( $cache ) ));
+		$remaining_keys = array_values( array_diff( $keys, array_keys( $cache ) ) );
 		// If all keys were satisfied by the internal cache, we're sorted.
 		if ( empty( $remaining_keys ) ) {
 			return $cache;
