@@ -2,8 +2,8 @@
 Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh
 Tags: cache, plugin, redis
 Requires at least: 3.0.1
-Tested up to: 5.4
-Stable tag: 1.0.1
+Tested up to: 5.5
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -106,6 +106,13 @@ This declaration means use of `wp_cache_set( 'foo', 'bar', 'bad-actor' );` and `
 There's a known issue with WordPress `alloptions` cache design. Specifically, a race condition between two requests can cause the object cache to have stale values. If you think you might be impacted by this, [review this GitHub issue](https://github.com/pantheon-systems/wp-redis/issues/221) for links to more context, including a workaround.
 
 == Changelog ==
+
+= 1.1.1 (August 17, 2020) =
+* Returns cache data in correct order when using `wp_cache_get_multiple()` and internal cache is already primed [[#292](https://github.com/pantheon-systems/wp-redis/pull/292)].
+
+= 1.1.0 (July 13, 2020) =
+* Implements `wp_cache_get_multiple()` for WordPress 5.5 [[#287](https://github.com/pantheon-systems/wp-redis/pull/287)].
+* Bails early when connecting to Redis throws an Exception to avoid fatal error [[285](https://github.com/pantheon-systems/wp-redis/pull/285)].
 
 = 1.0.1 (April 14, 2020) =
 * Adds support for specifying Redis database number from environment/server variables [[#273](https://github.com/pantheon-systems/wp-redis/pull/273)].
