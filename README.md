@@ -35,6 +35,16 @@ This assumes you have a PHP environment with the [required PhpRedis extension](h
             'database' => 0, // Optionally use a specific numeric Redis database. Default is 0.
         );
 
+2.1 If your Redis server is listening through a sockt file instead, set its path on `host` parameter and change the port to `null`:
+
+        $redis_server = array(
+            'host'     => '/path/of/redis/socket-file.sock',
+            'port'     => null,
+            'auth'     => '12345',
+            'database' => 0, // Optionally use a specific numeric Redis database. Default is 0.
+        );
+
+
 3. Engage thrusters: you are now backing WP's Object Cache with Redis.
 4. (Optional) To use the `wp redis` WP-CLI commands, activate the WP Redis plugin. No activation is necessary if you're solely using the object cache drop-in.
 5. (Optional) To use the same Redis server with multiple, discreet WordPress installs, you can use the `WP_CACHE_KEY_SALT` constant to define a unique salt for each install.
