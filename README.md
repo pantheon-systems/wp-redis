@@ -44,7 +44,6 @@ This assumes you have a PHP environment with the [required PhpRedis extension](h
             'database' => 0, // Optionally use a specific numeric Redis database. Default is 0.
         );
 
-
 4. Engage thrusters: you are now backing WP's Object Cache with Redis.
 5. (Optional) To use the `wp redis` WP-CLI commands, activate the WP Redis plugin. No activation is necessary if you're solely using the object cache drop-in.
 6. (Optional) To use the same Redis server with multiple, discreet WordPress installs, you can use the `WP_CACHE_KEY_SALT` constant to define a unique salt for each install.
