@@ -35,11 +35,20 @@ This assumes you have a PHP environment with the [required PhpRedis extension](h
             'database' => 0, // Optionally use a specific numeric Redis database. Default is 0.
         );
 
-3. Engage thrusters: you are now backing WP's Object Cache with Redis.
-4. (Optional) To use the `wp redis` WP-CLI commands, activate the WP Redis plugin. No activation is necessary if you're solely using the object cache drop-in.
-5. (Optional) To use the same Redis server with multiple, discreet WordPress installs, you can use the `WP_CACHE_KEY_SALT` constant to define a unique salt for each install.
-6. (Optional) To use true cache groups, with the ability to delete all keys for a given group, register groups with `wp_cache_add_redis_hash_groups()`, or define the `WP_REDIS_USE_CACHE_GROUPS` constant to true to enable with all groups. However, when enabled, the expiration value is not respected because expiration on group keys isn't a feature supported by Redis.
-7. (Optional) On an existing site previously using WordPress' transient cache, use WP-CLI to delete all (`%_transient_%`) transients from the options table: `wp transient delete-all`. WP Redis assumes responsibility for the transient cache.
+3. If your Redis server is listening through a sockt file instead, set its path on `host` parameter and change the port to `null`:
+
+        $redis_server = array(
+            'host'     => '/path/of/redis/socket-file.sock',
+            'port'     => null,
+            'auth'     => '12345',
+            'database' => 0, // Optionally use a specific numeric Redis database. Default is 0.
+        );
+
+4. Engage thrusters: you are now backing WP's Object Cache with Redis.
+5. (Optional) To use the `wp redis` WP-CLI commands, activate the WP Redis plugin. No activation is necessary if you're solely using the object cache drop-in.
+6. (Optional) To use the same Redis server with multiple, discreet WordPress installs, you can use the `WP_CACHE_KEY_SALT` constant to define a unique salt for each install.
+7. (Optional) To use true cache groups, with the ability to delete all keys for a given group, register groups with `wp_cache_add_redis_hash_groups()`, or define the `WP_REDIS_USE_CACHE_GROUPS` constant to true to enable with all groups. However, when enabled, the expiration value is not respected because expiration on group keys isn't a feature supported by Redis.
+8. (Optional) On an existing site previously using WordPress' transient cache, use WP-CLI to delete all (`%_transient_%`) transients from the options table: `wp transient delete-all`. WP Redis assumes responsibility for the transient cache.
 
 ## WP-CLI Commands ##
 
