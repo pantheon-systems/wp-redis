@@ -5,7 +5,8 @@ workflows:
     jobs:
       - lint
       - test-behat
-      - test-phpunit
+      - test-phpunit-redis-disabled
+      - test-phpunit-redis-enabled
   nightly:
     triggers:
       - schedule:
@@ -80,7 +81,7 @@ jobs:
     - run:
         command: ./bin/behat-cleanup.sh
         when: always
-  test-phpunit:
+  test-phpunit-redis-disabled:
     working_directory: ~/pantheon-systems/wp-redis
     docker:
       - image: circleci/php:7.4-node-browsers
@@ -114,6 +115,46 @@ jobs:
             bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 latest
             composer phpunit
             WP_MULTISITE=1 composer phpunit
+            WP_REDIS_USE_CACHE_GROUPS=1 composer phpunit
+            rm -rf $WP_TESTS_DIR $WP_CORE_DIR
+            bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 nightly true
+            composer phpunit
+  test-phpunit-redis-enabled:
+    working_directory: ~/pantheon-systems/wp-redis
+    docker:
+      - image: circleci/php:7.4-node-browsers
+      - image: circleci/mariadb:10.3
+      - image: circleci/redis:latest
+    environment:
+      - WP_TESTS_DIR: "/tmp/wordpress-tests-lib"
+      - WP_CORE_DIR: "/tmp/wordpress/"
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - test-phpunit-dependencies-{{ checksum "composer.json" }}
+      - run: composer install -n --prefer-dist
+      - save_cache:
+          key: test-phpunit-dependencies-{{ checksum "composer.json" }}
+          paths:
+            - vendor
+      - run:
+          name: "Install Extras"
+          command: |
+            sudo apt-get update
+            sudo apt-get install subversion
+            sudo apt-get install -y libmagickwand-dev --no-install-recommends
+            yes '' | sudo pecl install imagick || true
+            sudo docker-php-ext-enable imagick
+            sudo docker-php-ext-install mysqli
+            sudo apt-get install mariadb-client-10.3
+      - run:
+          name: "Run Tests"
+          command: |
+            bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 latest
+            composer phpunit
+            WP_MULTISITE=1 composer phpunit
+            WP_REDIS_USE_CACHE_GROUPS=1 composer phpunit
             rm -rf $WP_TESTS_DIR $WP_CORE_DIR
             bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 nightly true
             composer phpunit
