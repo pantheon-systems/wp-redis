@@ -19,25 +19,13 @@
 	<exclude-pattern>*/vendor/*</exclude-pattern>
 	<exclude-pattern>*/node_modules/*</exclude-pattern>
 
-	<rule ref="WordPress-VIP">
-		<exclude name="WordPress.NamingConventions.ValidVariableName" />
-		<exclude name="Squiz.PHP.CommentedOutCode" />
-		<exclude name="WordPress.CSRF.NonceVerification" />
-		<exclude name="WordPress.WhiteSpace.ControlStructureSpacing" />
-		<exclude name="WordPress.Security.ValidatedSanitizedInput.MissingUnslash" />
-		<exclude name="WordPress.Security.ValidatedSanitizedInput.InputNotSanitized" />
-		<exclude name="WordPress.Security.ValidatedSanitizedInput.InputNotValidated" />
-		<exclude name="WordPress.VIP.DirectDatabaseQuery" />
-		<exclude name="WordPress.VIP.SlowDBQuery" />
-		<exclude name="WordPress.VIP.SuperGlobalInputUsage" />
-		<exclude name="WordPress.VIP.ValidatedSanitizedInput" />
-		<exclude name="WordPress.VIP.RestrictedFunctions.error_log" />
-		<exclude name="WordPress.VIP.RestrictedFunctions.serialize" />
-	</rule>
 	<rule ref="WordPress.PHP.DevelopmentFunctions">
 		<properties>
 			<property name="exclude" value="error_log" />
 		</properties>
+	</rule>
+	<rule ref="WordPress.PHP.DevelopmentFunctions.error_log_error_log">
+		<exclude-pattern>*/tests/phpunit/bootstrap.php</exclude-pattern>
 	</rule>
 	<rule ref="WordPress.PHP.DiscouragedPHPFunctions">
 		<properties>
