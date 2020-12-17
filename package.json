@@ -9,6 +9,6 @@
   "author": "Pantheon <noreply@pantheon.io>",
   "devDependencies": {
     "grunt": "^1.3.0",
-    "grunt-wp-readme-to-markdown": "~1.0.0"
+    "grunt-wp-readme-to-markdown": "~2.0.1"
   }
 }
