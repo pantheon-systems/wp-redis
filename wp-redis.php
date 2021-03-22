@@ -34,6 +34,24 @@ if ( defined( 'WP_CLI' ) && WP_CLI && ! class_exists( 'WP_Redis_CLI_Command' ) )
 function wp_redis_get_info() {
 	global $wp_object_cache, $redis_server;
 
+	if ( empty( $redis_server ) ) {
+		// Attempt to automatically load Pantheon's Redis config from the env.
+		if ( isset( $_SERVER['CACHE_HOST'] ) ) {
+			$redis_server = array(
+				'host'     => $_SERVER['CACHE_HOST'],
+				'port'     => $_SERVER['CACHE_PORT'],
+				'auth'     => $_SERVER['CACHE_PASSWORD'],
+				'database' => isset( $_SERVER['CACHE_DB'] ) ? $_SERVER['CACHE_DB'] : 0,
+			);
+		} else {
+			$redis_server = array(
+				'host'     => '127.0.0.1',
+				'port'     => 6379,
+				'database' => 0,
+			);
+		}
+	}
+
 	if ( ! defined( 'WP_REDIS_OBJECT_CACHE' ) || ! WP_REDIS_OBJECT_CACHE ) {
 		return new WP_Error( 'wp-redis', 'WP Redis object-cache.php file is missing from the wp-content/ directory.' );
 	}
