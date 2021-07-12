@@ -2,7 +2,7 @@
 **Contributors:** [getpantheon](https://profiles.wordpress.org/getpantheon), [danielbachhuber](https://profiles.wordpress.org/danielbachhuber), [mboynes](https://profiles.wordpress.org/mboynes), [Outlandish Josh](https://profiles.wordpress.org/Outlandish Josh)  
 **Tags:** cache, plugin, redis  
 **Requires at least:** 3.0.1  
-**Tested up to:** 5.7  
+**Tested up to:** 5.8  
 **Stable tag:** 1.1.2  
 **License:** GPLv2 or later  
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html  
