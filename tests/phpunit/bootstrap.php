@@ -5,6 +5,8 @@ if ( ! $_tests_dir ) {
 	$_tests_dir = '/tmp/wordpress-tests-lib';
 }
 
+define( 'WP_TESTS_PHPUNIT_POLYFILLS_PATH', __DIR__ . '/../../vendor/yoast/phpunit-polyfills/phpunitpolyfills-autoload.php' );
+
 require_once $_tests_dir . '/includes/functions.php';
 
 if ( getenv( 'WP_CORE_DIR' ) ) {
