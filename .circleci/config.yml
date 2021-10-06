@@ -108,7 +108,7 @@ jobs:
             yes '' | sudo pecl install imagick || true
             sudo docker-php-ext-enable imagick
             sudo docker-php-ext-install mysqli
-            sudo apt-get install mariadb-client-10.3
+            sudo apt-get install mariadb-client-10.5
       - run:
           name: "Run Tests"
           command: |
