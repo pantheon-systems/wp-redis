@@ -21,6 +21,10 @@ if ( ! defined( 'WP_REDIS_DEFAULT_EXPIRE_SECONDS' ) ) {
 	define( 'WP_REDIS_DEFAULT_EXPIRE_SECONDS', 0 );
 }
 
+if ( ! defined( 'WP_REDIS_IGNORE_GLOBAL_GROUPS' ) ) {
+	define( 'WP_REDIS_IGNORE_GLOBAL_GROUPS', false );
+}
+
 /**
  * Adds data to the cache, if the cache key doesn't already exist.
  *
@@ -430,6 +434,11 @@ class WP_Object_Cache {
 	public function add_global_groups( $groups ) {
 		$groups = (array) $groups;
 
+                // Filter global groups
+		if ( is_array( WP_REDIS_IGNORE_GLOBAL_GROUPS ) ) {
+                	$groups = array_diff_key( $groups, WP_REDIS_IGNORE_GLOBAL_GROUPS );
+		}
+		
 		$groups              = array_fill_keys( $groups, true );
 		$this->global_groups = array_merge( $this->global_groups, $groups );
 	}
