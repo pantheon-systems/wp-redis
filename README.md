@@ -3,7 +3,7 @@
 **Tags:** cache, plugin, redis  
 **Requires at least:** 3.0.1  
 **Tested up to:** 5.8  
-**Stable tag:** 1.1.2  
+**Stable tag:** 1.1.3  
 **License:** GPLv2 or later  
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -115,6 +115,9 @@ This declaration means use of `wp_cache_set( 'foo', 'bar', 'bad-actor' );` and `
 There's a known issue with WordPress `alloptions` cache design. Specifically, a race condition between two requests can cause the object cache to have stale values. If you think you might be impacted by this, [review this GitHub issue](https://github.com/pantheon-systems/wp-redis/issues/221) for links to more context, including a workaround.
 
 ## Changelog ##
+
+### 1.1.3 (October 21, 2021) ###
+* Supports a `WP_REDIS_IGNORE_GLOBAL_GROUPS` constant to prevent groups from being added to global caching group [[#331](https://github.com/pantheon-systems/wp-redis/pull/331)].
 
 ### 1.1.2 (March 24, 2021) ###
 * Applies logic used elsewhere to fall back to `$_SERVER` in `wp_redis_get_info()` [[#316](https://github.com/pantheon-systems/wp-redis/pull/316)].
