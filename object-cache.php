@@ -434,11 +434,11 @@ class WP_Object_Cache {
 	public function add_global_groups( $groups ) {
 		$groups = (array) $groups;
 
-                // Filter global groups
+		// Allow force ignoring of global groups.
 		if ( is_array( WP_REDIS_IGNORE_GLOBAL_GROUPS ) ) {
-                	$groups = array_diff_key( $groups, WP_REDIS_IGNORE_GLOBAL_GROUPS );
+			$groups = array_diff( $groups, WP_REDIS_IGNORE_GLOBAL_GROUPS );
 		}
-		
+
 		$groups              = array_fill_keys( $groups, true );
 		$this->global_groups = array_merge( $this->global_groups, $groups );
 	}

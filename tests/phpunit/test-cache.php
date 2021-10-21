@@ -1377,6 +1377,13 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertFalse( wp_cache_get( $fake_key ) );
 	}
 
+	public function test_ignore_global_groups() {
+		$this->cache->add_global_groups( array( 'wp-redis-respected-group' ) );
+		$this->assertTrue( isset( $this->cache->global_groups['wp-redis-respected-group'] ) );
+		$this->cache->add_global_groups( array( 'wp-redis-ignored-group' ) );
+		$this->assertFalse( isset( $this->cache->global_groups['wp-redis-ignored-group'] ) );
+	}
+
 	public function test_wp_redis_get_info() {
 		if ( ! class_exists( 'Redis' ) ) {
 			$this->markTestSkipped( 'PHPRedis extension not available.' );

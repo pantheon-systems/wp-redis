@@ -21,6 +21,8 @@ if ( getenv( 'WP_REDIS_USE_CACHE_GROUPS' ) ) {
 	define( 'WP_REDIS_USE_CACHE_GROUPS', true );
 }
 
+define( 'WP_REDIS_IGNORE_GLOBAL_GROUPS', array( 'wp-redis-ignored-group' ) );
+
 // Easiest way to get this to where WordPress will load it
 copy( dirname( dirname( dirname( __FILE__ ) ) ) . '/object-cache.php', $_core_dir . '/wp-content/object-cache.php' );
 
