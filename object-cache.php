@@ -1207,7 +1207,11 @@ class WP_Object_Cache {
 	 * @return Redis Redis client.
 	 */
 	public function prepare_client_connection( $client_parameters ) {
-		$redis = new Redis;
+		if ( defined( 'WP_REDIS_USE_RELAY' ) && WP_REDIS_USE_RELAY ) {
+			$redis = new Relay\Relay;
+		} else {
+			$redis = new Redis;
+		}
 
 		$redis->connect(
 			$client_parameters['host'],
