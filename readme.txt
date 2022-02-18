@@ -3,7 +3,7 @@ Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh
 Tags: cache, plugin, redis
 Requires at least: 3.0.1
 Tested up to: 5.9
-Stable tag: 1.1.4
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,8 +47,9 @@ This assumes you have a PHP environment with the [required PhpRedis extension](h
 4. Engage thrusters: you are now backing WP's Object Cache with Redis.
 5. (Optional) To use the `wp redis` WP-CLI commands, activate the WP Redis plugin. No activation is necessary if you're solely using the object cache drop-in.
 6. (Optional) To use the same Redis server with multiple, discreet WordPress installs, you can use the `WP_CACHE_KEY_SALT` constant to define a unique salt for each install.
-7. (Optional) To use true cache groups, with the ability to delete all keys for a given group, register groups with `wp_cache_add_redis_hash_groups()`, or define the `WP_REDIS_USE_CACHE_GROUPS` constant to true to enable with all groups. However, when enabled, the expiration value is not respected because expiration on group keys isn't a feature supported by Redis.
+7. (Optional) To use true cache groups, with the ability to delete all keys for a given group, register groups with `wp_cache_add_redis_hash_groups()`, or define the `WP_REDIS_USE_CACHE_GROUPS` constant to `true` to enable with all groups. However, when enabled, the expiration value is not respected because expiration on group keys isn't a feature [supported by Redis](https://github.com/redis/redis/issues/6620).
 8. (Optional) On an existing site previously using WordPress' transient cache, use WP-CLI to delete all (`%_transient_%`) transients from the options table: `wp transient delete-all`. WP Redis assumes responsibility for the transient cache.
+9. (Optional) To use [Relay](https://relaycache.com) instead of PhpRedis as the client define the `WP_REDIS_USE_RELAY` constant to `true`.
 
 == WP-CLI Commands ==
 
@@ -115,6 +116,9 @@ This declaration means use of `wp_cache_set( 'foo', 'bar', 'bad-actor' );` and `
 There's a known issue with WordPress `alloptions` cache design. Specifically, a race condition between two requests can cause the object cache to have stale values. If you think you might be impacted by this, [review this GitHub issue](https://github.com/pantheon-systems/wp-redis/issues/221) for links to more context, including a workaround.
 
 == Changelog ==
+
+= 1.2.0 (February 17, 2022) =
+* Adds support for Relay via `WP_REDIS_USE_RELAY` constant [[#344](https://github.com/pantheon-systems/wp-redis/pull/344)].
 
 = 1.1.4 (October 21, 2021) =
 * Fixes some faulty logic in `WP_REDIS_IGNORE_GLOBAL_GROUPS` check [[#333](https://github.com/pantheon-systems/wp-redis/pull/333)].
