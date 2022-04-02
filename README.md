@@ -51,7 +51,7 @@ This assumes you have a PHP environment with the [required PhpRedis extension](h
 6. (Optional) To use the same Redis server with multiple, discreet WordPress installs, you can use the `WP_CACHE_KEY_SALT` constant to define a unique salt for each install.
 7. (Optional) To use true cache groups, with the ability to delete all keys for a given group, register groups with `wp_cache_add_redis_hash_groups()`, or define the `WP_REDIS_USE_CACHE_GROUPS` constant to `true` to enable with all groups. However, when enabled, the expiration value is not respected because expiration on group keys isn't a feature [supported by Redis](https://github.com/redis/redis/issues/6620).
 8. (Optional) On an existing site previously using WordPress' transient cache, use WP-CLI to delete all (`%_transient_%`) transients from the options table: `wp transient delete-all`. WP Redis assumes responsibility for the transient cache.
-9. (Optional) To use [Relay](https://relaycache.com) instead of PhpRedis as the client define the `WP_REDIS_USE_RELAY` constant to `true`.
+9. (Optional) To use [Relay](https://relaycache.com) instead of PhpRedis as the client define the `WP_REDIS_USE_RELAY` constant to `true`. For support requests, please use [Relay's GitHub discussions](https://github.com/cachewerk/relay/discussions).
 
 ## WP-CLI Commands ##
 
