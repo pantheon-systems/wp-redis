@@ -8,7 +8,7 @@
   "main": "Gruntfile.js",
   "author": "Pantheon <noreply@pantheon.io>",
   "devDependencies": {
-    "grunt": "^1.5.2",
+    "grunt": "^1.5.3",
     "grunt-wp-readme-to-markdown": "~2.1.0"
   }
 }
