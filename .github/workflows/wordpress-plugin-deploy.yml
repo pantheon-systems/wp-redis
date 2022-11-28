@@ -7,6 +7,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
     - name: WordPress Plugin Deploy
       uses: 10up/action-wordpress-plugin-deploy@2.1.1
       env:
