@@ -1,0 +1,16 @@
+name: Release wp-redis plugin to wp.org
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: WordPress Plugin Deploy
+      uses: 10up/action-wordpress-plugin-deploy@2.1.1
+      env:
+        SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+        SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+        SLUG: ${{ env.SLUG }}

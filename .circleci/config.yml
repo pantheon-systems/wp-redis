@@ -102,6 +102,7 @@ jobs:
       - run:
           name: "Install Extras"
           command: |
+            sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4EB27DB2A3B88B8B
             sudo apt-get update
             sudo apt-get install subversion
             sudo apt-get install -y libmagickwand-dev --no-install-recommends
@@ -141,6 +142,7 @@ jobs:
       - run:
           name: "Install Extras"
           command: |
+            sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4EB27DB2A3B88B8B
             sudo apt-get update
             sudo apt-get install subversion
             sudo apt-get install -y libmagickwand-dev --no-install-recommends

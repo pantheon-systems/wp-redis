@@ -78,22 +78,7 @@ Use `wp help redis <command>` to learn more about each command.
 
 ## Contributing ##
 
-The best way to contribute to the development of this plugin is by participating on the GitHub project:
-
-https://github.com/pantheon-systems/wp-redis
-
-Pull requests and issues are welcome!
-
-You may notice there are two sets of tests running, on two different services:
-
-* Travis CI runs the [PHPUnit](https://phpunit.de/) test suite in a variety of environment configurations (e.g. Redis enabled vs. Redis disabled).
-* Circle CI runs the [Behat](http://behat.org/) test suite against a Pantheon site, to ensure the plugin's compatibility with the Pantheon platform.
-
-Both of these test suites can be run locally, with a varying amount of setup.
-
-PHPUnit requires the [WordPress PHPUnit test suite](https://make.wordpress.org/core/handbook/testing/automated-testing/phpunit/), and access to a database with name `wordpress_test`. If you haven't already configured the test suite locally, you can run `bash bin/install-wp-tests.sh wordpress_test root '' localhost`. You'll also need to enable Redis and the PHPRedis extension in order to run the test suite against Redis.
-
-Behat requires a Pantheon site with Redis enabled. Once you've created the site, you'll need [install Terminus](https://github.com/pantheon-systems/terminus#installation), and set the `TERMINUS_TOKEN`, `TERMINUS_SITE`, and `TERMINUS_ENV` environment variables. Then, you can run `./bin/behat-prepare.sh` to prepare the site for the test suite.
+See [CONTRIBUTING.md](https://github.com/pantheon-systems/wp-redis/blob/master/CONTRIBUTING.md) for information on contributing.
 
 ## Frequently Asked Questions ##
 

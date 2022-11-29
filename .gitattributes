@@ -1,0 +1,27 @@
+# Directories
+/.circleci export-ignore
+/.git export-ignore
+/.github export-ignore
+/.wordpress-org export-ignore
+/tests export-ignore
+/node_modules export-ignore
+/vendor export-ignore
+/bin export-ignore
+
+# Files
+/.DS_Store export-ignore
+/Thumbs.db export-ignore
+/.editorconfig export-ignore
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/behat.yml export-ignore
+/CODEOWNERS export-ignore
+/composer.json export-ignore
+/composer.lock export-ignore
+/CONTRIBUTING.md export-ignore
+/Gruntfile.js export-ignore
+/package-lock.json export-ignore
+/package.json export-ignore
+/phpcs.xml.dist export-ignore
+/phpunit.xml.dist export-ignore
+/README.md export-ignore
