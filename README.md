@@ -5,7 +5,7 @@
 **Tags:** cache, plugin, redis  
 **Requires at least:** 3.0.1  
 **Tested up to:** 5.9  
-**Stable tag:** 1.2.0  
+**Stable tag:** 1.3.0  
 **License:** GPLv2 or later  
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -103,6 +103,9 @@ This declaration means use of `wp_cache_set( 'foo', 'bar', 'bad-actor' );` and `
 There's a known issue with WordPress `alloptions` cache design. Specifically, a race condition between two requests can cause the object cache to have stale values. If you think you might be impacted by this, [review this GitHub issue](https://github.com/pantheon-systems/wp-redis/issues/221) for links to more context, including a workaround.
 
 ## Changelog ##
+
+### 1.3.0 (November 29th, 2022) ###
+* Added CONTRIBUTING.MD and GitHub action to automate deployments to wp.org. [[#368](https://github.com/pantheon-systems/wp-redis/pull/368)]
 
 ### 1.2.0 (February 17, 2022) ###
 * Adds support for Relay via `WP_REDIS_USE_RELAY` constant [[#344](https://github.com/pantheon-systems/wp-redis/pull/344)].
