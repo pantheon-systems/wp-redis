@@ -1,6 +1,6 @@
 {
   "name": "wp-redis",
-  "version": "0.2.2",
+  "version": "1.3.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/pantheon-systems/wp-redis.git"
