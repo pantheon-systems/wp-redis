@@ -6,6 +6,7 @@ updates:
     interval: weekly
     timezone: America/Los_Angeles
     day: tuesday
+  target-branch: "develop"
   open-pull-requests-limit: 99
   ignore:
   - dependency-name: phpunit/phpunit
@@ -22,4 +23,5 @@ updates:
     interval: weekly
     timezone: America/Los_Angeles
     day: tuesday
+  target-branch: "develop"
   open-pull-requests-limit: 99
