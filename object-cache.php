@@ -300,18 +300,14 @@ function wp_cache_reset() {
  * @return bool True if the feature is supported, false otherwise.
  */
 function wp_cache_supports( $feature ) {
-	switch ( $feature ) {
-		case 'add_multiple':
-		case 'set_multiple':
-		case 'get_multiple':
-		case 'delete_multiple':
-		case 'flush_runtime':
-		case 'flush_group':
-			return true;
-
-		default:
-			return false;
-	}
+	return in_array( $feature, array(
+		'add_multiple',
+		'set_multiple',
+		'get_multiple',
+		'delete_multiple',
+		'flush_runtime',
+		'flush_group',
+	), true );
 }
 
 /**
