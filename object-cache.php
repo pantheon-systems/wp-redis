@@ -301,14 +301,14 @@ function wp_cache_reset() {
  */
 function wp_cache_supports( $feature ) {
 	switch ( $feature ) {
+		case 'get_multiple':
+			return true;
+
 		case 'add_multiple':
 		case 'set_multiple':
-		case 'get_multiple':
 		case 'delete_multiple':
 		case 'flush_runtime':
 		case 'flush_group':
-			return true;
-
 		default:
 			return false;
 	}
