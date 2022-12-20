@@ -21,7 +21,7 @@ jobs:
   lint:
     working_directory: ~/pantheon-systems/wp-redis
     docker:
-      - image: quay.io/pantheon-public/build-tools-ci:6.x
+      - image: quay.io/pantheon-public/build-tools-ci:8.x-php7.4
     steps:
       - checkout
       - restore_cache:
@@ -40,7 +40,7 @@ jobs:
     working_directory: ~/pantheon-systems/wp-redis
     parallelism: 1
     docker:
-    - image: quay.io/pantheon-public/build-tools-ci:6.x
+    - image: quay.io/pantheon-public/build-tools-ci:8.x-php7.4
     steps:
     - checkout
     - restore_cache:
