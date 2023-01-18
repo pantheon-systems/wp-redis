@@ -13,7 +13,7 @@
     "behat/mink-goutte-driver": "^1.2",
     "pantheon-systems/pantheon-wordpress-upstream-tests": "dev-master",
     "wp-coding-standards/wpcs": "^2",
-    "dealerdirect/phpcodesniffer-composer-installer": "^0.7.0",
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.0.0",
     "phpunit/phpunit": "^7",
     "phpcompatibility/php-compatibility": "^9.3",
     "yoast/phpunit-polyfills": "^1.0"
