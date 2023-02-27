@@ -30,7 +30,7 @@ class CacheTest extends WP_UnitTestCase {
 		'retry_interval' => 100,
 	);
 
-	public function setUp() {
+	public function setUp(): void {
 		parent::setUp();
 		$GLOBALS['redis_server'] = array(
 			'host' => '127.0.0.1',
@@ -1449,7 +1449,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->cache->perform_client_connection( $redis, $settings, $keys_methods );
 	}
 
-	public function tearDown() {
+	public function tearDown(): void {
 		parent::tearDown();
 		$this->flush_cache();
 	}
@@ -1457,7 +1457,7 @@ class CacheTest extends WP_UnitTestCase {
 	/**
 	 * Remove the object-cache.php from the place we've dropped it
 	 */
-	static function tearDownAfterClass() {
+	static function tearDownAfterClass(): void {
 		// @codingStandardsIgnoreStart
 		unlink( ABSPATH . 'wp-content/object-cache.php' );
 		// @codingStandardsIgnoreEnd
