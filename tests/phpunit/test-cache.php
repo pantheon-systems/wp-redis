@@ -1391,8 +1391,8 @@ class CacheTest extends WP_UnitTestCase {
 		$data = wp_redis_get_info();
 		$this->assertEquals( 'connected', $data['status'] );
 		$this->assertIsInt( $data['key_count'] );
-		$this->assertRegExp( '/[\d]+\/sec/', $data['instantaneous_ops'] );
-		$this->assertRegExp( '/[\d]+\sdays?/', $data['uptime'] );
+		$this->assertMatchesRegularExpression( '/[\d]+\/sec/', $data['instantaneous_ops'] );
+		$this->assertMatchesRegularExpression( '/[\d]+\sdays?/', $data['uptime'] );
 	}
 
 	public function test_dependencies() {
