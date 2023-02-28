@@ -26,7 +26,7 @@ Behat requires a Pantheon site with Redis enabled. Once you've created the site,
 ## Release Process
 
 1. Starting from `develop`, cut a release branch named `release_X.Y.Z` containing your changes.
-1. Update plugin version in `package.json`, `README.md`, `readme.txt`, and `wp-redis.php`.
+1. Update plugin version in `README.md`, `readme.txt`, and `wp-redis.php`.
 1. Update the Changelog with the latest changes.
 1. Create a PR against the `master` branch.
 1. After all tests pass and you have received approval from a CODEOWNER (including resolving any merge conflicts), merge the PR into `master`.

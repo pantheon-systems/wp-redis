@@ -326,6 +326,7 @@ function wp_cache_supports( $feature ) {
  * in the wp-content folder which is looked at in wp-settings. If that file
  * exists, then this file will not be included.
  */
+#[AllowDynamicProperties]
 class WP_Object_Cache {
 
 	/**
