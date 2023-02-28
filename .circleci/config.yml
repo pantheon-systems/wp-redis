@@ -5,8 +5,10 @@ workflows:
     jobs:
       - lint
       - test-behat
-      - test-phpunit-redis-disabled
-      - test-phpunit-redis-enabled
+      - test-phpunit-redis-disabled-74
+      - test-phpunit-redis-enabled-74
+      - test-phpunit-redis-disabled-82
+      - test-phpunit-redis-enabled-82
   nightly:
     triggers:
       - schedule:
@@ -21,7 +23,7 @@ jobs:
   lint:
     working_directory: ~/pantheon-systems/wp-redis
     docker:
-      - image: quay.io/pantheon-public/build-tools-ci:8.x-php7.4
+      - image: quay.io/pantheon-public/build-tools-ci:8.x-php8.2
     steps:
       - checkout
       - restore_cache:
@@ -40,7 +42,7 @@ jobs:
     working_directory: ~/pantheon-systems/wp-redis
     parallelism: 1
     docker:
-    - image: quay.io/pantheon-public/build-tools-ci:8.x-php7.4
+    - image: quay.io/pantheon-public/build-tools-ci:8.x-php8.2
     steps:
     - checkout
     - restore_cache:
@@ -81,7 +83,7 @@ jobs:
     - run:
         command: ./bin/behat-cleanup.sh
         when: always
-  test-phpunit-redis-disabled:
+  test-phpunit-redis-disabled-74:
     working_directory: ~/pantheon-systems/wp-redis
     docker:
       - image: circleci/php:7.4-node-browsers
@@ -93,10 +95,10 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - test-phpunit-dependencies-{{ checksum "composer.json" }}
+            - test-phpunit-74-dependencies-{{ checksum "composer.json" }}
       - run: composer install -n --prefer-dist
       - save_cache:
-          key: test-phpunit-dependencies-{{ checksum "composer.json" }}
+          key: test-phpunit-74-dependencies-{{ checksum "composer.json" }}
           paths:
             - vendor
       - run:
@@ -120,7 +122,7 @@ jobs:
             rm -rf $WP_TESTS_DIR $WP_CORE_DIR
             bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 nightly true
             composer phpunit
-  test-phpunit-redis-enabled:
+  test-phpunit-redis-enabled-74:
     working_directory: ~/pantheon-systems/wp-redis
     docker:
       - image: circleci/php:7.4-node-browsers
@@ -133,10 +135,10 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - test-phpunit-dependencies-{{ checksum "composer.json" }}
+            - test-phpunit-74-dependencies-{{ checksum "composer.json" }}
       - run: composer install -n --prefer-dist
       - save_cache:
-          key: test-phpunit-dependencies-{{ checksum "composer.json" }}
+          key: test-phpunit-74-dependencies-{{ checksum "composer.json" }}
           paths:
             - vendor
       - run:
@@ -150,6 +152,87 @@ jobs:
             sudo docker-php-ext-enable imagick
             sudo docker-php-ext-install mysqli
             sudo apt-get install mariadb-client-10.5
+            yes '' | sudo pecl install redis || true
+            sudo docker-php-ext-enable redis
+      - run:
+          name: "Run Tests"
+          command: |
+            bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 latest
+            composer phpunit
+            WP_MULTISITE=1 composer phpunit
+            WP_REDIS_USE_CACHE_GROUPS=1 composer phpunit
+            rm -rf $WP_TESTS_DIR $WP_CORE_DIR
+            bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 nightly true
+            composer phpunit
+  test-phpunit-redis-disabled-82:
+    working_directory: ~/pantheon-systems/wp-redis
+    docker:
+      - image: cimg/php:8.2.0
+      - image: circleci/mariadb:10.3
+    environment:
+      - WP_TESTS_DIR: "/tmp/wordpress-tests-lib"
+      - WP_CORE_DIR: "/tmp/wordpress/"
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - test-phpunit-82-dependencies-{{ checksum "composer.json" }}
+      - run: composer install -n --prefer-dist
+      - save_cache:
+          key: test-phpunit-82-dependencies-{{ checksum "composer.json" }}
+          paths:
+            - vendor
+      - run:
+          name: "Install Extras"
+          command: |
+            sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4EB27DB2A3B88B8B
+            sudo apt-get update
+            sudo apt-get install subversion
+            sudo apt-get install -y libmagickwand-dev --no-install-recommends
+            yes '' | sudo pecl install imagick || true
+            sudo docker-php-ext-enable imagick
+            sudo docker-php-ext-install mysqli
+            sudo apt-get install mariadb-client-10.6
+      - run:
+          name: "Run Tests"
+          command: |
+            bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 latest
+            composer phpunit
+            WP_MULTISITE=1 composer phpunit
+            WP_REDIS_USE_CACHE_GROUPS=1 composer phpunit
+            rm -rf $WP_TESTS_DIR $WP_CORE_DIR
+            bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 nightly true
+            composer phpunit
+  test-phpunit-redis-enabled-82:
+    working_directory: ~/pantheon-systems/wp-redis
+    docker:
+      - image: cimg/php:8.2.0
+      - image: circleci/mariadb:10.3
+      - image: circleci/redis:latest
+    environment:
+      - WP_TESTS_DIR: "/tmp/wordpress-tests-lib"
+      - WP_CORE_DIR: "/tmp/wordpress/"
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - test-phpunit-82-dependencies-{{ checksum "composer.json" }}
+      - run: composer install -n --prefer-dist
+      - save_cache:
+          key: test-phpunit-82-dependencies-{{ checksum "composer.json" }}
+          paths:
+            - vendor
+      - run:
+          name: "Install Extras"
+          command: |
+            sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4EB27DB2A3B88B8B
+            sudo apt-get update
+            sudo apt-get install subversion
+            sudo apt-get install -y libmagickwand-dev --no-install-recommends
+            yes '' | sudo pecl install imagick || true
+            sudo docker-php-ext-enable imagick
+            sudo docker-php-ext-install mysqli
+            sudo apt-get install mariadb-client-10.6
             yes '' | sudo pecl install redis || true
             sudo docker-php-ext-enable redis
       - run:
