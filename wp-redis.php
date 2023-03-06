@@ -57,6 +57,10 @@ function wp_redis_get_info() {
 	}
 
 	if ( ! $wp_object_cache->is_redis_connected ) {
+		if ( ! isset( $wp_object_cache->missing_redis_message ) ) {
+			$wp_object_cache->missing_redis_message = 'A Redis service needs to be enabled before the WP Redis object cache will function properly.';
+		}
+
 		return new WP_Error( 'wp-redis', $wp_object_cache->missing_redis_message );
 	}
 
