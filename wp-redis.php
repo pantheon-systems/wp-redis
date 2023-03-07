@@ -53,12 +53,12 @@ function wp_redis_get_info() {
 	}
 
 	if ( ! defined( 'WP_REDIS_OBJECT_CACHE' ) || ! WP_REDIS_OBJECT_CACHE ) {
-		return new WP_Error( 'wp-redis', 'WP Redis object-cache.php file is missing from the wp-content/ directory.' );
+		return new WP_Error( 'wp-redis', __( 'WP Redis object-cache.php file is missing from the wp-content/ directory.', 'wp-redis' ) );
 	}
 
 	if ( ! $wp_object_cache->is_redis_connected ) {
 		if ( ! isset( $wp_object_cache->missing_redis_message ) ) {
-			$wp_object_cache->missing_redis_message = 'A Redis service needs to be enabled before the WP Redis object cache will function properly.';
+			$wp_object_cache->missing_redis_message = __( 'A Redis service needs to be enabled before the WP Redis object cache will function properly.', 'wp-redis' );
 		}
 
 		return new WP_Error( 'wp-redis', $wp_object_cache->missing_redis_message );
