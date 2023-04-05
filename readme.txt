@@ -1,5 +1,5 @@
 === WP Redis ===
-Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh
+Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh, jspellman, jazzs3quence
 Tags: cache, plugin, redis
 Requires at least: 3.0.1
 Tested up to: 6.2
