@@ -102,7 +102,7 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 
 == Changelog ==
 
-= 1.3.5 (April 5, 2023) =
+= 1.3.5 (April 6, 2023) =
 * Bump tested up to version to 6.2
 * Update Composer dependencies [[#394](https://github.com/pantheon-systems/wp-redis/pull/394)]
 
