@@ -1,9 +1,9 @@
 === WP Redis ===
-Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh
+Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh, jspellman, jazzs3quence
 Tags: cache, plugin, redis
 Requires at least: 3.0.1
-Tested up to: 6.1.1
-Stable tag: 1.3.4
+Tested up to: 6.2
+Stable tag: 1.3.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,10 @@ This declaration means use of `wp_cache_set( 'foo', 'bar', 'bad-actor' );` and `
 There's a known issue with WordPress `alloptions` cache design. Specifically, a race condition between two requests can cause the object cache to have stale values. If you think you might be impacted by this, [review this GitHub issue](https://github.com/pantheon-systems/wp-redis/issues/221) for links to more context, including a workaround.
 
 == Changelog ==
+
+= 1.3.5 (April 6, 2023) =
+* Bump tested up to version to 6.2
+* Update Composer dependencies [[#394](https://github.com/pantheon-systems/wp-redis/pull/394)]
 
 = 1.3.4 (March 7, 2023) =
 * Set `missing_redis_message` if Redis service is not connected [[#391](https://github.com/pantheon-systems/wp-redis/pull/391)].
