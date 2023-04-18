@@ -349,17 +349,15 @@ class WP_Object_Cache {
 	 * Amount of times the cache did not have the request in cache
 	 *
 	 * @var int
-	 * @access public
 	 */
 	public $cache_misses = 0;
 
 	/**
 	 * The amount of times a request was made to Redis
 	 *
-	 * @access private
 	 * @var int
 	 */
-	private $redis_calls = [];
+	public $redis_calls = [];
 
 	/**
 	 * List of global groups
