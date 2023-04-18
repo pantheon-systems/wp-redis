@@ -34,6 +34,12 @@
 		<exclude name="WordPress.DB.DirectDatabaseQuery.DirectQuery">
 			<file>/object-cache.php</file>
 		</exclude>
+
+		<!-- Rules we ignore for WP-CLI. -->
+		<!-- Function comments work differently for WP-CLI functions, so don't throw CS errors on them. -->
+		<exclude name="Squiz.Commenting.FunctionComment.MissingParamTag">
+			<file>/cli.php</file>
+		</exclude>
 	</rule>
 	<rule ref="PHPCompatibility"/>
 
