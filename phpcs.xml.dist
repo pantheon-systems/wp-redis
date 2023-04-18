@@ -9,10 +9,11 @@
 	<!-- Show progress and sniff codes in all reports -->
 	<arg value="ps"/>
 
+	<rule ref="Pantheon-WP" />
 	<rule ref="PHPCompatibility"/>
 
 	<!-- Minimum PHP and WP versions -->
-	<config name="testVersion" value="7.1-"/>
+	<config name="testVersion" value="7.3-"/>
 	<config name="minimum_supported_wp_version" value="4.6"/>
 
 	<exclude-pattern>*/bin/*</exclude-pattern>
