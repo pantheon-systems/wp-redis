@@ -363,33 +363,29 @@ class WP_Object_Cache {
 	 * List of global groups
 	 *
 	 * @var array
-	 * @access protected
 	 */
-	protected $global_groups = [];
+	public $global_groups = [];
 
 	/**
 	 * List of non-persistent groups
 	 *
 	 * @var array
-	 * @access protected
 	 */
-	protected $non_persistent_groups = [];
+	public $non_persistent_groups = [];
 
 	/**
 	 * List of groups which use Redis hashes.
 	 *
 	 * @var array
-	 * @access protected
 	 */
-	protected $redis_hash_groups = [];
+	public $redis_hash_groups = [];
 
 	/**
 	 * The blog prefix to prepend to keys in non-global groups.
 	 *
 	 * @var int
-	 * @access private
 	 */
-	private $blog_prefix;
+	public $blog_prefix;
 
 	/**
 	 * Whether or not Redis is connected
@@ -402,9 +398,8 @@ class WP_Object_Cache {
 	 * Whether or not the object cache thinks Redis needs a flush
 	 *
 	 * @var bool
-	 * @access private
 	 */
-	private $do_redis_failback_flush = false;
+	public $do_redis_failback_flush = false;
 
 	/**
 	 * The last triggered error
@@ -417,7 +412,6 @@ class WP_Object_Cache {
 	 * Whether or not to use true cache groups, instead of flattening.
 	 *
 	 * @var bool
-	 * @access private
 	 */
 	const USE_GROUPS = WP_REDIS_USE_CACHE_GROUPS;
 
