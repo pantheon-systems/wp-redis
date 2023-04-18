@@ -395,9 +395,8 @@ class WP_Object_Cache {
 	 * Whether or not Redis is connected
 	 *
 	 * @var bool
-	 * @access private
 	 */
-	private $is_redis_connected = false;
+	public $is_redis_connected = false;
 
 	/**
 	 * Whether or not the object cache thinks Redis needs a flush
