@@ -181,7 +181,7 @@ function wp_cache_init() {
 	global $wp_object_cache;
 
 	if ( ! ( $wp_object_cache instanceof WP_Object_Cache ) ) {
-		$wp_object_cache = new WP_Object_Cache;
+		$wp_object_cache = new WP_Object_Cache();
 	}
 }
 
@@ -335,7 +335,7 @@ class WP_Object_Cache {
 	 * @var array
 	 * @access private
 	 */
-	var $cache = array();
+	var $cache = [];
 
 	/**
 	 * The amount of times the cache data was already stored in the cache.
@@ -359,7 +359,7 @@ class WP_Object_Cache {
 	 * @access private
 	 * @var int
 	 */
-	var $redis_calls = array();
+	var $redis_calls = [];
 
 	/**
 	 * List of global groups
@@ -367,7 +367,7 @@ class WP_Object_Cache {
 	 * @var array
 	 * @access protected
 	 */
-	var $global_groups = array();
+	var $global_groups = [];
 
 	/**
 	 * List of non-persistent groups
@@ -375,7 +375,7 @@ class WP_Object_Cache {
 	 * @var array
 	 * @access protected
 	 */
-	var $non_persistent_groups = array();
+	var $non_persistent_groups = [];
 
 	/**
 	 * List of groups which use Redis hashes.
@@ -383,7 +383,7 @@ class WP_Object_Cache {
 	 * @var array
 	 * @access protected
 	 */
-	var $redis_hash_groups = array();
+	var $redis_hash_groups = [];
 
 	/**
 	 * The blog prefix to prepend to keys in non-global groups.
@@ -629,7 +629,7 @@ class WP_Object_Cache {
 	 * @return bool Always returns true
 	 */
 	public function flush( $redis = true ) {
-		$this->cache = array();
+		$this->cache = [];
 		if ( $redis ) {
 			$this->_call_redis( 'flushdb' );
 		}
@@ -711,7 +711,7 @@ class WP_Object_Cache {
 			$group = 'default';
 		}
 
-		$cache = array();
+		$cache = [];
 		if ( ! $this->_should_persist( $group ) ) {
 			foreach ( $keys as $key ) {
 				$cache[ $key ] = $this->_isset_internal( $key, $group ) ? $this->_get_internal( $key, $group ) : false;
@@ -739,7 +739,7 @@ class WP_Object_Cache {
 			$results          = $this->_call_redis( 'hmGet', $redis_safe_group, $remaining_keys );
 			$results          = is_array( $results ) ? array_values( $results ) : $results;
 		} else {
-			$ids = array();
+			$ids = [];
 			foreach ( $remaining_keys as $key ) {
 				$ids[] = $this->_key( $key, $group );
 			}
@@ -759,7 +759,7 @@ class WP_Object_Cache {
 			$cache[ $key ] = $value;
 		}
 		// Make sure return values are returned in the order of the passed keys.
-		$return_cache = array();
+		$return_cache = [];
 		foreach ( $keys as $key ) {
 			$return_cache[ $key ] = isset( $cache[ $key ] ) ? $cache[ $key ] : false;
 		}
@@ -826,6 +826,7 @@ class WP_Object_Cache {
 
 	/**
 	 * Replace the contents in the cache, if contents already exist
+	 *
 	 * @see WP_Object_Cache::set()
 	 *
 	 * @param int|string $key What to call the contents in the cache
@@ -922,7 +923,7 @@ class WP_Object_Cache {
 		foreach ( $this->redis_calls as $method => $calls ) {
 			$total_redis_calls += $calls;
 		}
-		$out   = array();
+		$out   = [];
 		$out[] = '<p>';
 		$out[] = '<strong>Cache Hits:</strong>' . (int) $this->cache_hits . '<br />';
 		$out[] = '<strong>Cache Misses:</strong>' . (int) $this->cache_misses . '<br />';
@@ -1030,7 +1031,7 @@ class WP_Object_Cache {
 		if ( $this->_should_use_redis_hashes( $group ) ) {
 			$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
 			if ( ! isset( $this->cache[ $multisite_safe_group ] ) ) {
-				$this->cache[ $multisite_safe_group ] = array();
+				$this->cache[ $multisite_safe_group ] = [];
 			}
 			$this->cache[ $multisite_safe_group ][ $key ] = $value;
 		} else {
@@ -1109,7 +1110,7 @@ class WP_Object_Cache {
 	protected function _connect_redis() {
 		global $redis_server;
 
-		$check_dependencies = array( $this, 'check_client_dependencies' );
+		$check_dependencies = [ $this, 'check_client_dependencies' ];
 		/**
 		 * Permits alternate dependency check mechanism to be used.
 		 *
@@ -1125,34 +1126,34 @@ class WP_Object_Cache {
 		$client_parameters = $this->build_client_parameters( $redis_server );
 
 		try {
-			$client_connection = array( $this, 'prepare_client_connection' );
+			$client_connection = [ $this, 'prepare_client_connection' ];
 			/**
 			 * Permits alternate initial client connection mechanism to be used.
 			 *
 			 * @param callable $client_connection Callback to execute.
 			 */
 			$client_connection = apply_filters( 'wp_redis_prepare_client_connection_callback', $client_connection );
-			$this->redis       = call_user_func_array( $client_connection, array( $client_parameters ) );
+			$this->redis       = call_user_func_array( $client_connection, [ $client_parameters ] );
 		} catch ( Exception $e ) {
 			$this->_exception_handler( $e );
 			$this->is_redis_connected = false;
 			return $this->is_redis_connected;
 		}
 
-		$keys_methods = array(
+		$keys_methods = [
 			'auth'     => 'auth',
 			'database' => 'select',
-		);
+		];
 
 		try {
-			$setup_connection = array( $this, 'perform_client_connection' );
+			$setup_connection = [ $this, 'perform_client_connection' ];
 			/**
 			 * Permits alternate setup client connection mechanism to be used.
 			 *
 			 * @param callable $setup_connection Callback to execute.
 			 */
 			$setup_connection = apply_filters( 'wp_redis_perform_client_connection_callback', $setup_connection );
-			call_user_func_array( $setup_connection, array( $this->redis, $client_parameters, $keys_methods ) );
+			call_user_func_array( $setup_connection, [ $this->redis, $client_parameters, $keys_methods ] );
 		} catch ( Exception $e ) {
 			$this->_exception_handler( $e );
 			$this->is_redis_connected = false;
@@ -1191,34 +1192,34 @@ class WP_Object_Cache {
 		if ( empty( $redis_server ) ) {
 			// Attempt to automatically load Pantheon's Redis config from the env.
 			if ( isset( $_SERVER['CACHE_HOST'] ) ) {
-				$redis_server = array(
+				$redis_server = [
 					'host'     => $_SERVER['CACHE_HOST'],
 					'port'     => $_SERVER['CACHE_PORT'],
 					'auth'     => $_SERVER['CACHE_PASSWORD'],
 					'database' => isset( $_SERVER['CACHE_DB'] ) ? $_SERVER['CACHE_DB'] : 0,
-				);
+				];
 			} else {
-				$redis_server = array(
+				$redis_server = [
 					'host'     => '127.0.0.1',
 					'port'     => 6379,
 					'database' => 0,
-				);
+				];
 			}
 		}
 
-		if ( file_exists( $redis_server['host'] ) && 'socket' === filetype( $redis_server['host'] ) ) { //unix socket connection
-			//port must be null or socket won't connect
+		if ( file_exists( $redis_server['host'] ) && 'socket' === filetype( $redis_server['host'] ) ) { // unix socket connection
+			// port must be null or socket won't connect
 			$port = null;
-		} else { //tcp connection
+		} else { // tcp connection
 			$port = ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379;
 		}
 
-		$defaults = array(
+		$defaults = [
 			'host'           => $redis_server['host'],
 			'port'           => $port,
 			'timeout'        => 1000, // I multiplied this by 1000 so we'd have a common measure of ms instead of s and ms, need to make sure this gets divided by 1000
 			'retry_interval' => 100,
-		);
+		];
 		// 1s timeout, 100ms delay between reconnections
 
 		// merging the defaults with the original $redis_server enables any
@@ -1234,9 +1235,9 @@ class WP_Object_Cache {
 	 */
 	public function prepare_client_connection( $client_parameters ) {
 		if ( defined( 'WP_REDIS_USE_RELAY' ) && WP_REDIS_USE_RELAY ) {
-			$redis = new Relay\Relay;
+			$redis = new Relay\Relay();
 		} else {
-			$redis = new Redis;
+			$redis = new Redis();
 		}
 
 		$redis->connect(
@@ -1302,7 +1303,7 @@ class WP_Object_Cache {
 					$this->redis_calls[ $method ] = 0;
 				}
 				$this->redis_calls[ $method ]++;
-				$retval = call_user_func_array( array( $this->redis, $method ), $arguments );
+				$retval = call_user_func_array( [ $this->redis, $method ], $arguments );
 				return $retval;
 			} catch ( Exception $e ) {
 				$retry_exception_messages = $this->retry_exception_messages();
@@ -1315,7 +1316,7 @@ class WP_Object_Cache {
 					// Attempt to refresh the connection if it was successfully established once
 					// $this->is_redis_connected will be set inside _connect_redis()
 					if ( $this->_connect_redis() ) {
-						return call_user_func_array( array( $this, '_call_redis' ), array_merge( array( $method ), $arguments ) );
+						return call_user_func_array( [ $this, '_call_redis' ], array_merge( [ $method ], $arguments ) );
 					}
 					// Fall through to fallback below
 				} else {
@@ -1379,7 +1380,7 @@ class WP_Object_Cache {
 	 * @return array Array of expected exception messages
 	 */
 	public function retry_exception_messages() {
-		$retry_exception_messages = array( 'socket error on read socket', 'Connection closed', 'Redis server went away' );
+		$retry_exception_messages = [ 'socket error on read socket', 'Connection closed', 'Redis server went away' ];
 		return apply_filters( 'wp_redis_retry_exception_messages', $retry_exception_messages );
 	}
 
@@ -1470,7 +1471,7 @@ class WP_Object_Cache {
 		$this->blog_prefix = $this->multisite ? $blog_id . ':' : '';
 
 		if ( ! $this->_connect_redis() && function_exists( 'add_action' ) ) {
-			add_action( 'admin_notices', array( $this, 'wp_action_admin_notices_warn_missing_redis' ) );
+			add_action( 'admin_notices', [ $this, 'wp_action_admin_notices_warn_missing_redis' ] );
 		}
 
 		if ( $this->is_redis_failback_flush_enabled() && ! empty( $wpdb ) ) {
@@ -1503,7 +1504,7 @@ class WP_Object_Cache {
 		 * @todo This should be moved to the PHP4 style constructor, PHP5
 		 * already calls __destruct()
 		 */
-		register_shutdown_function( array( $this, '__destruct' ) );
+		register_shutdown_function( [ $this, '__destruct' ] );
 	}
 
 	/**

@@ -12,21 +12,21 @@ class WP_Redis_CLI_Command {
 		global $redis_server;
 
 		if ( empty( $redis_server ) ) {
-			# Attempt to automatically load Pantheon's Redis config from the env.
+			// Attempt to automatically load Pantheon's Redis config from the env.
 			if ( isset( $_SERVER['CACHE_HOST'] ) ) {
-				$redis_server = array(
+				$redis_server = [
 					'host'     => $_SERVER['CACHE_HOST'],
 					'port'     => $_SERVER['CACHE_PORT'],
 					'auth'     => $_SERVER['CACHE_PASSWORD'],
 					'database' => isset( $_SERVER['CACHE_DB'] ) ? $_SERVER['CACHE_DB'] : 0,
-				);
+				];
 			} else {
-				$redis_server = array(
+				$redis_server = [
 					'host'     => '127.0.0.1',
 					'port'     => 6379,
 					'auth'     => '',
 					'database' => 0,
-				);
+				];
 			}
 		}
 
@@ -35,7 +35,7 @@ class WP_Redis_CLI_Command {
 		}
 
 		$cmd     = WP_CLI\Utils\esc_cmd( 'redis-cli -h %s -p %s -a %s -n %s', $redis_server['host'], $redis_server['port'], $redis_server['auth'], $redis_server['database'] );
-		$process = WP_CLI\Utils\proc_open_compat( $cmd, array( STDIN, STDOUT, STDERR ), $pipes );
+		$process = WP_CLI\Utils\proc_open_compat( $cmd, [ STDIN, STDOUT, STDERR ], $pipes );
 		$r       = proc_close( $process );
 		exit( (int) $r );
 	}
@@ -56,11 +56,11 @@ class WP_Redis_CLI_Command {
 	public function debug( $_, $assoc_args ) {
 		global $wp_object_cache;
 		$this->load_wordpress_with_template();
-		$data = array(
+		$data = [
 			'cache_hits'   => $wp_object_cache->cache_hits,
 			'cache_misses' => $wp_object_cache->cache_misses,
 			'redis_calls'  => $wp_object_cache->redis_calls,
-		);
+		];
 		WP_CLI::print_value( $data, $assoc_args );
 	}
 
@@ -168,7 +168,7 @@ class WP_Redis_CLI_Command {
 		// Set up the main WordPress query.
 		wp();
 
-		$interpreted = array();
+		$interpreted = [];
 		foreach ( $wp_query as $key => $value ) {
 			if ( 0 === stripos( $key, 'is_' ) && $value ) {
 				$interpreted[] = $key;
@@ -196,7 +196,7 @@ class WP_Redis_CLI_Command {
 
 		// Load the theme template.
 		ob_start();
-		require_once( ABSPATH . WPINC . '/template-loader.php' );
+		require_once ABSPATH . WPINC . '/template-loader.php';
 		ob_get_clean();
 	}
 
