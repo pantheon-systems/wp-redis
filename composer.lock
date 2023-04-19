@@ -1192,12 +1192,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pantheon-systems/pantheon-wordpress-upstream-tests.git",
-                "reference": "827142b9b6483687c9f4101f0649f7112683cbac"
+                "reference": "601f031df3d948ac58ad0f2bf800732285bb0c0c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pantheon-systems/pantheon-wordpress-upstream-tests/zipball/827142b9b6483687c9f4101f0649f7112683cbac",
-                "reference": "827142b9b6483687c9f4101f0649f7112683cbac",
+                "url": "https://api.github.com/repos/pantheon-systems/pantheon-wordpress-upstream-tests/zipball/601f031df3d948ac58ad0f2bf800732285bb0c0c",
+                "reference": "601f031df3d948ac58ad0f2bf800732285bb0c0c",
                 "shasum": ""
             },
             "require": {
@@ -1222,7 +1222,7 @@
                 "issues": "https://github.com/pantheon-systems/pantheon-wordpress-upstream-tests/issues",
                 "source": "https://github.com/pantheon-systems/pantheon-wordpress-upstream-tests/tree/fix-behat-upstream-tests"
             },
-            "time": "2023-04-19T17:03:10+00:00"
+            "time": "2023-04-19T17:12:49+00:00"
         },
         {
             "name": "pantheon-systems/pantheon-wp-coding-standards",
