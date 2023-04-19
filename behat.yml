@@ -7,15 +7,6 @@ default:
       contexts:
         - Behat\MinkExtension\Context\MinkContext
         - PantheonSystems\PantheonWordPressUpstreamTests\Behat\AdminLogIn
-    core:
-      filters:
-        tags: "~@upstreamonly"
-      paths:
-        - vendor/pantheon-systems/pantheon-wordpress-upstream-tests/features
-      contexts:
-        - Behat\MinkExtension\Context\MinkContext
-        - PantheonSystems\PantheonWordPressUpstreamTests\Behat\AdminLogIn
-        - PantheonSystems\PantheonWordPressUpstreamTests\Behat\ResponseHeader
   extensions:
     Behat\MinkExtension:
       # base_url set by ENV
