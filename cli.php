@@ -21,7 +21,7 @@ class WP_Redis_CLI_Command {
 					'host' => sanitize_text_field( $_SERVER['CACHE_HOST'] ),
 					'port' => sanitize_text_field( $_SERVER['CACHE_PORT'] ),
 					'auth' => sanitize_text_field( $_SERVER['CACHE_PASSWORD'] ),
-					'database' => sanitize_text_field( $_SERVER['CACHE_DB'] ),
+					'database' => isset( $_SERVER['CACHE_DB'] ) ? sanitize_text_field( $_SERVER['CACHE_DB'] ) : 0,
 				];
 			} else {
 				$redis_server = [
