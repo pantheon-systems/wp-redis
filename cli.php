@@ -16,7 +16,7 @@ class WP_Redis_CLI_Command {
 
 		if ( empty( $redis_server ) ) {
 			// Attempt to automatically load Pantheon's Redis config from the env.
-			if ( isset( $_SERVER['CACHE_HOST'] ) && isset( $_SERVER['CACHE_PORT'] ) && isset( $_SERVER['CACHE_PASSWORD'] ) && isset( $_SERVER['CACHE_DB'] ) ) {
+			if ( isset( $_SERVER['CACHE_HOST'] ) ) {
 				$redis_server = [
 					'host' => sanitize_text_field( $_SERVER['CACHE_HOST'] ),
 					'port' => sanitize_text_field( $_SERVER['CACHE_PORT'] ),
