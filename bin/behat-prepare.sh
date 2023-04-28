@@ -32,7 +32,6 @@ terminus env:wipe $SITE_ENV --yes
 
 # Enable Redis
 terminus redis:enable $TERMINUS_SITE
-terminus build:workflow:wait $SITE_ENV
 
 ###
 # Get all necessary environment details.
