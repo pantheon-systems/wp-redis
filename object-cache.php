@@ -1186,7 +1186,7 @@ class WP_Object_Cache {
 			// Attempt to automatically load Pantheon's Redis config from the env.
 			if ( isset( $_SERVER['CACHE_HOST'] ) ) {
 				$redis_server = [
-					'host' => isset( $_SERVER['CACHE_HOST'] ) ? sanitize_text_field( $_SERVER['CACHE_HOST'] ) : 0,
+					'host' => sanitize_text_field( $_SERVER['CACHE_HOST'] ),
 					'port' => isset( $_SERVER['CACHE_PORT'] ) ? sanitize_text_field( $_SERVER['CACHE_PORT'] ) : 0,
 					'auth' => isset( $_SERVER['CACHE_PASSWORD'] ) ? sanitize_text_field( $_SERVER['CACHE_PASSWORD'] ) : 0,
 					'database' => isset( $_SERVER['CACHE_DB'] ) ? sanitize_text_field( $_SERVER['CACHE_DB'] ) : 0,
