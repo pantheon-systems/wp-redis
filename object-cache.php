@@ -1186,10 +1186,10 @@ class WP_Object_Cache {
 			// Attempt to automatically load Pantheon's Redis config from the env.
 			if ( isset( $_SERVER['CACHE_HOST'] ) ) {
 				$redis_server = [
-					'host' => sanitize_text_field( $_SERVER['CACHE_HOST'] ),
-					'port' => isset( $_SERVER['CACHE_PORT'] ) ? sanitize_text_field( $_SERVER['CACHE_PORT'] ) : 0,
-					'auth' => isset( $_SERVER['CACHE_PASSWORD'] ) ? sanitize_text_field( $_SERVER['CACHE_PASSWORD'] ) : 0,
-					'database' => isset( $_SERVER['CACHE_DB'] ) ? sanitize_text_field( $_SERVER['CACHE_DB'] ) : 0,
+					'host' => wp_strip_all_tags( $_SERVER['CACHE_HOST'] ),
+					'port' => isset( $_SERVER['CACHE_PORT'] ) ? wp_strip_all_tags( $_SERVER['CACHE_PORT'] ) : 0,
+					'auth' => isset( $_SERVER['CACHE_PASSWORD'] ) ? wp_strip_all_tags( $_SERVER['CACHE_PASSWORD'] ) : '',
+					'database' => isset( $_SERVER['CACHE_DB'] ) ? wp_strip_all_tags( $_SERVER['CACHE_DB'] ) : 0,
 				];
 			} else {
 				$redis_server = [
