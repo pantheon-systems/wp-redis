@@ -89,7 +89,8 @@ echo "Installing WordPress..."
 	terminus wp $SITE_ENV -- core install --title=$TERMINUS_ENV-$TERMINUS_SITE --url=$PANTHEON_SITE_URL --admin_user=$WORDPRESS_ADMIN_USERNAME --admin_email=wp-redis@getpantheon.com --admin_password=$WORDPRESS_ADMIN_PASSWORD
 } &> /dev/null
 # Enable Redis
-terminus redis:enable $SITE_ENV
+terminus redis:enable $TERMINUS_SITE
+terminus build:workflow:wait $SITE_ENV
 terminus wp $SITE_ENV -- plugin activate wp-redis
 terminus wp $SITE_ENV -- redis enable
 
