@@ -85,7 +85,8 @@ terminus build:workflow:wait $TERMINUS_SITE.$TERMINUS_ENV
 ###
 # Silence output so as not to show the password.
 echo "Installing WordPress..."
-  terminus wp $SITE_ENV -- core install --title=$TERMINUS_ENV-$TERMINUS_SITE --url=$PANTHEON_SITE_URL --admin_user=$WORDPRESS_ADMIN_USERNAME --admin_email=wp-redis@getpantheon.com --admin_password=$WORDPRESS_ADMIN_PASSWORD &> /dev/null
+# Hide the output of the terminus command from the prompt
+{ terminus wp $SITE_ENV -- core install --title=$TERMINUS_ENV-$TERMINUS_SITE --url=$PANTHEON_SITE_URL --admin_user=$WORDPRESS_ADMIN_USERNAME --admin_email=wp-redis@getpantheon.com --admin_password=$WORDPRESS_ADMIN_PASSWORD } > /dev/null
 echo "Flush cache and setup environment..."
 terminus wp $SITE_ENV -- cache flush
 terminus wp $SITE_ENV -- plugin activate wp-redis classic-editor
