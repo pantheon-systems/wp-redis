@@ -105,6 +105,7 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 ## Changelog ##
 
 ### Latest ###
+* Update Composer dependencies [[#401](https://github.com/pantheon-systems/wp-redis/pull/394)]
 
 ### 1.3.5 (April 6, 2023) ###
 * Bump tested up to version to 6.2
