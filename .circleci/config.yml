@@ -96,7 +96,7 @@ jobs:
       - restore_cache:
           keys:
             - test-phpunit-74-dependencies-{{ checksum "composer.json" }}
-      - run: composer install -n --prefer-dist
+      - run: composer update && composer install -n --prefer-dist
       - save_cache:
           key: test-phpunit-74-dependencies-{{ checksum "composer.json" }}
           paths:
@@ -136,7 +136,7 @@ jobs:
       - restore_cache:
           keys:
             - test-phpunit-74-dependencies-{{ checksum "composer.json" }}
-      - run: composer install -n --prefer-dist
+      - run: composer update && composer install -n --prefer-dist
       - save_cache:
           key: test-phpunit-74-dependencies-{{ checksum "composer.json" }}
           paths:
