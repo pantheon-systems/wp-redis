@@ -90,7 +90,9 @@ terminus build:workflow:wait $TERMINUS_SITE.$TERMINUS_ENV
 {
   terminus wp $SITE_ENV -- core install --title=$TERMINUS_ENV-$TERMINUS_SITE --url=$PANTHEON_SITE_URL --admin_user=$WORDPRESS_ADMIN_USERNAME --admin_email=wp-redis@getpantheon.com --admin_password=$WORDPRESS_ADMIN_PASSWORD
 } &> /dev/null
-terminus wp $SITE_ENV -- cache flush
+
+echo "Flush cache and setup environment..."
 terminus wp $SITE_ENV -- plugin activate wp-redis classic-editor
+terminus wp $SITE_ENV -- cache flush
 terminus wp $SITE_ENV -- theme activate twentyseventeen
 terminus wp $SITE_ENV -- rewrite structure '/%year%/%monthnum%/%day%/%postname%/'
