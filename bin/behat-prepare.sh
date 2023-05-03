@@ -92,7 +92,6 @@ echo "Installing WordPress..."
 	terminus wp $SITE_ENV -- core install --title=$TERMINUS_ENV-$TERMINUS_SITE --url=$PANTHEON_SITE_URL --admin_user=$WORDPRESS_ADMIN_USERNAME --admin_email=wp-redis@getpantheon.com --admin_password=$WORDPRESS_ADMIN_PASSWORD
 } &> /dev/null
 
-
 echo "Flush cache and setup environment..."
 terminus wp $SITE_ENV -- plugin activate wp-redis classic-editor
 terminus wp $SITE_ENV -- cache flush
