@@ -105,6 +105,7 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 ## Changelog ##
 
 ### Latest ###
+* Add support for `flush_runtime` and `flush_group` functions [[#405](https://github.com/pantheon-systems/wp-redis/pull/405)]
 * Update Composer dependencies [[#401](https://github.com/pantheon-systems/wp-redis/pull/394)]
 
 ### 1.3.5 (April 6, 2023) ###
