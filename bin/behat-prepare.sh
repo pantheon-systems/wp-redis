@@ -86,9 +86,10 @@ terminus build:workflow:wait $TERMINUS_SITE.$TERMINUS_ENV
 ###
 # Set up WordPress, theme, and plugins for the test run
 ###
+echo "Installing WordPress..."
 # Silence output so as not to show the password.
 {
-  terminus wp $SITE_ENV -- core install --title=$TERMINUS_ENV-$TERMINUS_SITE --url=$PANTHEON_SITE_URL --admin_user=$WORDPRESS_ADMIN_USERNAME --admin_email=wp-redis@getpantheon.com --admin_password=$WORDPRESS_ADMIN_PASSWORD
+	terminus wp $SITE_ENV -- core install --title=$TERMINUS_ENV-$TERMINUS_SITE --url=$PANTHEON_SITE_URL --admin_user=$WORDPRESS_ADMIN_USERNAME --admin_email=wp-redis@getpantheon.com --admin_password=$WORDPRESS_ADMIN_PASSWORD
 } &> /dev/null
 
 echo "Flush cache and setup environment..."

@@ -23,25 +23,25 @@ class CacheTest extends WP_UnitTestCase {
 
 	private static $flush_all_key;
 
-	private static $client_parameters = array(
+	private static $client_parameters = [
 		'host'           => 'localhost',
 		'port'           => 6379,
 		'timeout'        => 1000,
 		'retry_interval' => 100,
-	);
+	];
 
 	public function setUp(): void {
 		parent::setUp();
-		$GLOBALS['redis_server'] = array(
+		$GLOBALS['redis_server'] = [
 			'host' => '127.0.0.1',
 			'port' => 6379,
-		);
+		];
 		// create two cache objects with a shared cache dir
 		// this simulates a typical cache situation, two separate requests interacting
 		$this->cache               =& $this->init_cache();
 		$this->cache->cache_hits   = 0;
 		$this->cache->cache_misses = 0;
-		$this->cache->redis_calls  = array();
+		$this->cache->redis_calls  = [];
 
 		self::$exists_key  = WP_Object_Cache::USE_GROUPS ? 'hExists' : 'exists';
 		self::$get_key     = WP_Object_Cache::USE_GROUPS ? 'hGet' : 'get';
@@ -57,7 +57,7 @@ class CacheTest extends WP_UnitTestCase {
 
 	public function &init_cache() {
 		$cache = new WP_Object_Cache();
-		$cache->add_global_groups( array( 'global-cache-test', 'users', 'userlogins', 'usermeta', 'user_meta', 'site-transient', 'site-options', 'site-lookup', 'blog-lookup', 'blog-details', 'rss', 'global-posts', 'blog-id-cache' ) );
+		$cache->add_global_groups( [ 'global-cache-test', 'users', 'userlogins', 'usermeta', 'user_meta', 'site-transient', 'site-options', 'site-lookup', 'blog-lookup', 'blog-details', 'rss', 'global-posts', 'blog-id-cache' ] );
 		return $cache;
 	}
 
@@ -66,24 +66,24 @@ class CacheTest extends WP_UnitTestCase {
 	}
 
 	public function test_connection_details() {
-		$redis_server = array(
+		$redis_server = [
 			'host'      => '127.0.0.1',
 			'port'      => 6379,
 			'extra'     => true,
-			'recursive' => array(
+			'recursive' => [
 				'child' => true,
-			),
-		);
-		$expected     = array(
+			],
+		];
+		$expected     = [
 			'host'           => '127.0.0.1',
 			'port'           => 6379,
 			'extra'          => true,
-			'recursive'      => array(
+			'recursive'      => [
 				'child' => true,
-			),
+			],
 			'timeout'        => 1000,
 			'retry_interval' => 100,
-		);
+		];
 		$actual       = $this->cache->build_client_parameters( $redis_server );
 		$this->assertEquals( $expected, $actual );
 	}
@@ -147,8 +147,8 @@ class CacheTest extends WP_UnitTestCase {
 		$redis_server['host'] = '127.0.0.1';
 		$redis_server['port'] = 9999;
 		$client_parameters    = $this->cache->build_client_parameters( $redis_server );
-		$client_connection    = apply_filters( 'wp_redis_prepare_client_connection_callback', array( $this->cache, 'prepare_client_connection' ) );
-		$this->cache->redis   = call_user_func_array( $client_connection, array( $client_parameters ) );
+		$client_connection    = apply_filters( 'wp_redis_prepare_client_connection_callback', [ $this->cache, 'prepare_client_connection' ] );
+		$this->cache->redis   = call_user_func_array( $client_connection, [ $client_parameters ] );
 		// Setting cache value when redis connection fails saves wakeup flush
 		$this->cache->set( 'foo', 'bar' );
 		$this->assertTrue(
@@ -191,7 +191,7 @@ class CacheTest extends WP_UnitTestCase {
 		$redis_server['host'] = '127.0.0.1';
 		$redis_server['port'] = 9999;
 		$redis_server['auth'] = 'foobar';
-		$cache                = new WP_Object_Cache;
+		$cache                = new WP_Object_Cache();
 		$this->assertTrue(
 			$cache->exception_message_matches(
 				str_replace( 'WP Redis: ', '', $cache->last_triggered_error ),
@@ -210,9 +210,9 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 1, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$get_key => 1,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -230,10 +230,10 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$exists_key => 1,
 					self::$set_key    => 1,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -252,10 +252,10 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$exists_key => 1,
 					self::$set_key    => 1,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -273,10 +273,10 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$exists_key => 1,
 					self::$set_key    => 1,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -299,10 +299,10 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$exists_key => 1,
 					self::$set_key    => 1,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -324,11 +324,11 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( $val2, $this->cache->get( $key ) );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$exists_key => 2,
 					self::$set_key    => 2,
 					self::$get_key    => 1,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -351,9 +351,9 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$set_key => 2,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -378,12 +378,12 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 1, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$exists_key    => 1,
 					self::$set_key       => 1,
 					self::$get_key       => 1,
 					self::$flush_all_key => 1,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -394,7 +394,7 @@ class CacheTest extends WP_UnitTestCase {
 	// Make sure objects are cloned going to and from the cache
 	public function test_object_refs() {
 		$key           = rand_str();
-		$object_a      = new stdClass;
+		$object_a      = new stdClass();
 		$object_a->foo = 'alpha';
 		$this->cache->set( $key, $object_a );
 		$object_a->foo = 'bravo';
@@ -404,7 +404,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 'bravo', $object_a->foo );
 
 		$key           = rand_str();
-		$object_a      = new stdClass;
+		$object_a      = new stdClass();
 		$object_a->foo = 'alpha';
 		$this->cache->add( $key, $object_a );
 		$object_a->foo = 'bravo';
@@ -419,15 +419,15 @@ class CacheTest extends WP_UnitTestCase {
 		$this->cache->set( $key, 'alpha' );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$set_key => 1,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
 		}
-		$this->cache->redis_calls = array(); // reset to limit scope of test
+		$this->cache->redis_calls = []; // reset to limit scope of test
 		$this->assertEquals( 'alpha', $this->cache->get( $key ) );
 		$this->assertEquals( 1, $this->cache->cache_hits );
 		$this->assertEquals( 0, $this->cache->cache_misses );
@@ -444,9 +444,9 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 2, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$get_key => 2,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -485,8 +485,8 @@ class CacheTest extends WP_UnitTestCase {
 		$this->cache->set( $key, false );
 		$this->cache->cache_hits   = 0; // reset everything
 		$this->cache->cache_misses = 0; // reset everything
-		$this->cache->redis_calls  = array(); // reset everything
-		$this->cache->cache        = array(); // reset everything
+		$this->cache->redis_calls  = []; // reset everything
+		$this->cache->cache        = []; // reset everything
 		$found                     = null;
 		$this->assertFalse( $this->cache->get( $key, 'default', false, $found ) );
 		$this->assertTrue( $found );
@@ -494,9 +494,9 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$get_key => 1,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -512,8 +512,8 @@ class CacheTest extends WP_UnitTestCase {
 		$this->cache->set( $key, true );
 		$this->cache->cache_hits   = 0; // reset everything
 		$this->cache->cache_misses = 0; // reset everything
-		$this->cache->redis_calls  = array(); // reset everything
-		$this->cache->cache        = array(); // reset everything
+		$this->cache->redis_calls  = []; // reset everything
+		$this->cache->cache        = []; // reset everything
 		$found                     = null;
 		$this->assertTrue( $this->cache->get( $key, 'default', false, $found ) );
 		$this->assertTrue( $found );
@@ -521,9 +521,9 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$get_key => 1,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -539,8 +539,8 @@ class CacheTest extends WP_UnitTestCase {
 		$this->cache->set( $key, null );
 		$this->cache->cache_hits   = 0; // reset everything
 		$this->cache->cache_misses = 0; // reset everything
-		$this->cache->redis_calls  = array(); // reset everything
-		$this->cache->cache        = array(); // reset everything
+		$this->cache->redis_calls  = []; // reset everything
+		$this->cache->cache        = []; // reset everything
 		$found                     = null;
 		$this->assertNull( $this->cache->get( $key, 'default', false, $found ) );
 		$this->assertTrue( $found );
@@ -548,9 +548,9 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$get_key => 1,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -568,8 +568,8 @@ class CacheTest extends WP_UnitTestCase {
 		$this->cache->set( $key2, 0xf4c3b00c );
 		$this->cache->cache_hits   = 0; // reset everything
 		$this->cache->cache_misses = 0; // reset everything
-		$this->cache->redis_calls  = array(); // reset everything
-		$this->cache->cache        = array(); // reset everything
+		$this->cache->redis_calls  = []; // reset everything
+		$this->cache->cache        = []; // reset everything
 		// Should be upgraded to more strict comparison if change proposed in issue #181 is merged.
 		$this->assertSame( 123, $this->cache->get( $key1 ) );
 		$this->assertSame( 4106465292, $this->cache->get( $key2 ) );
@@ -577,9 +577,9 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$get_key => 2,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -597,17 +597,17 @@ class CacheTest extends WP_UnitTestCase {
 		$this->cache->set( $key2, + 0123.45e6 );
 		$this->cache->cache_hits   = 0; // reset everything
 		$this->cache->cache_misses = 0; // reset everything
-		$this->cache->redis_calls  = array(); // reset everything
-		$this->cache->cache        = array(); // reset everything
+		$this->cache->redis_calls  = []; // reset everything
+		$this->cache->cache        = []; // reset everything
 		$this->assertSame( 123.456, $this->cache->get( $key1 ) );
 		$this->assertSame( 123450000.0, $this->cache->get( $key2 ) );
 		$this->assertEquals( 2, $this->cache->cache_hits );
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$get_key => 2,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -630,8 +630,8 @@ class CacheTest extends WP_UnitTestCase {
 		$this->cache->set( $key4, '+0123.45e6' );
 		$this->cache->cache_hits   = 0; // reset everything
 		$this->cache->cache_misses = 0; // reset everything
-		$this->cache->redis_calls  = array(); // reset everything
-		$this->cache->cache        = array(); // reset everything
+		$this->cache->redis_calls  = []; // reset everything
+		$this->cache->cache        = []; // reset everything
 		$this->assertEquals( 'a plain old string', $this->cache->get( $key1 ) );
 		$this->assertSame( '42', $this->cache->get( $key2 ) );
 		$this->assertSame( '123.456', $this->cache->get( $key3 ) );
@@ -640,9 +640,9 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$get_key => 4,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -655,20 +655,20 @@ class CacheTest extends WP_UnitTestCase {
 			$this->markTestSkipped( 'PHPRedis extension not available.' );
 		}
 		$key   = rand_str();
-		$value = array( 'one', 2, true );
+		$value = [ 'one', 2, true ];
 		$this->cache->set( $key, $value );
 		$this->cache->cache_hits   = 0; // reset everything
 		$this->cache->cache_misses = 0; // reset everything
-		$this->cache->redis_calls  = array(); // reset everything
-		$this->cache->cache        = array(); // reset everything
+		$this->cache->redis_calls  = []; // reset everything
+		$this->cache->cache        = []; // reset everything
 		$this->assertEquals( $value, $this->cache->get( $key ) );
 		$this->assertEquals( 1, $this->cache->cache_hits );
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$get_key => 1,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -681,22 +681,22 @@ class CacheTest extends WP_UnitTestCase {
 			$this->markTestSkipped( 'PHPRedis extension not available.' );
 		}
 		$key          = rand_str();
-		$value        = new stdClass;
+		$value        = new stdClass();
 		$value->one   = 'two';
 		$value->three = 'four';
 		$this->cache->set( $key, $value );
 		$this->cache->cache_hits   = 0; // reset everything
 		$this->cache->cache_misses = 0; // reset everything
-		$this->cache->redis_calls  = array(); // reset everything
-		$this->cache->cache        = array(); // reset everything
+		$this->cache->redis_calls  = []; // reset everything
+		$this->cache->cache        = []; // reset everything
 		$this->assertEquals( $value, $this->cache->get( $key ) );
 		$this->assertEquals( 1, $this->cache->cache_hits );
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$get_key => 1,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -719,7 +719,7 @@ class CacheTest extends WP_UnitTestCase {
 		if ( WP_Object_Cache::USE_GROUPS ) {
 			$multisite_safe_group = $this->cache->multisite && ! isset( $this->cache->global_groups[ $group ] ) ? $this->cache->blog_prefix . $group : $group;
 			if ( ! isset( $this->cache->cache[ $multisite_safe_group ] ) ) {
-				$this->cache->cache[ $multisite_safe_group ] = array();
+				$this->cache->cache[ $multisite_safe_group ] = [];
 			}
 			$this->cache->cache[ $multisite_safe_group ][ $key ] = 'beta';
 		} else {
@@ -737,10 +737,10 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 3, $this->cache->cache_hits );
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		$this->assertEquals(
-			array(
+			[
 				self::$get_key => 1,
 				self::$set_key => 1,
-			),
+			],
 			$this->cache->redis_calls
 		);
 	}
@@ -764,23 +764,23 @@ class CacheTest extends WP_UnitTestCase {
 		$this->cache->set( 'foo2', 'bar', 'group1' );
 		$this->cache->set( 'foo1', 'bar', 'group2' );
 
-		$found = $this->cache->get_multiple( array( 'foo1', 'foo2', 'foo3' ), 'group1' );
+		$found = $this->cache->get_multiple( [ 'foo1', 'foo2', 'foo3' ], 'group1' );
 
-		$expected = array(
+		$expected = [
 			'foo1' => 'bar',
 			'foo2' => 'bar',
 			'foo3' => false,
-		);
+		];
 
 		$this->assertSame( $expected, $found );
 		$this->assertEquals( 2, $this->cache->cache_hits );
 		$this->assertEquals( 1, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$mget_key => 1,
 					self::$set_key  => 3,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -796,44 +796,44 @@ class CacheTest extends WP_UnitTestCase {
 		$this->cache->set( 'foo2', 'baz', 'group1' );
 		$this->cache->set( 'foo3', 'bap', 'group1' );
 		// Reset the internal cache.
-		$this->cache->cache = array();
+		$this->cache->cache = [];
 		// Prime the second item into the internal cache.
 		$this->cache->get( 'foo2', 'group1' );
 
-		$found = $this->cache->get_multiple( array( 'foo1', 'foo2', 'foo3', 'foo4' ), 'group1' );
+		$found = $this->cache->get_multiple( [ 'foo1', 'foo2', 'foo3', 'foo4' ], 'group1' );
 
-		$expected = array(
+		$expected = [
 			'foo1' => 'bar',
 			'foo2' => 'baz',
 			'foo3' => 'bap',
 			'foo4' => false,
-		);
+		];
 
 		$this->assertSame( $expected, $found );
 		$this->assertEquals( 4, $this->cache->cache_hits );
 		$this->assertEquals( 1, $this->cache->cache_misses );
 		$this->assertEquals(
-			array(
+			[
 				self::$get_key  => 1,
 				self::$mget_key => 1,
 				self::$set_key  => 3,
-			),
+			],
 			$this->cache->redis_calls
 		);
 	}
 
 	public function test_get_multiple_non_persistent() {
-		$this->cache->add_non_persistent_groups( array( 'group1' ) );
+		$this->cache->add_non_persistent_groups( [ 'group1' ] );
 		$this->cache->set( 'foo1', 'bar', 'group1' );
 		$this->cache->set( 'foo2', 'bar', 'group1' );
 
-		$found = $this->cache->get_multiple( array( 'foo1', 'foo2', 'foo3' ), 'group1' );
+		$found = $this->cache->get_multiple( [ 'foo1', 'foo2', 'foo3' ], 'group1' );
 
-		$expected = array(
+		$expected = [
 			'foo1' => 'bar',
 			'foo2' => 'bar',
 			'foo3' => false,
-		);
+		];
 		$this->assertSame( $expected, $found );
 		$this->assertEquals( 2, $this->cache->cache_hits );
 		$this->assertEquals( 1, $this->cache->cache_misses );
@@ -859,11 +859,11 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$exists_key  => 1,
 					self::$set_key     => 1,
 					self::$incr_by_key => 2,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -898,11 +898,11 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$exists_key  => 2,
 					self::$set_key     => 2,
 					self::$incr_by_key => 4,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -922,10 +922,10 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$incr_by_key => 1,
 					self::$set_key     => 2,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -936,7 +936,7 @@ class CacheTest extends WP_UnitTestCase {
 	public function test_incr_non_persistent() {
 		$key = rand_str();
 
-		$this->cache->add_non_persistent_groups( array( 'nonpersistent' ) );
+		$this->cache->add_non_persistent_groups( [ 'nonpersistent' ] );
 		$this->assertFalse( $this->cache->incr( $key, 1, 'nonpersistent' ) );
 
 		$this->cache->set( $key, 0, 'nonpersistent' );
@@ -950,7 +950,7 @@ class CacheTest extends WP_UnitTestCase {
 
 	public function test_incr_non_persistent_never_below_zero() {
 		$key = rand_str();
-		$this->cache->add_non_persistent_groups( array( 'nonpersistent' ) );
+		$this->cache->add_non_persistent_groups( [ 'nonpersistent' ] );
 		$this->cache->set( $key, 1, 'nonpersistent' );
 		$this->assertEquals( 1, $this->cache->get( $key, 'nonpersistent' ) );
 		$this->cache->incr( $key, -2, 'nonpersistent' );
@@ -996,11 +996,11 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$exists_key  => 1,
 					self::$set_key     => 3,
 					self::$decr_by_key => 3,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -1044,11 +1044,11 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$exists_key  => 2,
 					self::$set_key     => 7,
 					self::$decr_by_key => 6,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -1068,10 +1068,10 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->cache->cache_misses );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$decr_by_key => 1,
 					self::$set_key     => 2,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -1082,7 +1082,7 @@ class CacheTest extends WP_UnitTestCase {
 	public function test_decr_non_persistent() {
 		$key = rand_str();
 
-		$this->cache->add_non_persistent_groups( array( 'nonpersistent' ) );
+		$this->cache->add_non_persistent_groups( [ 'nonpersistent' ] );
 		$this->assertFalse( $this->cache->decr( $key, 1, 'nonpersistent' ) );
 
 		$this->cache->set( $key, 0, 'nonpersistent' );
@@ -1100,7 +1100,7 @@ class CacheTest extends WP_UnitTestCase {
 
 	public function test_decr_non_persistent_never_below_zero() {
 		$key = rand_str();
-		$this->cache->add_non_persistent_groups( array( 'nonpersistent' ) );
+		$this->cache->add_non_persistent_groups( [ 'nonpersistent' ] );
 		$this->cache->set( $key, 1, 'nonpersistent' );
 		$this->assertEquals( 1, $this->cache->get( $key, 'nonpersistent' ) );
 		$this->cache->decr( $key, 2, 'nonpersistent' );
@@ -1147,12 +1147,12 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertFalse( $this->cache->delete( $key, 'default' ) );
 		if ( $this->cache->is_redis_connected ) {
 			$this->assertEquals(
-				array(
+				[
 					self::$exists_key => 1,
 					self::$set_key    => 1,
 					self::$delete_key => 1,
 					self::$get_key    => 1,
-				),
+				],
 				$this->cache->redis_calls
 			);
 		} else {
@@ -1190,7 +1190,7 @@ class CacheTest extends WP_UnitTestCase {
 		$group2 = 'bar';
 
 		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
-			$this->cache->add_redis_hash_groups( array( $group, $group2 ) );
+			$this->cache->add_redis_hash_groups( [ $group, $group2 ] );
 		}
 
 		// Set up the values
@@ -1224,10 +1224,10 @@ class CacheTest extends WP_UnitTestCase {
 		$val3   = rand_str();
 		$group  = 'foo';
 		$group2 = 'bar';
-		$this->cache->add_non_persistent_groups( array( $group, $group2 ) );
+		$this->cache->add_non_persistent_groups( [ $group, $group2 ] );
 
 		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
-			$this->cache->add_redis_hash_groups( array( $group, $group2 ) );
+			$this->cache->add_redis_hash_groups( [ $group, $group2 ] );
 		}
 
 		// Set up the values
@@ -1259,7 +1259,7 @@ class CacheTest extends WP_UnitTestCase {
 		$group2 = 'bar';
 
 		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
-			$GLOBALS['wp_object_cache']->add_redis_hash_groups( array( $group, $group2 ) );
+			$GLOBALS['wp_object_cache']->add_redis_hash_groups( [ $group, $group2 ] );
 		}
 
 		// Set up the values
@@ -1345,7 +1345,7 @@ class CacheTest extends WP_UnitTestCase {
 			$this->markTestSkipped( 'PHPRedis extension not available.' );
 		}
 		$redis_server['database'] = 2;
-		$second_cache             = new WP_Object_Cache;
+		$second_cache             = new WP_Object_Cache();
 		$second_cache->flush(); // Make sure it's in pristine state.
 		$this->cache->set( 'foo', 'bar' );
 		$this->assertEquals( 'bar', $this->cache->get( 'foo' ) );
@@ -1378,9 +1378,9 @@ class CacheTest extends WP_UnitTestCase {
 	}
 
 	public function test_ignore_global_groups() {
-		$this->cache->add_global_groups( array( 'wp-redis-respected-group' ) );
+		$this->cache->add_global_groups( [ 'wp-redis-respected-group' ] );
 		$this->assertTrue( isset( $this->cache->global_groups['wp-redis-respected-group'] ) );
-		$this->cache->add_global_groups( array( 'wp-redis-ignored-group' ) );
+		$this->cache->add_global_groups( [ 'wp-redis-ignored-group' ] );
 		$this->assertFalse( isset( $this->cache->global_groups['wp-redis-ignored-group'] ) );
 	}
 
@@ -1419,7 +1419,7 @@ class CacheTest extends WP_UnitTestCase {
 		}
 
 		$redis   = $this->cache->prepare_client_connection( self::$client_parameters );
-		$isSetUp = $this->cache->perform_client_connection( $redis, array(), array() );
+		$isSetUp = $this->cache->perform_client_connection( $redis, [], [] );
 		$this->assertTrue( $isSetUp );
 	}
 
@@ -1430,7 +1430,7 @@ class CacheTest extends WP_UnitTestCase {
 
 		$redis = $this->getMockBuilder( 'Redis' )->getMock();
 		$redis->method( 'select' )
-			->will( $this->throwException( new RedisException ) );
+			->will( $this->throwException( new RedisException() ) );
 
 		$redis->connect(
 			self::$client_parameters['host'],
@@ -1439,12 +1439,12 @@ class CacheTest extends WP_UnitTestCase {
 			null,
 			self::$client_parameters['retry_interval']
 		);
-		$settings     = array(
+		$settings     = [
 			'database' => 2,
-		);
-		$keys_methods = array(
+		];
+		$keys_methods = [
 			'database' => 'select',
-		);
+		];
 		$this->setExpectedException( 'Exception' );
 		$this->cache->perform_client_connection( $redis, $settings, $keys_methods );
 	}
