@@ -12,11 +12,9 @@
     "behat/behat": "^3.1",
     "behat/mink-extension": "^2.2",
     "behat/mink-goutte-driver": "^1.2",
-    "pantheon-systems/pantheon-wordpress-upstream-tests": "dev-fix-behat-upstream-tests",
-    "wp-coding-standards/wpcs": "dev-develop as 2.3.1",
-    "dealerdirect/phpcodesniffer-composer-installer": "^1.0.0",
+    "pantheon-systems/pantheon-wp-coding-standards": "^1.0",
+    "pantheon-systems/pantheon-wordpress-upstream-tests": "dev-master",
     "phpunit/phpunit": "^9",
-    "phpcompatibility/php-compatibility": "^9.3",
     "yoast/phpunit-polyfills": "^1.0"
   },
   "scripts": {

@@ -1,7 +1,10 @@
 <?php
+/**
+ * Various WP Redis CLI utility commands.
+ */
 
 /**
- * Various WP Redis utility commands.
+ * Main WP Redis CLI command class.
  */
 class WP_Redis_CLI_Command {
 
@@ -12,21 +15,21 @@ class WP_Redis_CLI_Command {
 		global $redis_server;
 
 		if ( empty( $redis_server ) ) {
-			# Attempt to automatically load Pantheon's Redis config from the env.
-			if ( isset( $_SERVER['CACHE_HOST'] ) ) {
-				$redis_server = array(
-					'host'     => $_SERVER['CACHE_HOST'],
-					'port'     => $_SERVER['CACHE_PORT'],
-					'auth'     => $_SERVER['CACHE_PASSWORD'],
-					'database' => isset( $_SERVER['CACHE_DB'] ) ? $_SERVER['CACHE_DB'] : 0,
-				);
+			// Attempt to automatically load Pantheon's Redis config from the env.
+			if ( isset( $_SERVER['CACHE_HOST'] ) && isset( $_SERVER['CACHE_PORT'] ) && isset( $_SERVER['CACHE_PASSWORD'] ) && isset( $_SERVER['CACHE_DB'] ) ) {
+				$redis_server = [
+					'host' => sanitize_text_field( $_SERVER['CACHE_HOST'] ),
+					'port' => sanitize_text_field( $_SERVER['CACHE_PORT'] ),
+					'auth' => sanitize_text_field( $_SERVER['CACHE_PASSWORD'] ),
+					'database' => sanitize_text_field( $_SERVER['CACHE_DB'] ),
+				];
 			} else {
-				$redis_server = array(
-					'host'     => '127.0.0.1',
-					'port'     => 6379,
-					'auth'     => '',
+				$redis_server = [
+					'host' => '127.0.0.1',
+					'port' => 6379,
+					'auth' => '',
 					'database' => 0,
-				);
+				];
 			}
 		}
 
@@ -34,9 +37,10 @@ class WP_Redis_CLI_Command {
 			$redis_server['database'] = 0;
 		}
 
-		$cmd     = WP_CLI\Utils\esc_cmd( 'redis-cli -h %s -p %s -a %s -n %s', $redis_server['host'], $redis_server['port'], $redis_server['auth'], $redis_server['database'] );
-		$process = WP_CLI\Utils\proc_open_compat( $cmd, array( STDIN, STDOUT, STDERR ), $pipes );
-		$r       = proc_close( $process );
+		$pipes = null;
+		$cmd = WP_CLI\Utils\esc_cmd( 'redis-cli -h %s -p %s -a %s -n %s', $redis_server['host'], $redis_server['port'], $redis_server['auth'], $redis_server['database'] );
+		$process = WP_CLI\Utils\proc_open_compat( $cmd, [ STDIN, STDOUT, STDERR ], $pipes );
+		$r = proc_close( $process );
 		exit( (int) $r );
 	}
 
@@ -56,11 +60,11 @@ class WP_Redis_CLI_Command {
 	public function debug( $_, $assoc_args ) {
 		global $wp_object_cache;
 		$this->load_wordpress_with_template();
-		$data = array(
+		$data = [
 			'cache_hits'   => $wp_object_cache->cache_hits,
 			'cache_misses' => $wp_object_cache->cache_misses,
 			'redis_calls'  => $wp_object_cache->redis_calls,
-		);
+		];
 		WP_CLI::print_value( $data, $assoc_args );
 	}
 
@@ -134,14 +138,14 @@ class WP_Redis_CLI_Command {
 	 *     Success: Redis stats reset.
 	 */
 	public function info( $_, $assoc_args ) {
-		global $wp_object_cache, $redis_server;
+		global $wp_object_cache;
 
 		if ( ! defined( 'WP_REDIS_OBJECT_CACHE' ) || ! WP_REDIS_OBJECT_CACHE ) {
 			WP_CLI::error( 'WP Redis object-cache.php file is missing from the wp-content/ directory.' );
 		}
 
 		if ( $wp_object_cache->is_redis_connected && WP_CLI\Utils\get_flag_value( $assoc_args, 'reset' ) ) {
-			// Redis::resetStat() isn't functional, see https://github.com/phpredis/phpredis/issues/928
+			// Redis::resetStat() isn't functional, see https://github.com/phpredis/phpredis/issues/928.
 			if ( $wp_object_cache->redis->eval( "return redis.call('CONFIG','RESETSTAT')" ) ) {
 				WP_CLI::success( 'Redis stats reset.' );
 			} else {
@@ -168,7 +172,7 @@ class WP_Redis_CLI_Command {
 		// Set up the main WordPress query.
 		wp();
 
-		$interpreted = array();
+		$interpreted = [];
 		foreach ( $wp_query as $key => $value ) {
 			if ( 0 === stripos( $key, 'is_' ) && $value ) {
 				$interpreted[] = $key;
@@ -188,7 +192,7 @@ class WP_Redis_CLI_Command {
 			999
 		);
 
-		// Template is normally loaded in global scope, so we need to replicate
+		// Template is normally loaded in global scope, so we need to replicate.
 		foreach ( $GLOBALS as $key => $value ) {
 			// phpcs:ignore PHPCompatibility.Variables.ForbiddenGlobalVariableVariable.NonBareVariableFound
 			global $$key;
@@ -196,7 +200,7 @@ class WP_Redis_CLI_Command {
 
 		// Load the theme template.
 		ob_start();
-		require_once( ABSPATH . WPINC . '/template-loader.php' );
+		require_once ABSPATH . WPINC . '/template-loader.php';
 		ob_get_clean();
 	}
 
@@ -206,7 +210,7 @@ class WP_Redis_CLI_Command {
 	 * @see http://stackoverflow.com/questions/2637945/getting-relative-path-from-absolute-path-in-php
 	 */
 	private static function get_relative_path( $from, $to ) {
-		// some compatibility fixes for Windows paths
+		// some compatibility fixes for Windows paths.
 		$from = is_dir( $from ) ? rtrim( $from, '\/' ) . '/' : $from;
 		$to   = is_dir( $to ) ? rtrim( $to, '\/' ) . '/' : $to;
 		$from = str_replace( '\\', '/', $from );
@@ -217,15 +221,15 @@ class WP_Redis_CLI_Command {
 		$rel_path = $to;
 
 		foreach ( $from as $depth => $dir ) {
-			// find first non-matching dir
+			// find first non-matching dir.
 			if ( $dir === $to[ $depth ] ) {
-				// ignore this directory
+				// ignore this directory.
 				array_shift( $rel_path );
 			} else {
-				// get number of remaining dirs to $from
+				// get number of remaining dirs to $from.
 				$remaining = count( $from ) - $depth;
 				if ( $remaining > 1 ) {
-					// add traversals up to first matching dir
+					// add traversals up to first matching dir.
 					$pad_length = ( count( $rel_path ) + $remaining - 1 ) * -1;
 					$rel_path   = array_pad( $rel_path, $pad_length, '..' );
 					break;

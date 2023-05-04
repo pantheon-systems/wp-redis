@@ -7,7 +7,9 @@
  * Author: Pantheon, Josh Koenig, Matthew Boynes, Daniel Bachhuber, Alley Interactive
  * Author URI: https://pantheon.io/
  */
-/*  This program is free software; you can redistribute it and/or modify
+
+/*
+	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation; either version 2 of the License, or
 	(at your option) any later version.
@@ -36,19 +38,19 @@ function wp_redis_get_info() {
 
 	if ( empty( $redis_server ) ) {
 		// Attempt to automatically load Pantheon's Redis config from the env.
-		if ( isset( $_SERVER['CACHE_HOST'] ) ) {
-			$redis_server = array(
-				'host'     => $_SERVER['CACHE_HOST'],
-				'port'     => $_SERVER['CACHE_PORT'],
-				'auth'     => $_SERVER['CACHE_PASSWORD'],
-				'database' => isset( $_SERVER['CACHE_DB'] ) ? $_SERVER['CACHE_DB'] : 0,
-			);
+		if ( isset( $_SERVER['CACHE_HOST'] ) && isset( $_SERVER['CACHE_PORT'] ) && isset( $_SERVER['CACHE_PASSWORD'] ) && isset( $_SERVER['CACHE_DB'] ) ) {
+			$redis_server = [
+				'host' => sanitize_text_field( $_SERVER['CACHE_HOST'] ),
+				'port' => sanitize_text_field( $_SERVER['CACHE_PORT'] ),
+				'auth' => sanitize_text_field( $_SERVER['CACHE_PASSWORD'] ),
+				'database' => sanitize_text_field( $_SERVER['CACHE_DB'] ),
+			];
 		} else {
-			$redis_server = array(
-				'host'     => '127.0.0.1',
-				'port'     => 6379,
+			$redis_server = [
+				'host' => '127.0.0.1',
+				'port' => 6379,
 				'database' => 0,
-			);
+			];
 		}
 	}
 
@@ -76,7 +78,7 @@ function wp_redis_get_info() {
 	if ( isset( $info[ 'db' . $database ] ) && preg_match( '#keys=([\d]+)#', $info[ 'db' . $database ], $matches ) ) {
 		$key_count = $matches[1];
 	}
-	return array(
+	return [
 		'status'            => 'connected',
 		'used_memory'       => $info['used_memory_human'],
 		'uptime'            => $uptime_in_days,
@@ -87,5 +89,5 @@ function wp_redis_get_info() {
 		'redis_port'        => ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379,
 		'redis_auth'        => ! empty( $redis_server['auth'] ) ? $redis_server['auth'] : '',
 		'redis_database'    => $database,
-	);
+	];
 }

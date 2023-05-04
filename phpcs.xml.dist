@@ -9,15 +9,49 @@
 	<!-- Show progress and sniff codes in all reports -->
 	<arg value="ps"/>
 
+	<rule ref="Pantheon-WP">
+		<!-- Rules we explicitly ignore in the object-cache.php drop-in. -->
+		<!-- Allow overriding WP globals -->
+		<exclude name="WordPress.WP.GlobalVariablesOverride.Prohibited">
+			<file>/object-cache.php</file>
+		</exclude>
+		<!-- Ignore snifs for unprepared $wpdb queries. -->
+		<exclude name="WordPress.DB.PreparedSQL.InterpolatedNotPrepared">
+			<file>/object-cache.php</file>
+		</exclude>
+		<!-- Allow underscored functions. -->
+		<exclude name="PSR2.Methods.MethodDeclaration.Underscore">
+			<file>/object-cache.php</file>
+		</exclude>
+		<!-- Ignore the WPVIP long timeout sniff. -->
+		<exclude name="WordPressVIPMinimum.Performance.RemoteRequestTimeout.timeout_timeout">
+			<file>/object-cache.php</file>
+		</exclude>
+		<!-- Don't warn about uncached database calls. -->
+		<exclude name="WordPress.DB.DirectDatabaseQuery.NoCaching">
+			<file>/object-cache.php</file>
+		</exclude>
+		<exclude name="WordPress.DB.DirectDatabaseQuery.DirectQuery">
+			<file>/object-cache.php</file>
+		</exclude>
+
+		<!-- Rules we ignore for WP-CLI. -->
+		<!-- Function comments work differently for WP-CLI functions, so don't throw CS errors on them. -->
+		<exclude name="Squiz.Commenting.FunctionComment.MissingParamTag">
+			<file>/cli.php</file>
+		</exclude>
+	</rule>
 	<rule ref="PHPCompatibility"/>
 
 	<!-- Minimum PHP and WP versions -->
-	<config name="testVersion" value="7.1-"/>
+	<config name="testVersion" value="7.3-"/>
 	<config name="minimum_supported_wp_version" value="4.6"/>
 
 	<exclude-pattern>*/bin/*</exclude-pattern>
+	<exclude-pattern>*/tests/*</exclude-pattern>
 	<exclude-pattern>*/vendor/*</exclude-pattern>
 	<exclude-pattern>*/node_modules/*</exclude-pattern>
+
 
 	<rule ref="WordPress.PHP.DevelopmentFunctions">
 		<properties>

@@ -23,7 +23,7 @@ jobs:
   lint:
     working_directory: ~/pantheon-systems/wp-redis
     docker:
-      - image: quay.io/pantheon-public/build-tools-ci:8.x-php8.2
+      - image: quay.io/pantheon-public/build-tools-ci:8.x-php8.0
     steps:
       - checkout
       - restore_cache:
