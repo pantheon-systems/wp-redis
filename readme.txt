@@ -3,7 +3,7 @@ Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh, jspellman,
 Tags: cache, plugin, redis
 Requires at least: 3.0.1
 Tested up to: 6.2
-Stable tag: 1.3.6-dev
+Stable tag: 1.4.0-dev
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -229,4 +229,4 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 == Upgrade Notice ==
 
 = Latest =
-WP Redis 1.3.6-dev adds support for the `flush_runtime` and `flush_group` functions. If you've copied `object-cache.php` and made your own changes, be sure to copy these additions over as well.
+WP Redis 1.4.0-dev adds support for the `flush_runtime` and `flush_group` functions. If you've copied `object-cache.php` and made your own changes, be sure to copy these additions over as well.
