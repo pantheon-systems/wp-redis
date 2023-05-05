@@ -391,6 +391,55 @@ class CacheTest extends WP_UnitTestCase {
 		}
 	}
 
+	public function test_wp_cache_flush_runtime() {
+		// Add some data to the cache
+		$data = array(
+			rand_str() => rand_str(),
+			rand_str() => rand_str()
+		);
+
+		foreach ( $data as $key => $value ) {
+			wp_cache_set( $key, $value, 'test_wp_cache_flush_runtime' );
+		}
+
+		// Verify that the cache contains the data
+		foreach ( $data as $key => $value ) {
+			$this->assertEquals( $value, wp_cache_get( $key, 'test_wp_cache_flush_runtime' ) );
+		}
+
+		// Flush the cache
+		wp_cache_flush_runtime();
+
+		// Verify that the cache is now empty
+		foreach ($data as $key => $value) {
+			$this->assertFalse( wp_cache_get( $key, 'test_wp_cache_flush_runtime' ) );
+		}
+	}
+
+	public function test_wp_cache_flush_group() {
+		// Add some data to the cache
+		$data = array(
+			rand_str() => rand_str(),
+			rand_str() => rand_str()
+		);
+
+		foreach ( $data as $key => $value ) {
+			wp_cache_set( $key, $value, 'test_wp_cache_flush_group' );
+		}
+
+		foreach ( $data as $key => $value ) {
+			$this->assertEquals( $value, wp_cache_get( $key, 'test_wp_cache_flush_group' ) );
+		}
+
+		// Flush the cache
+		wp_cache_flush_runtime();
+
+		// Verify that the cache is now empty
+		foreach ( $data as $key => $value ) {
+			$this->assertFalse( wp_cache_get( $key, 'test_wp_cache_flush_group' ) );
+		}
+	}
+
 	// Make sure objects are cloned going to and from the cache
 	public function test_object_refs() {
 		$key           = rand_str();
