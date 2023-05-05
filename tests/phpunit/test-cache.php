@@ -432,7 +432,7 @@ class CacheTest extends WP_UnitTestCase {
 		}
 
 		// Flush the cache
-		wp_cache_flush_runtime();
+		wp_cache_flush_group( 'test_wp_cache_flush_group' );
 
 		// Verify that the cache is now empty
 		foreach ( $data as $key => $value ) {
