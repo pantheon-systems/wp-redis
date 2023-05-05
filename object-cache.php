@@ -673,8 +673,21 @@ class WP_Object_Cache {
 	 * @return true Always returns true.
 	 */
 	public function flush_group( $group ) {
-		unset( $this->cache[ $group ] );
+		if ( ! $this->_should_use_redis_hashes( $group ) ) {
+			return false;
+		}
 
+		$multisite_safe_group = $this->multisite && ! isset( $this->global_groups[ $group ] ) ? $this->blog_prefix . $group : $group;
+		$redis_safe_group     = $this->_key( '', $group );
+		if ( $this->_should_persist( $group ) ) {
+			$result = $this->_call_redis( 'del', $redis_safe_group );
+			if ( 1 !== $result ) {
+				return false;
+			}
+		} elseif ( ! $this->_should_persist( $group ) && ! isset( $this->cache[ $multisite_safe_group ] ) ) {
+			return false;
+		}
+		unset( $this->cache[ $multisite_safe_group ] );
 		return true;
 	}
 
