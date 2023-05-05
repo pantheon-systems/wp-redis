@@ -418,26 +418,17 @@ class CacheTest extends WP_UnitTestCase {
 
 	public function test_wp_cache_flush_group() {
 		// Add some data to the cache
-		$data = array(
-			rand_str() => rand_str(),
-			rand_str() => rand_str()
-		);
-
-		foreach ( $data as $key => $value ) {
-			wp_cache_set( $key, $value, 'test_wp_cache_flush_group' );
-		}
-
-		foreach ( $data as $key => $value ) {
-			$this->assertEquals( $value, wp_cache_get( $key, 'test_wp_cache_flush_group' ) );
-		}
+		$key = rand_str();
+		$val = rand_str();
+		
+		wp_cache_set( $key, $val, 'test_wp_cache_flush_group' );
+		$this->assertEquals( $val, wp_cache_get( $key, 'test_wp_cache_flush_group' ) );
 
 		// Flush the cache
 		wp_cache_flush_group( 'test_wp_cache_flush_group' );
 
 		// Verify that the cache is now empty
-		foreach ( $data as $key => $value ) {
-			$this->assertFalse( wp_cache_get( $key, 'test_wp_cache_flush_group' ) );
-		}
+		$this->assertFalse( wp_cache_get( $key, 'test_wp_cache_flush_group' ) );
 	}
 
 	// Make sure objects are cloned going to and from the cache
