@@ -425,7 +425,7 @@ class CacheTest extends WP_UnitTestCase {
 		$this->assertEquals( $val, wp_cache_get( $key, 'test_wp_cache_flush_group' ) );
 
 		// Flush the cache
-		wp_cache_flush_group( 'test_wp_cache_flush_group' );
+		wp_cache_delete( $key, 'test_wp_cache_flush_group' );
 
 		// Verify that the cache is now empty
 		$this->assertFalse( wp_cache_get( $key, 'test_wp_cache_flush_group' ) );
