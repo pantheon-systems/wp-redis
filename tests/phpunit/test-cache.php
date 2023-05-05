@@ -417,18 +417,39 @@ class CacheTest extends WP_UnitTestCase {
 	}
 
 	public function test_wp_cache_flush_group() {
-		// Add some data to the cache
-		$key = rand_str();
-		$val = rand_str();
-		
-		wp_cache_set( $key, $val, 'test_wp_cache_flush_group' );
-		$this->assertEquals( $val, wp_cache_get( $key, 'test_wp_cache_flush_group' ) );
+		$key1   = rand_str();
+		$val1   = rand_str();
+		$key2   = rand_str();
+		$val2   = rand_str();
+		$key3   = rand_str();
+		$val3   = rand_str();
+		$group  = 'foo';
+		$group2 = 'bar';
 
-		// Flush the cache
-		wp_cache_delete_group( 'test_wp_cache_flush_group' );
+		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
+			$GLOBALS['wp_object_cache']->add_redis_hash_groups( array( $group, $group2 ) );
+		}
 
-		// Verify that the cache is now empty
-		$this->assertFalse( wp_cache_get( $key, 'test_wp_cache_flush_group' ) );
+		// Set up the values
+		wp_cache_set( $key1, $val1, $group );
+		wp_cache_set( $key2, $val2, $group );
+		wp_cache_set( $key3, $val3, $group2 );
+		$this->assertEquals( $val1, wp_cache_get( $key1, $group ) );
+		$this->assertEquals( $val2, wp_cache_get( $key2, $group ) );
+		$this->assertEquals( $val3, wp_cache_get( $key3, $group2 ) );
+
+		$this->assertTrue( wp_cache_flush_group( $group ) );
+
+		$this->assertFalse( wp_cache_get( $key1, $group ) );
+		$this->assertFalse( wp_cache_get( $key2, $group ) );
+		$this->assertEquals( $val3, wp_cache_get( $key3, $group2 ) );
+
+		// _call_redis( 'delete' ) always returns true when Redis isn't available
+		if ( class_exists( 'Redis' ) ) {
+			$this->assertFalse( wp_cache_flush_group( $group ) );
+		} else {
+			$this->assertTrue( wp_cache_flush_group( $group ) );
+		}
 	}
 
 	// Make sure objects are cloned going to and from the cache
