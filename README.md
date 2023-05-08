@@ -5,7 +5,7 @@
 **Tags:** cache, plugin, redis
 **Requires at least:** 3.0.1
 **Tested up to:** 6.2
-**Stable tag:** 1.4.0-dev
+**Stable tag:** 1.4.0
 **License:** GPLv2 or later
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -104,8 +104,10 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 
 ## Changelog ##
 
-### Latest ###
+### 1.4.0 (May 9, 2023) ###
 * Add support for `flush_runtime` and `flush_group` functions [[#405](https://github.com/pantheon-systems/wp-redis/pull/405)]
+* Add `pantheon-wp-coding-standards` [[#400](https://github.com/pantheon-systems/wp-redis/pull/400)]
+* Update CONTRIBUTING.MD [[#406](https://github.com/pantheon-systems/wp-redis/pull/406)]
 * Update Composer dependencies [[#401](https://github.com/pantheon-systems/wp-redis/pull/394)]
 
 ### 1.3.5 (April 6, 2023) ###
@@ -114,7 +116,6 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 
 ### 1.3.4 (March 7, 2023) ###
 * Set `missing_redis_message` if Redis service is not connected [[#391](https://github.com/pantheon-systems/wp-redis/pull/391)]
-
 
 ### 1.3.3 (February 28, 2023) ###
 * Add PHP 8.2 support [[#388](https://github.com/pantheon-systems/wp-redis/pull/388)]
@@ -127,8 +128,7 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 ### 1.3.1 (December 2, 2022) ###
 * Declare `wp_cache_supports` function and support features. [[#378](https://github.com/pantheon-systems/wp-redis/pull/378)]
 * Make dependabot target `develop` branch for PRs. [[#376](https://github.com/pantheon-systems/wp-redis/pull/376)]
-
-Declare `wp_cache_supports` function and support features. [[#378](https://github.com/pantheon-systems/wp-redis/pull/378)]
+* Declare `wp_cache_supports` function and support features. [[#378](https://github.com/pantheon-systems/wp-redis/pull/378)]
 
 ### 1.3.0 (November 29, 2022) ###
 * Added CONTRIBUTING.MD and GitHub action to automate deployments to wp.org. [[#368](https://github.com/pantheon-systems/wp-redis/pull/368)]
@@ -231,5 +231,7 @@ Declare `wp_cache_supports` function and support features. [[#378](https://githu
 ### 0.1 ###
 * Initial commit of working code for the benefit of all.
 
-## Latest ##
-WP Redis 1.4.0-dev adds support for the `flush_runtime` and `flush_group` functions. If you've copied `object-cache.php` and made your own changes, be sure to copy these additions over as well.
+## Upgrade Notice ##
+
+### 1.4.0 (May 9, 2023) ###
+WP Redis 1.4.0 adds support for the `flush_runtime` and `flush_group` functions. If you've copied `object-cache.php` and made your own changes, be sure to copy these additions over as well.
