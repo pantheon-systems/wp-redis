@@ -391,6 +391,67 @@ class CacheTest extends WP_UnitTestCase {
 		}
 	}
 
+	public function test_wp_cache_flush_runtime() {
+		// Add some data to the cache
+		$data = array(
+			rand_str() => rand_str(),
+			rand_str() => rand_str()
+		);
+
+		foreach ( $data as $key => $value ) {
+			wp_cache_set( $key, $value, 'test_wp_cache_flush_runtime' );
+		}
+
+		// Verify that the cache contains the data
+		foreach ( $data as $key => $value ) {
+			$this->assertEquals( $value, wp_cache_get( $key, 'test_wp_cache_flush_runtime' ) );
+		}
+
+		// Flush the cache
+		wp_cache_flush_runtime();
+
+		// Verify that the cache is now empty
+		foreach ($data as $key => $value) {
+			$this->assertFalse( wp_cache_get( $key, 'test_wp_cache_flush_runtime' ) );
+		}
+	}
+
+	public function test_wp_cache_flush_group() {
+		$key1   = rand_str();
+		$val1   = rand_str();
+		$key2   = rand_str();
+		$val2   = rand_str();
+		$key3   = rand_str();
+		$val3   = rand_str();
+		$group  = 'foo';
+		$group2 = 'bar';
+
+		if ( ! defined( 'WP_REDIS_USE_CACHE_GROUPS' ) || ! WP_REDIS_USE_CACHE_GROUPS ) {
+			$GLOBALS['wp_object_cache']->add_redis_hash_groups( array( $group, $group2 ) );
+		}
+
+		// Set up the values
+		wp_cache_set( $key1, $val1, $group );
+		wp_cache_set( $key2, $val2, $group );
+		wp_cache_set( $key3, $val3, $group2 );
+		$this->assertEquals( $val1, wp_cache_get( $key1, $group ) );
+		$this->assertEquals( $val2, wp_cache_get( $key2, $group ) );
+		$this->assertEquals( $val3, wp_cache_get( $key3, $group2 ) );
+
+		$this->assertTrue( wp_cache_flush_group( $group ) );
+
+		$this->assertFalse( wp_cache_get( $key1, $group ) );
+		$this->assertFalse( wp_cache_get( $key2, $group ) );
+		$this->assertEquals( $val3, wp_cache_get( $key3, $group2 ) );
+
+		// _call_redis( 'delete' ) always returns true when Redis isn't available
+		if ( class_exists( 'Redis' ) ) {
+			$this->assertFalse( wp_cache_flush_group( $group ) );
+		} else {
+			$this->assertTrue( wp_cache_flush_group( $group ) );
+		}
+	}
+
 	// Make sure objects are cloned going to and from the cache
 	public function test_object_refs() {
 		$key           = rand_str();
