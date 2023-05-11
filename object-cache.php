@@ -165,7 +165,9 @@ function wp_cache_get_multiple( $keys, $group = '', $force = false ) {
  * @return bool True on success, false on failure.
  */
 function wp_cache_flush_runtime() {
-	return wp_cache_flush();
+	global $wp_object_cache;
+
+	return $wp_object_cache->flush( false );
 }
 
 /**
