@@ -85,11 +85,14 @@ jobs:
         command: ./bin/behat-cleanup.sh
         when: always
   test-behat-cli:
+    working_directory: ~/pantheon-systems/wp-redis
+    parallelism: 1
     docker:
     - image: quay.io/pantheon-public/build-tools-ci:8.x-php8.2
-    - run: composer install
-    - run: composer prepare-cli-tests
-    - run: composer behat-cli
+    steps:
+      - run: composer install
+      - run: composer prepare-cli-tests
+      - run: composer behat-cli
   test-phpunit-redis-disabled-74:
     working_directory: ~/pantheon-systems/wp-redis
     docker:
