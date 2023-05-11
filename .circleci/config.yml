@@ -9,6 +9,7 @@ workflows:
       - test-phpunit-redis-enabled-74
       - test-phpunit-redis-disabled-82
       - test-phpunit-redis-enabled-82
+      - test-behat-cli
   nightly:
     triggers:
       - schedule:
@@ -83,6 +84,12 @@ jobs:
     - run:
         command: ./bin/behat-cleanup.sh
         when: always
+  test-behat-cli:
+    docker:
+    - image: quay.io/pantheon-public/build-tools-ci:8.x-php8.2
+    - run: composer install
+    - run: composer prepare-cli-tests
+    - run: composer behat-cli
   test-phpunit-redis-disabled-74:
     working_directory: ~/pantheon-systems/wp-redis
     docker:

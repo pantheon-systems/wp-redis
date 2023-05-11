@@ -15,14 +15,18 @@
     "pantheon-systems/pantheon-wp-coding-standards": "^1.0",
     "pantheon-systems/pantheon-wordpress-upstream-tests": "dev-master",
     "phpunit/phpunit": "^9",
-    "yoast/phpunit-polyfills": "^1.0"
+    "yoast/phpunit-polyfills": "^1.0",
+    "wp-cli/wp-cli-tests": "^3.2"
   },
   "scripts": {
     "lint": "@phpcs",
     "phpcs": "vendor/bin/phpcs",
     "phpcbf": "vendor/bin/phpcbf",
     "phpunit": "vendor/bin/phpunit",
-    "test": "@phpunit"
+    "test": "@phpunit",
+    "prepare-cli-tests": "install-package-tests",
+    "behat-cli": "run-behat-tests",
+    "behat-cli-rerun": "rerun-behat-tests"
   },
   "config": {
     "allow-plugins": {

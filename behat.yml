@@ -1,12 +1,17 @@
 # behat.yml
 default:
   suites:
+    # default:
+    #   paths:
+    #     - tests/behat
+    #   contexts:
+    #     - Behat\MinkExtension\Context\MinkContext
+    #     - PantheonSystems\PantheonWordPressUpstreamTests\Behat\AdminLogIn
     default:
       paths:
-        - tests/behat
+        - tests/behat-cli
       contexts:
-        - Behat\MinkExtension\Context\MinkContext
-        - PantheonSystems\PantheonWordPressUpstreamTests\Behat\AdminLogIn
+        - WP_CLI\Tests\Context\FeatureContext
   extensions:
     Behat\MinkExtension:
       # base_url set by ENV
