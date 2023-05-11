@@ -88,6 +88,7 @@ jobs:
     docker:
     - image: quay.io/pantheon-public/build-tools-ci:8.x-php8.2
     steps:
+      - checkout
       - run: composer install
       - run: composer prepare-cli-tests
       - run: composer behat-cli
