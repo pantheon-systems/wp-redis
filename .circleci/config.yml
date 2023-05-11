@@ -86,8 +86,8 @@ jobs:
         when: always
   test-behat-cli:
     docker:
-      - image: cimg/php:8.0
-      - image: circleci/mariadb:10.4
+      - image: cimg/php:8.1
+      - image: cimg/mariadb:10.4
     environment:
       MYSQL_DATABASE: "wp_cli_test"
     steps:
