@@ -86,9 +86,20 @@ jobs:
         when: always
   test-behat-cli:
     docker:
-    - image: quay.io/pantheon-public/build-tools-ci:8.x-php8.2
+      - image: cimg/php:<< parameters.php_version >>
+      - image: circleci/mariadb:10.4
+    environment:
+      MYSQL_DATABASE: "wp_cli_test"
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - test-behat-dependencies-{{ checksum "composer.json" }}
+      - run: composer install -n --prefer-dist
+      - save_cache:
+          key: test-behat-dependencies-{{ checksum "composer.json" }}
+          paths:
+            - vendor
       - run: composer install
       - run: composer prepare-cli-tests
       - run: composer behat-cli
