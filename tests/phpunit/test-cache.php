@@ -410,7 +410,15 @@ class CacheTest extends WP_UnitTestCase {
 		// Flush the cache
 		wp_cache_flush_runtime();
 
-		// Verify that the cache is now empty
+		// If we are using redis, verify redis cache was not flished
+		if ($this->cache->is_redis_connected) {
+			foreach ( $data as $key => $value ) {
+				$this->assertEquals( $value, wp_cache_get( $key, 'test_wp_cache_flush_runtime' ) );
+			}
+			return
+		}
+
+		// If we are not using redis, verify the cache is now empty
 		foreach ($data as $key => $value) {
 			$this->assertFalse( wp_cache_get( $key, 'test_wp_cache_flush_runtime' ) );
 		}
