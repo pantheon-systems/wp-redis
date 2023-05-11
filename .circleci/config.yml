@@ -16,7 +16,7 @@ workflows:
           filters:
             branches:
               only:
-                - master
+                - release
     jobs:
       - test-behat
 jobs:
