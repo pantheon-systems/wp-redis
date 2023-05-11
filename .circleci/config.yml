@@ -1,10 +1,10 @@
-version: 2
+version: 2.1
 workflows:
-  version: 2
   main:
     jobs:
       - lint
-      - test-behat
+      # - test-behat
+      - test-cli
       - test-phpunit-redis-disabled-74
       - test-phpunit-redis-enabled-74
       - test-phpunit-redis-disabled-82
@@ -19,6 +19,58 @@ workflows:
                 - release
     jobs:
       - test-behat
+
+commands:
+  install-wpcli:
+    steps:
+      - run:
+          name: "Installing WP-CLI"
+          command: |
+            curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+            chmod +x wp-cli.phar
+            mv wp-cli.phar /home/circleci/bin/wp
+  install-extras:
+    steps:
+      - run:
+          name: "Install Extra Dependencies"
+          command: |
+            sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4EB27DB2A3B88B8B
+            sudo apt-get update
+            sudo apt-get install subversion
+            sudo apt-get install -y libmagickwand-dev --no-install-recommends
+            yes '' | sudo pecl install imagick || true
+            sudo docker-php-ext-enable imagick
+            sudo docker-php-ext-install mysqli
+  install-mariadb-10-5:
+    steps:
+      - run: sudo apt-get install mariadb-client-10.5
+  install-mariadb-10-6:
+    steps:
+      - run: sudo apt-get install mariadb-client-10.6
+  install-redis-extras:
+    steps:
+      - run: 
+          name: "Install Redis Extras"
+          command: |
+            yes '' | sudo pecl install redis || true
+            sudo docker-php-ext-enable redis
+  wait-for-db:
+    steps:
+      - run:
+          name: "Wait for database to be available"
+          command: "dockerize -wait tcp://127.0.0.1:3306 -timeout 1m"
+  run-phpunit-tests:
+    steps:
+      - run:
+          name: "Run Tests"
+          command: |
+            bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 latest
+            composer phpunit
+            WP_MULTISITE=1 composer phpunit
+            WP_REDIS_USE_CACHE_GROUPS=1 composer phpunit
+            rm -rf $WP_TESTS_DIR $WP_CORE_DIR
+            bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 nightly true
+            composer phpunit
 jobs:
   lint:
     working_directory: ~/pantheon-systems/wp-redis
@@ -38,6 +90,24 @@ jobs:
           name: "Run PHP Lint"
           command: |
             composer phpcs
+  test-cli:
+    docker:
+      - image: cimg/php:8.1
+      - image: cimg/mariadb:10.4
+    environment:
+      MYSQL_DATABASE: "cli_test"
+    steps:
+      - checkout
+      - install-extras
+      - install-redis-extras
+      - install-mariadb-10-6
+      - run: sudo apt install rsync
+      - install-wpcli
+      - wait-for-db
+      - run:
+          name: "Run Tests"
+          command: tests/cli.sh ${MYSQL_DATABASE} root "" 127.0.0.1
+
   test-behat:
     working_directory: ~/pantheon-systems/wp-redis
     parallelism: 1
@@ -102,27 +172,9 @@ jobs:
           key: test-phpunit-74-dependencies-{{ checksum "composer.json" }}
           paths:
             - vendor
-      - run:
-          name: "Install Extras"
-          command: |
-            sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4EB27DB2A3B88B8B
-            sudo apt-get update
-            sudo apt-get install subversion
-            sudo apt-get install -y libmagickwand-dev --no-install-recommends
-            yes '' | sudo pecl install imagick || true
-            sudo docker-php-ext-enable imagick
-            sudo docker-php-ext-install mysqli
-            sudo apt-get install mariadb-client-10.5
-      - run:
-          name: "Run Tests"
-          command: |
-            bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 latest
-            composer phpunit
-            WP_MULTISITE=1 composer phpunit
-            WP_REDIS_USE_CACHE_GROUPS=1 composer phpunit
-            rm -rf $WP_TESTS_DIR $WP_CORE_DIR
-            bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 nightly true
-            composer phpunit
+      - install-extras
+      - install-mariadb-10-5
+      - run-phpunit-tests
   test-phpunit-redis-enabled-74:
     working_directory: ~/pantheon-systems/wp-redis
     docker:
@@ -143,29 +195,10 @@ jobs:
           key: test-phpunit-74-dependencies-{{ checksum "composer.json" }}
           paths:
             - vendor
-      - run:
-          name: "Install Extras"
-          command: |
-            sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4EB27DB2A3B88B8B
-            sudo apt-get update
-            sudo apt-get install subversion
-            sudo apt-get install -y libmagickwand-dev --no-install-recommends
-            yes '' | sudo pecl install imagick || true
-            sudo docker-php-ext-enable imagick
-            sudo docker-php-ext-install mysqli
-            sudo apt-get install mariadb-client-10.5
-            yes '' | sudo pecl install redis || true
-            sudo docker-php-ext-enable redis
-      - run:
-          name: "Run Tests"
-          command: |
-            bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 latest
-            composer phpunit
-            WP_MULTISITE=1 composer phpunit
-            WP_REDIS_USE_CACHE_GROUPS=1 composer phpunit
-            rm -rf $WP_TESTS_DIR $WP_CORE_DIR
-            bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 nightly true
-            composer phpunit
+      - install-extras
+      - install-mariadb-10-5
+      - install-redis-extras
+      - run-phpunit-tests
   test-phpunit-redis-disabled-82:
     working_directory: ~/pantheon-systems/wp-redis
     docker:
@@ -184,27 +217,9 @@ jobs:
           key: test-phpunit-82-dependencies-{{ checksum "composer.json" }}
           paths:
             - vendor
-      - run:
-          name: "Install Extras"
-          command: |
-            sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4EB27DB2A3B88B8B
-            sudo apt-get update
-            sudo apt-get install subversion
-            sudo apt-get install -y libmagickwand-dev --no-install-recommends
-            yes '' | sudo pecl install imagick || true
-            sudo docker-php-ext-enable imagick
-            sudo docker-php-ext-install mysqli
-            sudo apt-get install mariadb-client-10.6
-      - run:
-          name: "Run Tests"
-          command: |
-            bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 latest
-            composer phpunit
-            WP_MULTISITE=1 composer phpunit
-            WP_REDIS_USE_CACHE_GROUPS=1 composer phpunit
-            rm -rf $WP_TESTS_DIR $WP_CORE_DIR
-            bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 nightly true
-            composer phpunit
+      - install-extras
+      - install-mariadb-10-6
+      - run-phpunit-tests
   test-phpunit-redis-enabled-82:
     working_directory: ~/pantheon-systems/wp-redis
     docker:
@@ -224,26 +239,7 @@ jobs:
           key: test-phpunit-82-dependencies-{{ checksum "composer.json" }}
           paths:
             - vendor
-      - run:
-          name: "Install Extras"
-          command: |
-            sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4EB27DB2A3B88B8B
-            sudo apt-get update
-            sudo apt-get install subversion
-            sudo apt-get install -y libmagickwand-dev --no-install-recommends
-            yes '' | sudo pecl install imagick || true
-            sudo docker-php-ext-enable imagick
-            sudo docker-php-ext-install mysqli
-            sudo apt-get install mariadb-client-10.6
-            yes '' | sudo pecl install redis || true
-            sudo docker-php-ext-enable redis
-      - run:
-          name: "Run Tests"
-          command: |
-            bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 latest
-            composer phpunit
-            WP_MULTISITE=1 composer phpunit
-            WP_REDIS_USE_CACHE_GROUPS=1 composer phpunit
-            rm -rf $WP_TESTS_DIR $WP_CORE_DIR
-            bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 nightly true
-            composer phpunit
+      - install-extras
+      - install-mariadb-10-6
+      - install-redis-extras
+      - run-phpunit-tests
