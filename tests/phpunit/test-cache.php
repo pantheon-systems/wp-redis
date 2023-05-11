@@ -415,7 +415,7 @@ class CacheTest extends WP_UnitTestCase {
 			foreach ( $data as $key => $value ) {
 				$this->assertEquals( $value, wp_cache_get( $key, 'test_wp_cache_flush_runtime' ) );
 			}
-			return
+			return;
 		}
 
 		// If we are not using redis, verify the cache is now empty
