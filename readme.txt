@@ -3,7 +3,7 @@ Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh, jspellman,
 Tags: cache, plugin, redis
 Requires at least: 3.0.1
 Tested up to: 6.2
-Stable tag: 1.4.1
+Stable tag: 1.4.2-dev
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,8 @@ This declaration means use of `wp_cache_set( 'foo', 'bar', 'bad-actor' );` and `
 There's a known issue with WordPress `alloptions` cache design. Specifically, a race condition between two requests can cause the object cache to have stale values. If you think you might be impacted by this, [review this GitHub issue](https://github.com/pantheon-systems/wp-redis/issues/221) for links to more context, including a workaround.
 
 == Changelog ==
+
+= Latest =
 
 = 1.4.1 (May 11, 2023) =
 * Bug fix: `wp_cache_flush_runtime` should only clear the local cache [[413](https://github.com/pantheon-systems/wp-redis/pull/413)]
