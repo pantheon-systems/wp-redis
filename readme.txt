@@ -3,7 +3,7 @@ Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh, jspellman,
 Tags: cache, plugin, redis
 Requires at least: 3.0.1
 Tested up to: 6.2
-Stable tag: 1.4.1-dev
+Stable tag: 1.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,7 +102,7 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 
 == Changelog ==
 
-= Latest =
+= 1.4.1 (May 11, 2023) =
 * Bug fix: `wp_cache_flush_runtime` should only clear the local cache [[413](https://github.com/pantheon-systems/wp-redis/pull/413)]
 
 = 1.4.0 (May 9, 2023) =
