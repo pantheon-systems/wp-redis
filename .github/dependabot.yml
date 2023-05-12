@@ -6,7 +6,7 @@ updates:
     interval: weekly
     timezone: America/Los_Angeles
     day: tuesday
-  target-branch: "develop"
+  target-branch: "default"
   open-pull-requests-limit: 99
   ignore:
   - dependency-name: phpunit/phpunit
@@ -17,11 +17,3 @@ updates:
     versions:
     - ">= 9.a"
     - "< 10"
-- package-ecosystem: npm
-  directory: "/"
-  schedule:
-    interval: weekly
-    timezone: America/Los_Angeles
-    day: tuesday
-  target-branch: "develop"
-  open-pull-requests-limit: 99

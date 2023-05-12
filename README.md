@@ -13,7 +13,7 @@ Back your WP Object Cache with Redis, a high-performance in-memory storage backe
 
 ## Description ##
 
-[![CircleCI](https://circleci.com/gh/pantheon-systems/wp-redis/tree/master.svg?style=svg)](https://circleci.com/gh/pantheon-systems/wp-redis/tree/master)
+[![CircleCI](https://circleci.com/gh/pantheon-systems/wp-redis/tree/release.svg?style=svg)](https://circleci.com/gh/pantheon-systems/wp-redis/tree/release)
 
 For sites concerned with high traffic, speed for logged-in users, or dynamic pageloads, a high-speed and persistent object cache is a must. You also need something that can scale across multiple instances of your application, so using local file caches or APC are out.
 
@@ -78,7 +78,7 @@ Use `wp help redis <command>` to learn more about each command.
 
 ## Contributing ##
 
-See [CONTRIBUTING.md](https://github.com/pantheon-systems/wp-redis/blob/master/CONTRIBUTING.md) for information on contributing.
+See [CONTRIBUTING.md](https://github.com/pantheon-systems/wp-redis/blob/default/CONTRIBUTING.md) for information on contributing.
 
 ## Frequently Asked Questions ##
 
