@@ -1470,7 +1470,9 @@ class WP_Object_Cache {
 		try {
 			$this->last_triggered_error = 'WP Redis: ' . $exception->getMessage();
 			// Be friendly to developers debugging production servers by triggering an error.
-			trigger_error( esc_html( $this->last_triggered_error ), E_USER_WARNING ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error
+			
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error,WordPress.Security.EscapeOutput.OutputNotEscaped
+			trigger_error( $this->last_triggered_error, E_USER_WARNING ); 
 		} catch ( PHPUnit_Framework_Error_Warning $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
 			// PHPUnit throws an Exception when `trigger_error()` is called. To ensure our tests (which expect Exceptions to be caught) continue to run, we catch the PHPUnit exception and inspect the RedisException message.
 		}
