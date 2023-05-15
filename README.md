@@ -105,6 +105,7 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 ## Changelog ##
 
 ### Latest ###
+* Bug fix: Removes exception loop caused by `esc_html` in `_exception_handler()` [[421](https://github.com/pantheon-systems/wp-redis/pull/421)]
 
 ### 1.4.1 (May 11, 2023) ###
 * Bug fix: `wp_cache_flush_runtime` should only clear the local cache [[413](https://github.com/pantheon-systems/wp-redis/pull/413)]
