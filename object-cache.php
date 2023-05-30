@@ -1261,7 +1261,7 @@ class WP_Object_Cache {
 			}
 		}
 
-		if ( file_exists( $redis_server['host'] ) && 'socket' === filetype( $redis_server['host'] ) ) { // unix socket connection.
+		if ( strpos($redis_server['host'], 'unix:///') === 0 ) ) { // Unix socket connection.
 			// port must be null or socket won't connect.
 			$port = null;
 		}
