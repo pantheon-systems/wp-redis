@@ -1293,6 +1293,7 @@ class WP_Object_Cache {
 			$client_parameters['port'],
 			// $client_parameters['timeout'] is sent in milliseconds, connect() takes seconds, so divide by 1000.
 			$client_parameters['timeout'] / 1000,
+			null,
 			$client_parameters['retry_interval']
 		);
 
