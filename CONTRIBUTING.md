@@ -34,7 +34,7 @@ The behat tests require a Pantheon site with Redis enabled. Once you've created 
 1. From `default`, checkout a new branch `release_X.Y.Z`.
 1. Make a release commit:
     * Drop the `-dev` from the version number in `README.md`, `readme.txt`, and `wp-redis.php`.
-    * Update the "Latest" heading in the changelog to the new version number with the date
+    * Add the date to the `** X.Y.X **` heading in the changelog(s)
     * Commit these changes with the message `Release X.Y.Z`
     * Push the release branch up.
 1. Open a Pull Request to merge `release_X.Y.Z` into `release`. Your PR should consist of all commits to `default` since the last release, and one commit to update the version number. The PR name should also be `Release X.Y.Z`.
@@ -47,10 +47,12 @@ The behat tests require a Pantheon site with Redis enabled. Once you've created 
 1. Wait for the [_Release wp-redis plugin to wp.org_ action](https://github.com/pantheon-systems/wp-redis/actions/workflows/wordpress-plugin-deploy.yml) to finish deploying to the WordPress.org plugin repository. If all goes well, users with SVN commit access for that plugin will receive an emailed diff of changes.
 1. Check WordPress.org: Ensure that the changes are live on [the plugin repository](https://wordpress.org/plugins/wp-redis/). This may take a few minutes.
 1. Following the release, prepare the next dev version with the following steps:
-    * `git checkout develop`
-    * `git rebase master`
+    * `git checkout release`
+    * `git pull origin release`
+	 * `git checkout develop`
+    * `git rebase release`
     * Update the version number in all locations, incrementing the version by one patch version, and add the `-dev` flag (e.g. after releasing `1.2.3`, the new verison will be `1.2.4-dev`)
-    * Add a new `** Latest **` heading to the changelog
+    * Add a new `** X.Y.X-dev **` heading to the changelog
     * `git add -A .`
     * `git commit -m "Prepare X.Y.X-dev"`
     * `git push origin develop`
