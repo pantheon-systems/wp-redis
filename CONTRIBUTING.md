@@ -14,7 +14,7 @@ We prefer to squash commits (i.e. avoid merge PRs) from a feature branch into `d
 
 `default` should be stable and usable, though possibly a few commits ahead of the public release on wp.org.
 
-The `release` branch matches the latest stable release deployed to [wp.org](wp.org).
+The `release` branch matches the latest stable release deployed to [wp.org](https://wordpress.org/).
 
 ## Testing
 
@@ -33,13 +33,13 @@ The behat tests require a Pantheon site with Redis enabled. Once you've created 
 
 1. From `default`, checkout a new branch `release_X.Y.Z`.
 1. Make a release commit:
-    * Drop the `-dev` from the version number in `README.md`, `readme.txt`, and `wp-redis.php`.
-    * Add the date to the `** X.Y.X **` heading in the changelog(s)
+    * In `README.md`, `readme.txt`, and `wp-redis.php`, remove the `-dev` from the version number.
+    * Add the date to the `** X.Y.X **` heading in the changelogs in README.md, readme.txt, and any other appropriate location.
     * Commit these changes with the message `Release X.Y.Z`
     * Push the release branch up.
 1. Open a Pull Request to merge `release_X.Y.Z` into `release`. Your PR should consist of all commits to `default` since the last release, and one commit to update the version number. The PR name should also be `Release X.Y.Z`.
 1. After all tests pass and you have received approval from a [CODEOWNER](./CODEOWNERS), merge the PR into `release`. "Rebase and merge" is preferred in this case. _Never_ squash to `release`.
-1. Pull `release` locally, create a new tag (based on version number from previous steps), and push up. The tag should _only_ be the version number. It _should not_ be prefixed  `v` (i.e. `X.Y.Z`, not `vX.Y.X`).
+1. Locally, pull the `release` branch, create a new tag (based on version number from previous steps), and push up. The tag should _only_ be the version number. It _should not_ be prefixed  `v` (i.e. `X.Y.Z`, not `vX.Y.X`).
     * `git tag X.Y.Z`
     * `git push --tags`
 1. Confirm that the necessary assets are present in the newly created tag, and test on a WP install if desired.
@@ -49,10 +49,10 @@ The behat tests require a Pantheon site with Redis enabled. Once you've created 
 1. Following the release, prepare the next dev version with the following steps:
     * `git checkout release`
     * `git pull origin release`
-	 * `git checkout develop`
+	 * `git checkout default`
     * `git rebase release`
     * Update the version number in all locations, incrementing the version by one patch version, and add the `-dev` flag (e.g. after releasing `1.2.3`, the new verison will be `1.2.4-dev`)
     * Add a new `** X.Y.X-dev **` heading to the changelog
     * `git add -A .`
     * `git commit -m "Prepare X.Y.X-dev"`
-    * `git push origin develop`
+    * `git push origin default`
