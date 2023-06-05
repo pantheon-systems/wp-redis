@@ -105,6 +105,7 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 ## Changelog ##
 
 ### 1.4.3-dev ###
+* Bug fix: Connect via unix socket instead of filesystem to be compatible with php open_basedir restrictions [[426](https://github.com/pantheon-systems/wp-redis/pull/426)] (props @hj-collab)
 * Bug fix: Fixes assumption that CACHE_PORT & CACHE_PASSWORD are Set. [[428](https://github.com/pantheon-systems/wp-redis/pull/428)] (props @timnolte)
 
 ### 1.4.2 (May 15, 2023) ###
