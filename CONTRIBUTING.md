@@ -49,7 +49,7 @@ The behat tests require a Pantheon site with Redis enabled. Once you've created 
 1. Following the release, prepare the next dev version with the following steps:
     * `git checkout release`
     * `git pull origin release`
-	 * `git checkout default`
+    * `git checkout default`
     * `git rebase release`
     * Update the version number in all locations, incrementing the version by one patch version, and add the `-dev` flag (e.g. after releasing `1.2.3`, the new verison will be `1.2.4-dev`)
     * Add a new `** X.Y.X-dev **` heading to the changelog
