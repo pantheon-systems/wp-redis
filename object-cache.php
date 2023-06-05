@@ -1243,8 +1243,8 @@ class WP_Object_Cache {
 			if ( isset( $_SERVER['CACHE_HOST'] ) ) {
 				$redis_server = [
 					'host' => wp_strip_all_tags( $_SERVER['CACHE_HOST'] ),
-					'port' => isset( $_SERVER['CACHE_PORT'] ) ? wp_strip_all_tags( $_SERVER['CACHE_PORT'] ) : 0,
-					'auth' => isset( $_SERVER['CACHE_PASSWORD'] ) ? wp_strip_all_tags( $_SERVER['CACHE_PASSWORD'] ) : '',
+					'port' => isset( $_SERVER['CACHE_PORT'] ) ? wp_strip_all_tags( $_SERVER['CACHE_PORT'] ) : 6379,
+					'auth' => isset( $_SERVER['CACHE_PASSWORD'] ) ? wp_strip_all_tags( $_SERVER['CACHE_PASSWORD'] ) : null,
 					'database' => isset( $_SERVER['CACHE_DB'] ) ? wp_strip_all_tags( $_SERVER['CACHE_DB'] ) : 0,
 				];
 			} else {
