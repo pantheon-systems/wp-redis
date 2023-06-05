@@ -96,4 +96,4 @@ echo "Flush cache and setup environment..."
 terminus wp $SITE_ENV -- plugin activate wp-redis classic-editor
 terminus wp $SITE_ENV -- cache flush
 terminus wp $SITE_ENV -- theme activate twentyseventeen
-terminus wp $SITE_ENV -- rewrite structure '/%year%/%monthnum%/%day%/%postname%/'
+terminus wp $SITE_ENV -- rewrite structure '/%year%/%monthnum%/%day%/%postname%/
