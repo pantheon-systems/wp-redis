@@ -1238,20 +1238,25 @@ class WP_Object_Cache {
 	 *               with defaults applied.
 	 */
 	public function build_client_parameters( $redis_server ) {
+		// Default Redis port.
+		$port = 6379;
+		// Default Redis database number.
+		$database = 0;
+
 		if ( empty( $redis_server ) ) {
 			// Attempt to automatically load Pantheon's Redis config from the env.
 			if ( isset( $_SERVER['CACHE_HOST'] ) ) {
 				$redis_server = [
 					'host' => wp_strip_all_tags( $_SERVER['CACHE_HOST'] ),
-					'port' => isset( $_SERVER['CACHE_PORT'] ) ? wp_strip_all_tags( $_SERVER['CACHE_PORT'] ) : 6379,
+					'port' => isset( $_SERVER['CACHE_PORT'] ) ? wp_strip_all_tags( $_SERVER['CACHE_PORT'] ) : $port,
 					'auth' => isset( $_SERVER['CACHE_PASSWORD'] ) ? wp_strip_all_tags( $_SERVER['CACHE_PASSWORD'] ) : null,
-					'database' => isset( $_SERVER['CACHE_DB'] ) ? wp_strip_all_tags( $_SERVER['CACHE_DB'] ) : 0,
+					'database' => isset( $_SERVER['CACHE_DB'] ) ? wp_strip_all_tags( $_SERVER['CACHE_DB'] ) : $database,
 				];
 			} else {
 				$redis_server = [
 					'host' => '127.0.0.1',
-					'port' => 6379,
-					'database' => 0,
+					'port' => $port,
+					'database' => $database,
 				];
 			}
 		}
@@ -1470,9 +1475,9 @@ class WP_Object_Cache {
 		try {
 			$this->last_triggered_error = 'WP Redis: ' . $exception->getMessage();
 			// Be friendly to developers debugging production servers by triggering an error.
-			
+
 			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error,WordPress.Security.EscapeOutput.OutputNotEscaped
-			trigger_error( $this->last_triggered_error, E_USER_WARNING ); 
+			trigger_error( $this->last_triggered_error, E_USER_WARNING );
 		} catch ( PHPUnit_Framework_Error_Warning $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
 			// PHPUnit throws an Exception when `trigger_error()` is called. To ensure our tests (which expect Exceptions to be caught) continue to run, we catch the PHPUnit exception and inspect the RedisException message.
 		}
