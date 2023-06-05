@@ -33,7 +33,7 @@ The behat tests require a Pantheon site with Redis enabled. Once you've created 
 
 1. From `default`, checkout a new branch `release_X.Y.Z`.
 1. Make a release commit:
-    * In `README.md`, `readme.txt`, and `wp-redis.php`, remove the `-dev` from the version number.
+    * In `README.md`, `readme.txt`, and `wp-redis.php`, remove the `-dev` from the version number. For the README files. the version number must be updated both at the top of the document as well as the changelog.
     * Add the date to the `** X.Y.X **` heading in the changelogs in README.md, readme.txt, and any other appropriate location.
     * Commit these changes with the message `Release X.Y.Z`
     * Push the release branch up.
