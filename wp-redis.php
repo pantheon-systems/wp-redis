@@ -38,12 +38,12 @@ function wp_redis_get_info() {
 
 	if ( empty( $redis_server ) ) {
 		// Attempt to automatically load Pantheon's Redis config from the env.
-		if ( isset( $_SERVER['CACHE_HOST'] ) && isset( $_SERVER['CACHE_PORT'] ) && isset( $_SERVER['CACHE_PASSWORD'] ) && isset( $_SERVER['CACHE_DB'] ) ) {
+		if ( isset( $_SERVER['CACHE_HOST'] ) ) {
 			$redis_server = [
 				'host' => sanitize_text_field( $_SERVER['CACHE_HOST'] ),
-				'port' => sanitize_text_field( $_SERVER['CACHE_PORT'] ),
-				'auth' => sanitize_text_field( $_SERVER['CACHE_PASSWORD'] ),
-				'database' => sanitize_text_field( $_SERVER['CACHE_DB'] ),
+				'port' => isset( $_SERVER['CACHE_PORT'] ) ? sanitize_text_field( $_SERVER['CACHE_PORT'] ) : 6379,
+				'auth' => isset( $_SERVER['CACHE_PASSWORD'] ) ? sanitize_text_field( $_SERVER['CACHE_PASSWORD'] ) : null,
+				'database' => isset( $_SERVER['CACHE_DB'] ) ? sanitize_text_field( $_SERVER['CACHE_DB'] ) : 0,
 			];
 		} else {
 			$redis_server = [
