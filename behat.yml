@@ -4,6 +4,7 @@ default:
     default:
       paths:
         - tests/behat
+        - tests/behat/bootstrap
       contexts:
         - Behat\MinkExtension\Context\MinkContext
         - PantheonSystems\PantheonWordPressUpstreamTests\Behat\AdminLogIn
