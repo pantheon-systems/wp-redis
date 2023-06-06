@@ -1,5 +1,7 @@
 <?php
 
+namespace behat\features\bootstrap;
+
 use Behat\Behat\Context\Context;
 
 class FeatureContext implements Context
@@ -12,7 +14,8 @@ class FeatureContext implements Context
 	 * You can also pass arbitrary arguments to the
 	 * context constructor through behat.yml.
 	 */
-	public function __construct() {
+	public function __construct()
+	{
 	}
 
 	/**
@@ -23,7 +26,8 @@ class FeatureContext implements Context
 	 *
 	 * @When I wait :seconds second(s)
 	 */
-	public function wait($seconds) {
+	public function wait($seconds)
+	{
 		sleep($seconds);
 	}
 

@@ -3,8 +3,7 @@ default:
   suites:
     default:
       paths:
-        - tests/behat
-        - tests/behat/bootstrap
+        - tests/behat/features
       contexts:
         - Behat\MinkExtension\Context\MinkContext
         - PantheonSystems\PantheonWordPressUpstreamTests\Behat\AdminLogIn
