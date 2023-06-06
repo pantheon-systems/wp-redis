@@ -1,10 +1,11 @@
 <?php
+// features/bootstrap/WPRedisFeatureContext.php
 
 namespace behat\features\bootstrap;
 
 use Behat\Behat\Context\Context;
 
-class FeatureContext implements Context
+class WPRedisFeatureContext implements Context
 {
 
 	/**
