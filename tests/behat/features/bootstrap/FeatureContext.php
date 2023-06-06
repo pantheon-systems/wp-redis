@@ -5,7 +5,7 @@ namespace behat\features\bootstrap;
 
 use Behat\Behat\Context\Context;
 
-class WPRedisFeatureContext implements Context
+class FeatureContext implements Context
 {
 
 	/**
