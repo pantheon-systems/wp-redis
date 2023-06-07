@@ -15,5 +15,4 @@ Feature: WP Redis
     Then I should see "Redis Calls:"
     And I should see "Cache Hits:"
     And I should see "Cache Misses:"
-    And I should see "- redis_get:"
     And I should see "- redis-get:"
