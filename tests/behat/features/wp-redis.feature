@@ -16,3 +16,7 @@ Feature: WP Redis
     And I should see "Cache Hits:"
     And I should see "Cache Misses:"
     And I should see "Redis Calls:"
+
+	When I am on "/?redis_debug"
+	Then I should see "get"
+
