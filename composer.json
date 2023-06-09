@@ -28,9 +28,5 @@
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true
     }
-  },
-  "autoload": {
-    "psr-4": { "wpredis\\behat\\features\\bootstrap\\": "tests/behat/features/bootstrap/" }
   }
-
 }
