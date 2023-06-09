@@ -119,9 +119,9 @@ jobs:
         terminus auth:login --machine-token=$TERMINUS_TOKEN
     - run: ./bin/behat-prepare.sh
     - run: ./bin/behat-test.sh --strict
-#    - run:
-#        command: ./bin/behat-cleanup.sh
-#        when: always
+    - run:
+        command: ./bin/behat-cleanup.sh
+        when: always
   test-phpunit-redis-disabled-74:
     working_directory: ~/pantheon-systems/wp-redis
     docker:
