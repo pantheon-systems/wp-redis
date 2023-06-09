@@ -5,7 +5,7 @@ namespace wpredis\behat\features\bootstrap;
 
 use Behat\Behat\Context\Context;
 
-class FeatureContext implements Context
+class WpRedisFeatureContext implements Context
 {
 
 	/**
