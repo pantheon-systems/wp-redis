@@ -30,7 +30,7 @@
     }
   },
   "autoload": {
-    "psr-4": { "wpredis\\behat\\features\\bootstrap\\": "tests/behat/features/bootstrap/" }
+    "psr-4": { "behat\\features\\bootstrap\\": "tests/behat/features/bootstrap/" }
   }
 
 }

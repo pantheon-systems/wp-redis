@@ -1,7 +1,7 @@
 <?php
 // features/bootstrap/WPRedisFeatureContext.php
 
-namespace wpredis\behat\features\bootstrap;
+namespace behat\features\bootstrap;
 
 use Behat\Behat\Context\Context;
 
