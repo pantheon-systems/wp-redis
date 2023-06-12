@@ -7,7 +7,7 @@ default:
       contexts:
         - Behat\MinkExtension\Context\MinkContext
         - PantheonSystems\PantheonWordPressUpstreamTests\Behat\AdminLogIn
-        - wpredis\behat\features\bootstrap\WpRedisFeatureContext
+        - behat\features\bootstrap\WpRedisFeatureContext
   extensions:
     Behat\MinkExtension:
       # base_url set by ENV
