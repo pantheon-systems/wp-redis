@@ -17,8 +17,9 @@ Feature: WP Redis
     And I should see "Cache Misses:"
     And I should see "Redis Calls:"
 
-	# We call the same page twice to give Redis an opportunity to cache
-	# something so that `get` actually fires.
-	When I am on "/?redis_debug"
-	Then I should see "Group:"
+    # We call the same page twice to give Redis an opportunity to cache
+    # something so that `get` actually fires.
+    When I am on "/?redis_debug"
+    Then I should see "Group:"
+    Then I should see "- get"
 
