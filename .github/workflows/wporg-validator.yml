@@ -1,0 +1,8 @@
+# On push, run the action-wporg-validator workflow.
+name: WP.org Validator
+on: [push]
+jobs:
+  wporg-validation:
+    uses: pantheon-systems/action-wporg-validator@1.0.0
+    with:
+      type: plugin
