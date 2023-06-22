@@ -15,7 +15,7 @@ Feature: WP Redis
     Then I should see "Redis Calls:"
     And I should see "Cache Hits:"
     And I should see "Cache Misses:"
-		And I should see "Redis Calls:"
+    And I should see "Redis Calls:"
 
     # We call the same page twice to give Redis an opportunity to cache
     # something so that `get` actually fires.
