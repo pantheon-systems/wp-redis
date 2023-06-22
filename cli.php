@@ -41,7 +41,7 @@ class WP_Redis_CLI_Command {
 		$cmd = WP_CLI\Utils\esc_cmd( 'redis-cli -h %s -p %s -a %s -n %s', $redis_server['host'], $redis_server['port'], $redis_server['auth'], $redis_server['database'] );
 		$process = WP_CLI\Utils\proc_open_compat( $cmd, [ STDIN, STDOUT, STDERR ], $pipes );
 		$r = proc_close( $process );
-		exit( (int) $r );
+		exit( (int) $r ); // phpcs:ignore WordPressDotOrg.sniffs.OutputEscaping.UnescapedOutputParameter
 	}
 
 	/**
