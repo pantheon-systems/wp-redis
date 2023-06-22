@@ -1264,6 +1264,8 @@ class WP_Object_Cache {
 		if ( file_exists( $redis_server['host'] ) && 'socket' === filetype( $redis_server['host'] ) ) { // unix socket connection.
 			// port must be null or socket won't connect.
 			$port = null;
+		} else { // tcp connection.
+			$port = ! empty( $redis_server['port'] ) ? $redis_server['port'] : 6379;
 		}
 
 		$defaults = [
