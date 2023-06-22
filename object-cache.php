@@ -986,7 +986,7 @@ class WP_Object_Cache {
 			$out[] = '<li><strong>Group:</strong> ' . esc_html( $group ) . ' - ( ' . number_format( strlen( serialize( $cache ) ) / 1024, 2 ) . 'k )</li>';
 		}
 		$out[] = '</ul>';
-		echo implode( PHP_EOL, $out ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped WordPressDotOrg.sniffs.OutputEscaping.UnescapedOutputParameter
+		echo implode( PHP_EOL, $out ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped,WordPressDotOrg.sniffs.OutputEscaping.UnescapedOutputParameter
 	}
 
 	/**
