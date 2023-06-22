@@ -106,6 +106,7 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 
 ### 1.4.3-dev ###
 * Bug fix: Fixes assumption that CACHE_PORT & CACHE_PASSWORD are Set. [[428](https://github.com/pantheon-systems/wp-redis/pull/428)] (props @timnolte)
+* Adds WP.org validation GitHub action [[#435](https://github.com/pantheon-systems/wp-redis/pull/435)]
 
 ### 1.4.2 (May 15, 2023) ###
 * Bug fix: Removes exception loop caused by `esc_html` in `_exception_handler()` [[421](https://github.com/pantheon-systems/wp-redis/pull/421)]
