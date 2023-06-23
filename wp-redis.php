@@ -44,11 +44,14 @@ function wp_redis_get_info() {
 		// Attempt to automatically load Pantheon's Redis config from the env.
 		if ( isset( $_SERVER['CACHE_HOST'] ) ) {
 			$redis_server = [
+				// Don't use WP methods to sanitize the host due to plugin loading issues with other caching methods.
+				// @phpcs:ignore WordPressVIPMinimum.Functions.StripTags.StripTagsOneParameter,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 				'host' => strip_tags( $_SERVER['CACHE_HOST'] ),
-				'port' => ! empty( $_SERVER['CACHE_PORT'] ) ? strip_tags( $_SERVER['CACHE_PORT'] ) : $port,
+				'port' => ! empty( $_SERVER['CACHE_PORT'] ) ? intval( $_SERVER['CACHE_PORT'] ) : $port,
 				// Don't attempt to sanitize passwords as this can break authentication.
+				// @phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 				'auth' => ! empty( $_SERVER['CACHE_PASSWORD'] ) ? $_SERVER['CACHE_PASSWORD'] : null,
-				'database' => ! empty( $_SERVER['CACHE_DB'] ) ? strip_tags( $_SERVER['CACHE_DB'] ) : $database,
+				'database' => ! empty( $_SERVER['CACHE_DB'] ) ? intval( $_SERVER['CACHE_DB'] ) : $database,
 			];
 		} else {
 			$redis_server = [
