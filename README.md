@@ -5,7 +5,7 @@
 **Tags:** cache, plugin, redis
 **Requires at least:** 3.0.1
 **Tested up to:** 6.2
-**Stable tag:** 1.4.3-dev
+**Stable tag:** 1.4.3
 **License:** GPLv2 or later
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -104,7 +104,7 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 
 ## Changelog ##
 
-### 1.4.3-dev ###
+### 1.4.3 (June 26, 2023) ###
 * Bug fix: Fixes assumption that CACHE_PORT & CACHE_PASSWORD are Set. [[428](https://github.com/pantheon-systems/wp-redis/pull/428)] (props @timnolte)
 * Adds WP.org validation GitHub action [[#435](https://github.com/pantheon-systems/wp-redis/pull/435)]
 * Bug fix: Fixes incorrect order of `array_replace_recursive` and other issues [[434](https://github.com/pantheon-systems/wp-redis/pull/434)] (props @timnolte)
