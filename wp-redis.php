@@ -81,7 +81,9 @@ function wp_redis_get_info() {
 	} else {
 		$uptime_in_days .= ' days';
 	}
-	$database  = ! empty( $redis_server['database'] ) ? $redis_server['database'] : $database;
+	if ( ! empty( $redis_server['database'] ) {
+		$database = $redis_server['database'];
+	}
 	$key_count = 0;
 	if ( isset( $info[ 'db' . $database ] ) && preg_match( '#keys=([\d]+)#', $info[ 'db' . $database ], $matches ) ) {
 		$key_count = $matches[1];
