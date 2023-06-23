@@ -30,9 +30,6 @@ set -ex
 terminus env:create  $TERMINUS_SITE.dev $TERMINUS_ENV
 terminus env:wipe $SITE_ENV --yes
 
-# Enable Redis
-terminus redis:enable $TERMINUS_SITE
-
 ###
 # Get all necessary environment details.
 ###

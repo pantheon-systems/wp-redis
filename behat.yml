@@ -3,10 +3,11 @@ default:
   suites:
     default:
       paths:
-        - tests/behat
+        - tests/behat/
       contexts:
         - Behat\MinkExtension\Context\MinkContext
         - PantheonSystems\PantheonWordPressUpstreamTests\Behat\AdminLogIn
+        - behat\features\bootstrap\WpRedisFeatureContext
   extensions:
     Behat\MinkExtension:
       # base_url set by ENV
