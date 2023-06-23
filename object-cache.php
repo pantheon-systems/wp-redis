@@ -1277,6 +1277,8 @@ class WP_Object_Cache {
 			// port must be null or socket won't connect.
 			unset( $redis_server['port'] );
 			$port = null;
+		} elseif ( ! empty( $redis_server['port'] ) ) { // tcp connection.
+			$port = $redis_server['port'];
 		}
 
 		$defaults = [
