@@ -1247,10 +1247,14 @@ class WP_Object_Cache {
 			// Attempt to automatically load Pantheon's Redis config from the env.
 			if ( isset( $_SERVER['CACHE_HOST'] ) ) {
 				$redis_server = [
-					'host' => wp_strip_all_tags( $_SERVER['CACHE_HOST'] ),
-					'port' => isset( $_SERVER['CACHE_PORT'] ) ? wp_strip_all_tags( $_SERVER['CACHE_PORT'] ) : $port,
-					'auth' => isset( $_SERVER['CACHE_PASSWORD'] ) ? wp_strip_all_tags( $_SERVER['CACHE_PASSWORD'] ) : null,
-					'database' => isset( $_SERVER['CACHE_DB'] ) ? wp_strip_all_tags( $_SERVER['CACHE_DB'] ) : $database,
+					// Don't use WP methods to sanitize the host due to plugin loading issues with other caching methods.
+					// @phpcs:ignore WordPressVIPMinimum.Functions.StripTags.StripTagsOneParameter,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+					'host' => strip_tags( $_SERVER['CACHE_HOST'] ),
+					'port' => ! empty( $_SERVER['CACHE_PORT'] ) ? intval( $_SERVER['CACHE_PORT'] ) : $port,
+					// Don't attempt to sanitize passwords as this can break authentication.
+					// @phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+					'auth' => ! empty( $_SERVER['CACHE_PASSWORD'] ) ? $_SERVER['CACHE_PASSWORD'] : null,
+					'database' => ! empty( $_SERVER['CACHE_DB'] ) ? intval( $_SERVER['CACHE_DB'] ) : $database,
 				];
 			} else {
 				$redis_server = [
@@ -1263,9 +1267,8 @@ class WP_Object_Cache {
 
 		if ( file_exists( $redis_server['host'] ) && 'socket' === filetype( $redis_server['host'] ) ) { // unix socket connection.
 			// port must be null or socket won't connect.
+			unset( $redis_server['port'] );
 			$port = null;
-		} elseif ( ! empty( $redis_server['port'] ) ) { // tcp connection.
-			$port = $redis_server['port'];
 		}
 
 		$defaults = [
@@ -1277,7 +1280,7 @@ class WP_Object_Cache {
 		// 1s timeout, 100ms delay between reconnections.
 
 		// merging the defaults with the original $redis_server enables any custom parameters to get sent downstream to the redis client.
-		return array_replace_recursive( $redis_server, $defaults );
+		return array_replace_recursive( $defaults, $redis_server );
 	}
 
 	/**

@@ -35,21 +35,29 @@ if ( defined( 'WP_CLI' ) && WP_CLI && ! class_exists( 'WP_Redis_CLI_Command' ) )
  */
 function wp_redis_get_info() {
 	global $wp_object_cache, $redis_server;
+	// Default Redis port.
+	$port = 6379;
+	// Default Redis database number.
+	$database = 0;
 
 	if ( empty( $redis_server ) ) {
 		// Attempt to automatically load Pantheon's Redis config from the env.
 		if ( isset( $_SERVER['CACHE_HOST'] ) ) {
 			$redis_server = [
-				'host' => sanitize_text_field( $_SERVER['CACHE_HOST'] ),
-				'port' => isset( $_SERVER['CACHE_PORT'] ) ? sanitize_text_field( $_SERVER['CACHE_PORT'] ) : 6379,
-				'auth' => isset( $_SERVER['CACHE_PASSWORD'] ) ? sanitize_text_field( $_SERVER['CACHE_PASSWORD'] ) : null,
-				'database' => isset( $_SERVER['CACHE_DB'] ) ? sanitize_text_field( $_SERVER['CACHE_DB'] ) : 0,
+				// Don't use WP methods to sanitize the host due to plugin loading issues with other caching methods.
+				// @phpcs:ignore WordPressVIPMinimum.Functions.StripTags.StripTagsOneParameter,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				'host' => strip_tags( $_SERVER['CACHE_HOST'] ),
+				'port' => ! empty( $_SERVER['CACHE_PORT'] ) ? intval( $_SERVER['CACHE_PORT'] ) : $port,
+				// Don't attempt to sanitize passwords as this can break authentication.
+				// @phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				'auth' => ! empty( $_SERVER['CACHE_PASSWORD'] ) ? $_SERVER['CACHE_PASSWORD'] : null,
+				'database' => ! empty( $_SERVER['CACHE_DB'] ) ? intval( $_SERVER['CACHE_DB'] ) : $database,
 			];
 		} else {
 			$redis_server = [
 				'host' => '127.0.0.1',
-				'port' => 6379,
-				'database' => 0,
+				'port' => $port,
+				'database' => $database,
 			];
 		}
 	}
@@ -73,7 +81,9 @@ function wp_redis_get_info() {
 	} else {
 		$uptime_in_days .= ' days';
 	}
-	$database  = ! empty( $redis_server['database'] ) ? $redis_server['database'] : 0;
+	if ( ! empty( $redis_server['database'] ) ) {
+		$database = $redis_server['database'];
+	}
 	$key_count = 0;
 	if ( isset( $info[ 'db' . $database ] ) && preg_match( '#keys=([\d]+)#', $info[ 'db' . $database ], $matches ) ) {
 		$key_count = $matches[1];
