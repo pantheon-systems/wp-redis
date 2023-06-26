@@ -38,7 +38,7 @@ The behat tests require a Pantheon site with Redis enabled. Once you've created 
     * Commit these changes with the message `Release X.Y.Z`
     * Push the release branch up.
 1. Open a Pull Request to merge `release_X.Y.Z` into `release`. Your PR should consist of all commits to `main` since the last release, and one commit to update the version number. The PR name should also be `Release X.Y.Z`.
-1. After all tests pass and you have received approval from a [CODEOWNER](./CODEOWNERS), merge the PR into `release`. "Rebase and merge" is preferred in this case. _Never_ squash to `release`.
+1. After all tests pass and you have received approval from a [CODEOWNER](./CODEOWNERS), merge the PR into `release`. A merge commit is preferred in this case. _Never_ squash to `release`.
 1. Locally, pull the `release` branch, create a new tag (based on version number from previous steps), and push up. The tag should _only_ be the version number. It _should not_ be prefixed  `v` (i.e. `X.Y.Z`, not `vX.Y.X`).
     * `git tag X.Y.Z`
     * `git push --tags`
