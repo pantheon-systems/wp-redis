@@ -106,7 +106,7 @@ Please report security bugs found in the source code of the WP Redis plugin thro
 == Changelog ==
 
 = 1.4.4-dev =
-* Updates security policy [[#](https://github.com/pantheon-systems/wp-redis/pull/)]
+* Updates security policy [[#441](https://github.com/pantheon-systems/wp-redis/pull/441)]
 
 = 1.4.3 (June 26, 2023)  =
 * Bug fix: Fixes assumption that CACHE_PORT & CACHE_PASSWORD are Set. [[428](https://github.com/pantheon-systems/wp-redis/pull/428)] (props @tnolte)
