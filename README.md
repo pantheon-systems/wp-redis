@@ -80,6 +80,10 @@ Use `wp help redis <command>` to learn more about each command.
 
 See [CONTRIBUTING.md](https://github.com/pantheon-systems/wp-redis/blob/default/CONTRIBUTING.md) for information on contributing.
 
+## Security Policy ##
+### Reporting Security Bugs
+Please report security bugs found in the WP Redis plugin's source code through the [Patchstack Vulnerability Disclosure Program](https://patchstack.com/database/vdp/wp-redis). The Patchstack team will assist you with verification, CVE assignment, and notify the developers of this plugin.
+
 ## Frequently Asked Questions ##
 
 ### Why would I want to use this plugin? ###
@@ -105,6 +109,7 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 ## Changelog ##
 
 ### 1.4.4-dev ###
+* Updates security policy [[#](https://github.com/pantheon-systems/wp-redis/pull/)]
 
 ### 1.4.3 (June 26, 2023) ###
 * Bug fix: Fixes assumption that CACHE_PORT & CACHE_PASSWORD are Set. [[428](https://github.com/pantheon-systems/wp-redis/pull/428)] (props @timnolte)
