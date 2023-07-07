@@ -1,8 +1,16 @@
 # On push, run the action-wporg-validator workflow.
-name: WP.org Validator
+name: Linting & Test
 on: [push]
 jobs:
+  validate-readme-spacing:
+    name: Validate README Spacing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: pantheon-systems/validate-readme-spacing@v1
   wporg-validation:
+    name: WP.org Validator
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
