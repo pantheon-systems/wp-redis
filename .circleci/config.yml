@@ -108,7 +108,7 @@ jobs:
     resource_class: small
     working_directory: ~/pantheon-systems/wp-redis
     docker:
-      - image: cimg/php:7.4
+      - image: circleci/php:7.4-node-browsers
       - image: cimg/mariadb:10.3
     environment:
       - WP_TESTS_DIR: "/tmp/wordpress-tests-lib"
@@ -131,7 +131,7 @@ jobs:
     resource_class: small
     working_directory: ~/pantheon-systems/wp-redis
     docker:
-      - image: cimg/php:7.4
+      - image: circleci/php:7.4-node-browsers
       - image: cimg/mariadb:10.3
       - image: cimg/redis:6.2
     environment:
