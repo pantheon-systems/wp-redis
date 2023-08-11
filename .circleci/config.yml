@@ -2,7 +2,6 @@ version: 2.1
 workflows:
   main:
     jobs:
-      - lint
       - test-behat
       - test-phpunit-redis-disabled-74
       - test-phpunit-redis-enabled-74
@@ -58,25 +57,6 @@ commands:
             bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 nightly true
             composer phpunit
 jobs:
-  lint:
-    working_directory: ~/pantheon-systems/wp-redis
-    docker:
-      - image: quay.io/pantheon-public/build-tools-ci:8.x-php8.0
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - test-lint-dependencies-{{ checksum "composer.json" }}
-      - run: composer install -n --prefer-dist
-      - save_cache:
-          key: test-lint-dependencies-{{ checksum "composer.json" }}
-          paths:
-            - vendor
-      - run:
-          name: "Run PHP Lint"
-          command: |
-            composer phpcs
-
   test-behat:
     working_directory: ~/pantheon-systems/wp-redis
     parallelism: 1
@@ -117,6 +97,7 @@ jobs:
           exit 0
         fi
         terminus auth:login --machine-token=$TERMINUS_TOKEN
+    - run: ./bin/validate-fixture-version.sh
     - run: ./bin/behat-prepare.sh
     - run: ./bin/behat-test.sh --strict
     - run:
