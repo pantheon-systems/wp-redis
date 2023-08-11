@@ -107,7 +107,7 @@ jobs:
   test-phpunit-redis-disabled-74:
     working_directory: ~/pantheon-systems/wp-redis
     docker:
-      - image: cimg/php:7.4-node-browsers
+      - image: circleci/php:7.4-node-browsers
       - image: cimg/mariadb:10.3
     resource_class: small
     environment:
@@ -130,7 +130,7 @@ jobs:
   test-phpunit-redis-enabled-74:
     working_directory: ~/pantheon-systems/wp-redis
     docker:
-      - image: cimg/php:7.4-node-browsers
+      - image: circleci/php:7.4-node-browsers
       - image: cimg/mariadb:10.3
       - image: cimg/redis:latest
     resource_class: small
