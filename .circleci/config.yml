@@ -58,6 +58,7 @@ commands:
             composer phpunit
 jobs:
   test-behat:
+    resource_class: small
     working_directory: ~/pantheon-systems/wp-redis
     parallelism: 1
     docker:
@@ -104,10 +105,11 @@ jobs:
         command: ./bin/behat-cleanup.sh
         when: always
   test-phpunit-redis-disabled-74:
+    resource_class: small
     working_directory: ~/pantheon-systems/wp-redis
     docker:
       - image: circleci/php:7.4-node-browsers
-      - image: circleci/mariadb:10.3
+      - image: cimg/mariadb:10.3
     environment:
       - WP_TESTS_DIR: "/tmp/wordpress-tests-lib"
       - WP_CORE_DIR: "/tmp/wordpress/"
@@ -126,11 +128,12 @@ jobs:
       - install-mariadb-10-5
       - run-phpunit-tests
   test-phpunit-redis-enabled-74:
+    resource_class: small
     working_directory: ~/pantheon-systems/wp-redis
     docker:
       - image: circleci/php:7.4-node-browsers
-      - image: circleci/mariadb:10.3
-      - image: circleci/redis:latest
+      - image: cimg/mariadb:10.3
+      - image: circleci/redis:6.2
     environment:
       - WP_TESTS_DIR: "/tmp/wordpress-tests-lib"
       - WP_CORE_DIR: "/tmp/wordpress/"
@@ -150,10 +153,11 @@ jobs:
       - install-redis-extras
       - run-phpunit-tests
   test-phpunit-redis-disabled-82:
+    resource_class: small
     working_directory: ~/pantheon-systems/wp-redis
     docker:
       - image: cimg/php:8.2.0
-      - image: circleci/mariadb:10.3
+      - image: cimg/mariadb:10.3
     environment:
       - WP_TESTS_DIR: "/tmp/wordpress-tests-lib"
       - WP_CORE_DIR: "/tmp/wordpress/"
@@ -171,11 +175,12 @@ jobs:
       - install-mariadb-10-6
       - run-phpunit-tests
   test-phpunit-redis-enabled-82:
+    resource_class: small
     working_directory: ~/pantheon-systems/wp-redis
     docker:
       - image: cimg/php:8.2.0
-      - image: circleci/mariadb:10.3
-      - image: circleci/redis:latest
+      - image: cimg/mariadb:10.3
+      - image: circleci/redis:6.2
     environment:
       - WP_TESTS_DIR: "/tmp/wordpress-tests-lib"
       - WP_CORE_DIR: "/tmp/wordpress/"
