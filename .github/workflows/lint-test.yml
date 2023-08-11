@@ -9,6 +9,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - uses: pantheon-systems/validate-readme-spacing@v1
+  lint:
+    name: PHPCS Linting
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/vendor
+        key: test-lint-dependencies-{{ checksum "composer.json" }}
+        restore-keys: test-lint-dependencies-{{ checksum "composer.json" }}
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.0'
+    - name: Install dependencies
+      run: composer install -n --prefer-dist
+    - name: Run PHP Lint
+      run: composer phpcs
   wporg-validation:
     name: WP.org Validator
     runs-on: ubuntu-latest

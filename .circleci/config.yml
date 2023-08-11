@@ -2,7 +2,6 @@ version: 2.1
 workflows:
   main:
     jobs:
-      - lint
       - test-behat
       - test-phpunit-redis-disabled-74
       - test-phpunit-redis-enabled-74
@@ -58,26 +57,8 @@ commands:
             bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 nightly true
             composer phpunit
 jobs:
-  lint:
-    working_directory: ~/pantheon-systems/wp-redis
-    docker:
-      - image: quay.io/pantheon-public/build-tools-ci:8.x-php8.0
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - test-lint-dependencies-{{ checksum "composer.json" }}
-      - run: composer install -n --prefer-dist
-      - save_cache:
-          key: test-lint-dependencies-{{ checksum "composer.json" }}
-          paths:
-            - vendor
-      - run:
-          name: "Run PHP Lint"
-          command: |
-            composer phpcs
-
   test-behat:
+    resource_class: small
     working_directory: ~/pantheon-systems/wp-redis
     parallelism: 1
     docker:
@@ -117,16 +98,18 @@ jobs:
           exit 0
         fi
         terminus auth:login --machine-token=$TERMINUS_TOKEN
+    - run: ./bin/validate-fixture-version.sh
     - run: ./bin/behat-prepare.sh
     - run: ./bin/behat-test.sh --strict
     - run:
         command: ./bin/behat-cleanup.sh
         when: always
   test-phpunit-redis-disabled-74:
+    resource_class: small
     working_directory: ~/pantheon-systems/wp-redis
     docker:
       - image: circleci/php:7.4-node-browsers
-      - image: circleci/mariadb:10.3
+      - image: cimg/mariadb:10.3
     environment:
       - WP_TESTS_DIR: "/tmp/wordpress-tests-lib"
       - WP_CORE_DIR: "/tmp/wordpress/"
@@ -145,11 +128,12 @@ jobs:
       - install-mariadb-10-5
       - run-phpunit-tests
   test-phpunit-redis-enabled-74:
+    resource_class: small
     working_directory: ~/pantheon-systems/wp-redis
     docker:
       - image: circleci/php:7.4-node-browsers
-      - image: circleci/mariadb:10.3
-      - image: circleci/redis:latest
+      - image: cimg/mariadb:10.3
+      - image: cimg/redis:6.2
     environment:
       - WP_TESTS_DIR: "/tmp/wordpress-tests-lib"
       - WP_CORE_DIR: "/tmp/wordpress/"
@@ -169,10 +153,11 @@ jobs:
       - install-redis-extras
       - run-phpunit-tests
   test-phpunit-redis-disabled-82:
+    resource_class: small
     working_directory: ~/pantheon-systems/wp-redis
     docker:
       - image: cimg/php:8.2.0
-      - image: circleci/mariadb:10.3
+      - image: cimg/mariadb:10.3
     environment:
       - WP_TESTS_DIR: "/tmp/wordpress-tests-lib"
       - WP_CORE_DIR: "/tmp/wordpress/"
@@ -190,11 +175,12 @@ jobs:
       - install-mariadb-10-6
       - run-phpunit-tests
   test-phpunit-redis-enabled-82:
+    resource_class: small
     working_directory: ~/pantheon-systems/wp-redis
     docker:
       - image: cimg/php:8.2.0
-      - image: circleci/mariadb:10.3
-      - image: circleci/redis:latest
+      - image: cimg/mariadb:10.3
+      - image: cimg/redis:6.2
     environment:
       - WP_TESTS_DIR: "/tmp/wordpress-tests-lib"
       - WP_CORE_DIR: "/tmp/wordpress/"
