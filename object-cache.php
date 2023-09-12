@@ -1329,7 +1329,7 @@ class WP_Object_Cache {
 
 				// PhpRedis throws an Exception when it fails a server call.
 				// To prevent WordPress from fataling, we catch the Exception.
-				throw new Exception( $e->getMessage(), $e->getCode(), $e );
+				throw new Exception( $e->getMessage(), $e->getCode(), $e ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 		}
 		return true;
@@ -1556,6 +1556,6 @@ class WP_Object_Cache {
 	 * @return bool True value. Won't be used by PHP
 	 */
 	public function __destruct() {
-		return true;
+		return true; // phpcs:ignore Universal.CodeAnalysis.ConstructorDestructorReturn.ReturnValueFound
 	}
 }
