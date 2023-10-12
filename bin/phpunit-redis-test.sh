@@ -4,8 +4,6 @@ set -e
 
 DIRNAME=$(dirname "$0")
 
-WITHDB="true"
-
 function database_exists {
   # Usage: database_exists <database_name> <user> <password> <host>
   local dbname=$1
@@ -19,10 +17,11 @@ function database_exists {
 # Check if the database exists
 if database_exists wordpress_test root root 127.0.0.1; then
   echo "Database wordpress_test already exists, we won't install a new one..."
-  WITHDB=""
+  bash "${DIRNAME}/install-wp-tests.sh" wordpress_test root root 127.0.0.1 latest true
+else
+  bash "${DIRNAME}/install-wp-tests.sh" wordpress_test root root 127.0.0.1 latest
 fi
 
-bash "${DIRNAME}/install-wp-tests.sh" wordpress_test root root 127.0.0.1 latest "$WITHDB"
 echo "Running WP Redis PHPUnit Tests on Single Site"
 WP_REDIS_USE_CACHE_GROUPS=1 composer phpunit
 rm -rf "$WP_TESTS_DIR" "$WP_CORE_DIR"
