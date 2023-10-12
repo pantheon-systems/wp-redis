@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ea743ee487296f5dd10b9f2037acd96e",
+    "content-hash": "d04680fc278eacf0f3b53fa875de4ac7",
     "packages": [],
     "packages-dev": [
         {
@@ -1259,6 +1259,48 @@
             ],
             "description": "PHPCS Rulesets for WordPress projects on Pantheon.",
             "time": "2023-09-12T17:25:08+00:00"
+        },
+        {
+            "name": "pantheon-systems/wpunit-helpers",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:pantheon-systems/wpunit-helpers.git",
+                "reference": "cd391a8134aafb1f4e0e87708f27eb005b33146d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pantheon-systems/wpunit-helpers/zipball/cd391a8134aafb1f4e0e87708f27eb005b33146d",
+                "reference": "cd391a8134aafb1f4e0e87708f27eb005b33146d",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^2.3"
+            },
+            "require-dev": {
+                "squizlabs/php_codesniffer": "^3.7"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Pantheon\\WPUnitHelpers\\Plugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Pantheon\\WPUnitHelpers\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Pantheon",
+                    "email": "noreply@pantheon.io"
+                }
+            ],
+            "description": "Unified scripts for installing and running automated WP Unit Tests.",
+            "time": "2023-10-12T19:26:30+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -5640,5 +5682,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }
