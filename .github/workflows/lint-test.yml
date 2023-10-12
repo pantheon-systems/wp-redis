@@ -39,3 +39,13 @@ jobs:
         uses: pantheon-systems/action-wporg-validator@1.0.0
         with:
           type: plugin
+  php8-compatibility:
+    name: PHP 8.x Compatibility
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: pantheon-systems/phpcompatibility-action@dev
+        with:
+          paths: ${{ github.workspace }}/*.php
+          test-versions: 8.0-
