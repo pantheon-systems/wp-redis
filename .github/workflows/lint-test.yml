@@ -89,4 +89,8 @@ jobs:
           fi
           composer install
       - name: Run PHPUnit
-        run: bash ./bin/phpunit-redis-test.sh
+        run: |
+          echo "Testing with Redis disabled"
+          bash ./bin/phpunit-test.sh
+          echo "Testing with Redis enabled"
+          bash ./bin/phpunit-redis-test.sh
