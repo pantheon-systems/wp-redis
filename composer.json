@@ -19,9 +19,13 @@
     "pantheon-systems/wpunit-helpers": "^1.0"
   },
   "scripts": {
-    "lint": "@phpcs",
+    "lint": [
+      "@phpcs",
+      "@phplint"
+    ],
     "phpcs": "vendor/bin/phpcs",
     "phpcbf": "vendor/bin/phpcbf",
+    "phplint": "find . -name '*.php' -type f -not -path './vendor/*' -not -path './tests/*' -exec php -l {} \\;",
     "phpunit": "vendor/bin/phpunit --do-not-cache-result",
     "test": "@phpunit",
     "test:install": "bin/install-local-tests.sh --nodb",
