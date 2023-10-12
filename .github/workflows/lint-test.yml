@@ -59,6 +59,10 @@ jobs:
     services:
       mariadb:
         image: mariadb:${{ (matrix.php_version == '7.4') && '10.5' || '10.6' }}
+      redis:
+        image: redis:6.2
+        ports:
+          - 6379:6379
     steps:
       - uses: actions/checkout@v3
       - name: Setup PHP
@@ -68,8 +72,10 @@ jobs:
           extensions: mysqli, zip, imagick, redis
       - name: Start MySQL Service
         run: sudo systemctl start mysql
-      - name: Start Redis Service
-        run: sudo systemctl start redis
+      - name: Test Redis
+        run: |
+          sudo apt-get install -y redis-tools
+          redis-cli -h localhost ping
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
