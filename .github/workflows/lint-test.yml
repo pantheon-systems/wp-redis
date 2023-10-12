@@ -81,4 +81,4 @@ jobs:
           fi
           composer install
       - name: Run PHPUnit
-        run: bash ./bin/phpunit-test.sh
+        run: bash ./bin/phpunit-redis-test.sh
