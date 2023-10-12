@@ -90,7 +90,7 @@ jobs:
           composer install
       - name: Run PHPUnit
         run: |
-          echo "\n\nTesting with Redis disabled"
+          echo -e "\n\nTesting with Redis disabled"
           bash ./bin/phpunit-test.sh
-          echo "\n\nTesting with Redis enabled"
+          echo -e "\n\nTesting with Redis enabled"
           bash ./bin/phpunit-redis-test.sh
