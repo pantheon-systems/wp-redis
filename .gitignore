@@ -5,3 +5,6 @@ vendor/
 phpredis
 pantheon-wordpress-upstream-master
 tests/pantheon-wordpress-upstream
+bin/install-local-tests.sh
+bin/install-wp-tests.sh
+bin/phpunit-test.sh
