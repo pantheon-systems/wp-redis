@@ -93,8 +93,8 @@ jobs:
         run: |
           if [ ${{ matrix.redis_enabled }} = 'true' ]; then
             export WP_REDIS_USE_CACHE_GROUPS=1
-            echo -e "\n\n🔋 Testing with Redis enabled"
+            echo -e "🔋 Testing with Redis enabled"
           else
-            echo -e "\n\n🪫 Testing with Redis disabled"
+            echo -e "🪫 Testing with Redis disabled"
           fi
           bash ./bin/phpunit-test.sh
