@@ -56,6 +56,7 @@ jobs:
     strategy:
       matrix:
         php_version: [7.4, 8.2, 8.3]
+        redis_enabled: [true, false]
     services:
       mariadb:
         image: mariadb:${{ (matrix.php_version == '7.4') && '10.5' || '10.6' }}
