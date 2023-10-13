@@ -15,18 +15,26 @@
     "pantheon-systems/pantheon-wp-coding-standards": "^2.0",
     "pantheon-systems/pantheon-wordpress-upstream-tests": "dev-master",
     "phpunit/phpunit": "^9",
-    "yoast/phpunit-polyfills": "^1.0"
+    "yoast/phpunit-polyfills": "^1.0",
+    "pantheon-systems/wpunit-helpers": "^1.0"
   },
   "scripts": {
-    "lint": "@phpcs",
+    "lint": [
+      "@phpcs",
+      "@phplint"
+    ],
     "phpcs": "vendor/bin/phpcs",
     "phpcbf": "vendor/bin/phpcbf",
-    "phpunit": "vendor/bin/phpunit",
-    "test": "@phpunit"
+    "phplint": "find . -name '*.php' -type f -not -path './vendor/*' -not -path './tests/*' -exec php -l {} \\;",
+    "phpunit": "vendor/bin/phpunit --do-not-cache-result",
+    "test": "@phpunit",
+    "test:install": "bin/install-local-tests.sh --nodb",
+    "test:install:withdb": "bin/install-local-tests.sh"
   },
   "config": {
     "allow-plugins": {
-      "dealerdirect/phpcodesniffer-composer-installer": true
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "pantheon-systems/wpunit-helpers": true
     }
   },
   "autoload": {

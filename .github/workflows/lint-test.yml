@@ -24,7 +24,7 @@ jobs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.0'
+        php-version: 8.3
     - name: Install dependencies
       run: composer install -n --prefer-dist
     - name: Run PHP Lint
@@ -39,3 +39,62 @@ jobs:
         uses: pantheon-systems/action-wporg-validator@1.0.0
         with:
           type: plugin
+  php8-compatibility:
+    name: PHP 8.x Compatibility
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: pantheon-systems/phpcompatibility-action@dev
+        with:
+          paths: ${{ github.workspace }}/*.php
+          test-versions: 8.0-
+  test:
+    needs: lint
+    name: Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php_version: [7.4, 8.2, 8.3]
+        redis_enabled: [true, false]
+    services:
+      mariadb:
+        image: mariadb:${{ (matrix.php_version == '7.4') && '10.5' || '10.6' }}
+      redis:
+        image: redis:6.2
+        ports:
+          - 6379:6379
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php_version }}
+          extensions: mysqli, zip, imagick, redis
+      - name: Start MySQL Service
+        run: sudo systemctl start mysql
+      - name: Test Redis
+        run: |
+          sudo apt-get install -y redis-tools
+          redis-cli -h localhost ping
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/vendor
+          key: test-dependencies-{{ checksum "composer.json" }}
+          restore-keys: test-dependencies-{{ checksum "composer.json" }}
+      - name: Install dependencies
+        run: |
+          if [ ${{ matrix.php_version }} = "7.4" ]; then
+            composer update
+          fi
+          composer install
+      - name: Run PHPUnit
+        run: |
+          if [ ${{ matrix.redis_enabled }} = 'true' ]; then
+            export WP_REDIS_USE_CACHE_GROUPS=1
+            echo -e "🔋 Testing with Redis enabled"
+          else
+            echo -e "🪫 Testing with Redis disabled"
+          fi
+          bash ./bin/phpunit-test.sh
