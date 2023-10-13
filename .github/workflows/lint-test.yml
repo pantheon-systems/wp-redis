@@ -91,7 +91,10 @@ jobs:
           composer install
       - name: Run PHPUnit
         run: |
-          echo -e "\n\n🪫 Testing with Redis disabled"
+          if [ ${{ matrix.redis_enabled }} = 'true' ]; then
+            export WP_REDIS_USE_CACHE_GROUPS=1
+            echo -e "\n\n🔋 Testing with Redis enabled"
+          else
+            echo -e "\n\n🪫 Testing with Redis disabled"
+          fi
           bash ./bin/phpunit-test.sh
-          echo -e "\n\n🔋 Testing with Redis enabled"
-          bash ./bin/phpunit-redis-test.sh
