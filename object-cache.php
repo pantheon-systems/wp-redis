@@ -759,6 +759,9 @@ class WP_Object_Cache {
 			$group = 'default';
 		}
 
+		// Get unique keys.
+		$keys = array_unique( $keys );
+
 		$cache = [];
 		if ( ! $this->_should_persist( $group ) ) {
 			foreach ( $keys as $key ) {
