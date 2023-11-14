@@ -2,7 +2,7 @@
 Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh, jspellman, jazzs3quence
 Tags: cache, plugin, redis
 Requires at least: 3.0.1
-Tested up to: 6.3
+Tested up to: 6.4.1
 Stable tag: 1.4.4-dev
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
