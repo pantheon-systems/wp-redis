@@ -55,7 +55,7 @@ rsync -av --exclude='vendor/' --exclude='node_modules/' --exclude='tests/' ./* $
 rm -rf $PREPARE_DIR/wp-content/plugins/wp-redis/.git
 cp object-cache.php $PREPARE_DIR/wp-content/object-cache.php
 
-PHP_VERSION="$(terminus site:info $SITE_ENV --field=php_version)"
+PHP_VERSION="$(terminus env:info $SITE_ENV --field=php_version)"
 echo "PHP Version: $PHP_VERSION"
 
 ###
