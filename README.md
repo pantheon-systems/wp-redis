@@ -1,12 +1,12 @@
 # WP Redis #
 [![Actively Maintained](https://img.shields.io/badge/Pantheon-Actively_Maintained-yellow?logo=pantheon&color=FFDC28)](https://pantheon.io/docs/oss-support-levels#actively-maintained)
 
-**Contributors:** [getpantheon](https://profiles.wordpress.org/getpantheon), [danielbachhuber](https://profiles.wordpress.org/danielbachhuber), [mboynes](https://profiles.wordpress.org/mboynes), [Outlandish Josh](https://profiles.wordpress.org/outlandish-josh) [jspellman](https://profiles.wordpress.org/jspellman/) [jazzs3quence](https://profiles.wordpress.org/jazzs3quence/)  
-**Tags:** cache, plugin, redis  
-**Requires at least:** 3.0.1  
-**Tested up to:** 6.4.1  
-**Stable tag:** 1.4.4-dev  
-**License:** GPLv2 or later  
+**Contributors:** [getpantheon](https://profiles.wordpress.org/getpantheon), [danielbachhuber](https://profiles.wordpress.org/danielbachhuber), [mboynes](https://profiles.wordpress.org/mboynes), [Outlandish Josh](https://profiles.wordpress.org/outlandish-josh) [jspellman](https://profiles.wordpress.org/jspellman/) [jazzs3quence](https://profiles.wordpress.org/jazzs3quence/)
+**Tags:** cache, plugin, redis
+**Requires at least:** 3.0.1
+**Tested up to:** 6.4.1
+**Stable tag:** 1.4.4-dev
+**License:** GPLv2 or later
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html
 
 Back your WP Object Cache with Redis, a high-performance in-memory storage backend.
@@ -111,6 +111,7 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 ### 1.4.4-dev ###
 * Updates security policy [[#441](https://github.com/pantheon-systems/wp-redis/pull/441)]
 * Updates Pantheon WP Coding Standards to 2.0 [[#445](https://github.com/pantheon-systems/wp-redis/pull/445)]
+* Handle duplicate keys in `get_multiple` function [[#448](https://github.com/pantheon-systems/wp-redis/pull/448)] (props @Souptik2001)
 
 ### 1.4.3 (June 26, 2023) ###
 * Bug fix: Fixes assumption that CACHE_PORT & CACHE_PASSWORD are Set. [[428](https://github.com/pantheon-systems/wp-redis/pull/428)] (props @timnolte)
