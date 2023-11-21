@@ -111,6 +111,7 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 ### 1.4.4-dev ###
 * Updates security policy [[#441](https://github.com/pantheon-systems/wp-redis/pull/441)]
 * Updates Pantheon WP Coding Standards to 2.0 [[#445](https://github.com/pantheon-systems/wp-redis/pull/445)]
+* Handle duplicate keys in `get_multiple` function [[#448](https://github.com/pantheon-systems/wp-redis/pull/448)] (props @Souptik2001)
 
 ### 1.4.3 (June 26, 2023) ###
 * Bug fix: Fixes assumption that CACHE_PORT & CACHE_PASSWORD are Set. [[428](https://github.com/pantheon-systems/wp-redis/pull/428)] (props @timnolte)
