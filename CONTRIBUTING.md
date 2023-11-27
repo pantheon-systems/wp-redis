@@ -47,19 +47,12 @@ The behat tests require a Pantheon site with Redis enabled. Once you've created 
 1. Wait for the [_Release wp-redis plugin to wp.org_ action](https://github.com/pantheon-systems/wp-redis/actions/workflows/wordpress-plugin-deploy.yml) to finish deploying to the WordPress.org plugin repository. If all goes well, users with SVN commit access for that plugin will receive an emailed diff of changes.
 1. Check WordPress.org: Ensure that the changes are live on [the plugin repository](https://wordpress.org/plugins/wp-redis/). This may take a few minutes.
 1. Following the release, prepare the next dev version with the following steps:
-<<<<<<< HEAD
     * `git checkout release`
     * `git pull origin release`
     * `git checkout main`
     * `git rebase release`
     * Update the version number in all locations, incrementing the version by one patch version, and add the `-dev` flag (e.g. after releasing `1.2.3`, the new version will be `1.2.4-dev`)
     * Add a new `** X.Y.X-dev **` heading to the changelog
-=======
-    * `git checkout develop`
-    * `git rebase master`
-    * Update the version number in all locations, incrementing the version by one patch version, and add the `-dev` flag (e.g. after releasing `1.2.3`, the new version will be `1.2.4-dev`)
-    * Add a new `** Latest **` heading to the changelog
->>>>>>> 604e8c2... Fix typos
     * `git add -A .`
     * `git commit -m "Prepare X.Y.X-dev"`
     * `git push origin main`
