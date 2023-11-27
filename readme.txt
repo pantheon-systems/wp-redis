@@ -3,7 +3,7 @@ Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh, jspellman,
 Tags: cache, plugin, redis
 Requires at least: 3.0.1
 Tested up to: 6.4.1
-Stable tag: 1.4.4-dev
+Stable tag: 1.4.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -105,8 +105,7 @@ Please report security bugs found in the source code of the WP Redis plugin thro
 
 == Changelog ==
 
-= 1.4.4-dev =
-* Updates security policy [[#441](https://github.com/pantheon-systems/wp-redis/pull/441)]
+= 1.4.4 (November 27, 2023) =
 * Updates Pantheon WP Coding Standards to 2.0 [[#445](https://github.com/pantheon-systems/wp-redis/pull/445)]
 * Handle duplicate keys in `get_multiple` function [[#448](https://github.com/pantheon-systems/wp-redis/pull/448)] (props @souptik)
 
