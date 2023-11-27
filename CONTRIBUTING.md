@@ -10,7 +10,7 @@ Pull requests and issues are welcome!
 
 Development and releases are structured around two branches, `develop` and `master`. The `develop` branch is the default branch for the repository, and is the source and destination for feature branches.
 
-We prefer to squash commits (i.e. avoid merge PRs) from a feature branch into `develop` when merging, and to include the PR # in the commit message. PRs to `develop` should also include any relevent updates to the changelog in readme.txt. For example, if a feature constitutes a minor or major version bump, that version update should be discussed and made as part of approving and merging the feature into `develop`.
+We prefer to squash commits (i.e. avoid merge PRs) from a feature branch into `develop` when merging, and to include the PR # in the commit message. PRs to `develop` should also include any relevant updates to the changelog in readme.txt. For example, if a feature constitutes a minor or major version bump, that version update should be discussed and made as part of approving and merging the feature into `develop`.
 
 `develop` should be stable and usable, though possibly a few commits ahead of the public release on wp.org.
 
@@ -47,7 +47,7 @@ Behat requires a Pantheon site with Redis enabled. Once you've created the site,
 1. Following the release, prepare the next dev version with the following steps:
     * `git checkout develop`
     * `git rebase master`
-    * Update the version number in all locations, incrementing the version by one patch version, and add the `-dev` flag (e.g. after releasing `1.2.3`, the new verison will be `1.2.4-dev`)
+    * Update the version number in all locations, incrementing the version by one patch version, and add the `-dev` flag (e.g. after releasing `1.2.3`, the new version will be `1.2.4-dev`)
     * Add a new `** Latest **` heading to the changelog
     * `git add -A .`
     * `git commit -m "Prepare X.Y.X-dev"`
