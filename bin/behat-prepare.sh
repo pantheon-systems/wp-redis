@@ -55,11 +55,8 @@ rsync -av --exclude='vendor/' --exclude='node_modules/' --exclude='tests/' ./* $
 rm -rf $PREPARE_DIR/wp-content/plugins/wp-redis/.git
 cp object-cache.php $PREPARE_DIR/wp-content/object-cache.php
 
-# Download the latest Classic Editor release from WordPress.org
-wget -O $PREPARE_DIR/classic-editor.zip https://downloads.wordpress.org/plugin/classic-editor.zip
-unzip $PREPARE_DIR/classic-editor.zip -d $PREPARE_DIR
-mv $PREPARE_DIR/classic-editor $PREPARE_DIR/wp-content/plugins/
-rm $PREPARE_DIR/classic-editor.zip
+PHP_VERSION="$(terminus env:info $SITE_ENV --field=php_version)"
+echo "PHP Version: $PHP_VERSION"
 
 ###
 # Add the debugging plugin to the environment
@@ -90,7 +87,7 @@ echo "Installing WordPress..."
 } &> /dev/null
 
 echo "Flush cache and setup environment..."
-terminus wp $SITE_ENV -- plugin activate wp-redis classic-editor
+terminus wp $SITE_ENV -- plugin activate wp-redis
 terminus wp $SITE_ENV -- cache flush
-terminus wp $SITE_ENV -- theme activate twentyseventeen
+terminus wp $SITE_ENV -- theme activate twentytwentythree
 terminus wp $SITE_ENV -- rewrite structure '/%year%/%monthnum%/%day%/%postname%/'

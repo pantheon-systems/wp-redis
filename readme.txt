@@ -2,8 +2,8 @@
 Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh, jspellman, jazzs3quence
 Tags: cache, plugin, redis
 Requires at least: 3.0.1
-Tested up to: 6.2
-Stable tag: 1.4.3
+Tested up to: 6.4.1
+Stable tag: 1.4.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -100,7 +100,14 @@ This declaration means use of `wp_cache_set( 'foo', 'bar', 'bad-actor' );` and `
 
 There's a known issue with WordPress `alloptions` cache design. Specifically, a race condition between two requests can cause the object cache to have stale values. If you think you might be impacted by this, [review this GitHub issue](https://github.com/pantheon-systems/wp-redis/issues/221) for links to more context, including a workaround.
 
+= Where do I report security bugs found in this plugin? =
+Please report security bugs found in the source code of the WP Redis plugin through the [Patchstack Vulnerability Disclosure Program](https://patchstack.com/database/vdp/wp-redis). The Patchstack team will assist you with verification, CVE assignment, and notify the developers of this plugin.
+
 == Changelog ==
+
+= 1.4.4 (November 27, 2023) =
+* Updates Pantheon WP Coding Standards to 2.0 [[#445](https://github.com/pantheon-systems/wp-redis/pull/445)]
+* Handle duplicate keys in `get_multiple` function [[#448](https://github.com/pantheon-systems/wp-redis/pull/448)] (props @souptik)
 
 = 1.4.3 (June 26, 2023)  =
 * Bug fix: Fixes assumption that CACHE_PORT & CACHE_PASSWORD are Set. [[428](https://github.com/pantheon-systems/wp-redis/pull/428)] (props @tnolte)

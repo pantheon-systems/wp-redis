@@ -759,6 +759,9 @@ class WP_Object_Cache {
 			$group = 'default';
 		}
 
+		// Get unique keys.
+		$keys = array_unique( $keys );
+
 		$cache = [];
 		if ( ! $this->_should_persist( $group ) ) {
 			foreach ( $keys as $key ) {
@@ -773,7 +776,7 @@ class WP_Object_Cache {
 			foreach ( $keys as $key ) {
 				if ( $this->_isset_internal( $key, $group ) ) {
 					$cache[ $key ] = $this->_get_internal( $key, $group );
-					$this->cache_hits++;
+					++$this->cache_hits;
 				}
 			}
 		}
@@ -800,9 +803,9 @@ class WP_Object_Cache {
 				// All non-numeric values are serialized.
 				$value = is_numeric( $value ) ? intval( $value ) : unserialize( $value );
 				$this->_set_internal( $key, $group, $value );
-				$this->cache_hits++;
+				++$this->cache_hits;
 			} else {
-				$this->cache_misses++;
+				++$this->cache_misses;
 			}
 			$cache[ $key ] = $value;
 		}
@@ -1329,7 +1332,7 @@ class WP_Object_Cache {
 
 				// PhpRedis throws an Exception when it fails a server call.
 				// To prevent WordPress from fataling, we catch the Exception.
-				throw new Exception( $e->getMessage(), $e->getCode(), $e );
+				throw new Exception( $e->getMessage(), $e->getCode(), $e ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			}
 		}
 		return true;
@@ -1358,7 +1361,7 @@ class WP_Object_Cache {
 				if ( ! isset( $this->redis_calls[ $method ] ) ) {
 					$this->redis_calls[ $method ] = 0;
 				}
-				$this->redis_calls[ $method ]++;
+				++$this->redis_calls[ $method ];
 				$retval = call_user_func_array( [ $this->redis, $method ], $arguments );
 				return $retval;
 			} catch ( Exception $e ) {
@@ -1424,7 +1427,6 @@ class WP_Object_Cache {
 			case 'hmGet':
 				return false;
 		}
-
 	}
 
 	/**
@@ -1557,6 +1559,6 @@ class WP_Object_Cache {
 	 * @return bool True value. Won't be used by PHP
 	 */
 	public function __destruct() {
-		return true;
+		return true; // phpcs:ignore Universal.CodeAnalysis.ConstructorDestructorReturn.ReturnValueFound
 	}
 }

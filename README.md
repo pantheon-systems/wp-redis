@@ -1,12 +1,12 @@
 # WP Redis #
 [![Actively Maintained](https://img.shields.io/badge/Pantheon-Actively_Maintained-yellow?logo=pantheon&color=FFDC28)](https://pantheon.io/docs/oss-support-levels#actively-maintained)
 
-**Contributors:** [getpantheon](https://profiles.wordpress.org/getpantheon), [danielbachhuber](https://profiles.wordpress.org/danielbachhuber), [mboynes](https://profiles.wordpress.org/mboynes), [Outlandish Josh](https://profiles.wordpress.org/outlandish-josh) [jspellman](https://profiles.wordpress.org/jspellman/) [jazzs3quence](https://profiles.wordpress.org/jazzs3quence/)
-**Tags:** cache, plugin, redis
-**Requires at least:** 3.0.1
-**Tested up to:** 6.2
-**Stable tag:** 1.4.3
-**License:** GPLv2 or later
+**Contributors:** [getpantheon](https://profiles.wordpress.org/getpantheon), [danielbachhuber](https://profiles.wordpress.org/danielbachhuber), [mboynes](https://profiles.wordpress.org/mboynes), [Outlandish Josh](https://profiles.wordpress.org/outlandish-josh) [jspellman](https://profiles.wordpress.org/jspellman/) [jazzs3quence](https://profiles.wordpress.org/jazzs3quence/)  
+**Tags:** cache, plugin, redis  
+**Requires at least:** 3.0.1  
+**Tested up to:** 6.4.1  
+**Stable tag:** 1.4.4  
+**License:** GPLv2 or later  
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html
 
 Back your WP Object Cache with Redis, a high-performance in-memory storage backend.
@@ -80,6 +80,10 @@ Use `wp help redis <command>` to learn more about each command.
 
 See [CONTRIBUTING.md](https://github.com/pantheon-systems/wp-redis/blob/default/CONTRIBUTING.md) for information on contributing.
 
+## Security Policy ##
+### Reporting Security Bugs
+Please report security bugs found in the WP Redis plugin's source code through the [Patchstack Vulnerability Disclosure Program](https://patchstack.com/database/vdp/wp-redis). The Patchstack team will assist you with verification, CVE assignment, and notify the developers of this plugin.
+
 ## Frequently Asked Questions ##
 
 ### Why would I want to use this plugin? ###
@@ -103,6 +107,10 @@ This declaration means use of `wp_cache_set( 'foo', 'bar', 'bad-actor' );` and `
 There's a known issue with WordPress `alloptions` cache design. Specifically, a race condition between two requests can cause the object cache to have stale values. If you think you might be impacted by this, [review this GitHub issue](https://github.com/pantheon-systems/wp-redis/issues/221) for links to more context, including a workaround.
 
 ## Changelog ##
+
+### 1.4.4 (November 27, 2023) ###
+* Updates Pantheon WP Coding Standards to 2.0 [[#445](https://github.com/pantheon-systems/wp-redis/pull/445)]
+* Handle duplicate keys in `get_multiple` function [[#448](https://github.com/pantheon-systems/wp-redis/pull/448)] (props @Souptik2001)
 
 ### 1.4.3 (June 26, 2023) ###
 * Bug fix: Fixes assumption that CACHE_PORT & CACHE_PASSWORD are Set. [[428](https://github.com/pantheon-systems/wp-redis/pull/428)] (props @timnolte)

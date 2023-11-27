@@ -34,6 +34,10 @@
 		<exclude name="WordPress.DB.DirectDatabaseQuery.DirectQuery">
 			<file>/object-cache.php</file>
 		</exclude>
+		<!-- Don't error on mixed function & structure declarations for object-cache.php -->
+		<exclude name="Universal.Files.SeparateFunctionsFromOO.Mixed">
+			<file>/object-cache.php</file>
+		</exclude>
 
 		<!-- Rules we ignore for WP-CLI. -->
 		<!-- Function comments work differently for WP-CLI functions, so don't throw CS errors on them. -->

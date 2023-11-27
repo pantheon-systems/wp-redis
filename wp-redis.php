@@ -3,7 +3,7 @@
  * Plugin Name: WP Redis
  * Plugin URI: http://github.com/pantheon-systems/wp-redis/
  * Description: WordPress Object Cache using Redis. Requires the PhpRedis extension (https://github.com/phpredis/phpredis).
- * Version: 1.4.3
+ * Version: 1.4.4
  * Author: Pantheon, Josh Koenig, Matthew Boynes, Daniel Bachhuber, Alley Interactive
  * Author URI: https://pantheon.io/
  */
@@ -25,7 +25,7 @@
 */
 
 if ( defined( 'WP_CLI' ) && WP_CLI && ! class_exists( 'WP_Redis_CLI_Command' ) ) {
-	require_once dirname( __FILE__ ) . '/cli.php';
+	require_once __DIR__ . '/cli.php';
 }
 
 /**

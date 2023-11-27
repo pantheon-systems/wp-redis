@@ -855,6 +855,31 @@ class CacheTest extends WP_UnitTestCase {
 		} else {
 			$this->assertEmpty( $this->cache->redis_calls );
 		}
+
+		$this->cache->set( 'foo3', 'bar1', 'group1' );
+		$this->cache->set( 'foo4', 'bar2', 'group1' );
+
+		$found = $this->cache->get_multiple( [ 'foo3', 'foo3', 'foo4' ], 'group1', true );
+
+		$expected = [
+			'foo3' => 'bar1',
+			'foo4' => 'bar2',
+		];
+
+		$this->assertSame( $expected, $found );
+		$this->assertEquals( 4, $this->cache->cache_hits );
+		$this->assertEquals( 1, $this->cache->cache_misses );
+		if ( $this->cache->is_redis_connected ) {
+			$this->assertEquals(
+				[
+					self::$mget_key => 2,
+					self::$set_key  => 5,
+				],
+				$this->cache->redis_calls
+			);
+		} else {
+			$this->assertEmpty( $this->cache->redis_calls );
+		}
 	}
 
 	public function test_get_multiple_partial_cache_miss() {
