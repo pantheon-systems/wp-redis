@@ -1388,7 +1388,7 @@ class CacheTest extends WP_UnitTestCase {
 		$val2 = rand_str();
 
 		if ( ! is_multisite() ) {
-			// Single site ingnores switch_to_blog().
+			// Single site ignores switch_to_blog().
 			$this->assertTrue( $this->cache->set( $key, $val ) );
 			$this->assertEquals( $val, $this->cache->get( $key ) );
 			$this->cache->switch_to_blog( 999 );
@@ -1464,7 +1464,7 @@ class CacheTest extends WP_UnitTestCase {
 		wp_cache_replace( $key, $val2 );
 		$this->assertEquals( $val2, wp_cache_get( $key ) );
 
-		// Non-existant key should fail
+		// Non-existent key should fail
 		$this->assertFalse( wp_cache_replace( $fake_key, $val1 ) );
 
 		// Make sure $fake_key is not stored

@@ -10,7 +10,7 @@ Pull requests and issues are welcome!
 
 Development and releases are structured around two branches, `main` and `release`. The `main` branch is the default branch for the repository, and is the source and destination for feature branches.
 
-We prefer to squash commits (i.e. avoid merge PRs) from a feature branch into `main` when merging, and to include the PR # in the commit message. PRs to `main` should also include any relevent updates to the changelog in readme.txt. For example, if a feature constitutes a minor or major version bump, that version update should be discussed and made as part of approving and merging the feature into `main`.
+We prefer to squash commits (i.e. avoid merge PRs) from a feature branch into `main` when merging, and to include the PR # in the commit message. PRs to `main` should also include any relevant updates to the changelog in readme.txt. For example, if a feature constitutes a minor or major version bump, that version update should be discussed and made as part of approving and merging the feature into `main`.
 
 `main` should be stable and usable, though possibly a few commits ahead of the public release on wp.org.
 
@@ -51,7 +51,7 @@ The behat tests require a Pantheon site with Redis enabled. Once you've created 
     * `git pull origin release`
     * `git checkout main`
     * `git rebase release`
-    * Update the version number in all locations, incrementing the version by one patch version, and add the `-dev` flag (e.g. after releasing `1.2.3`, the new verison will be `1.2.4-dev`)
+    * Update the version number in all locations, incrementing the version by one patch version, and add the `-dev` flag (e.g. after releasing `1.2.3`, the new version will be `1.2.4-dev`)
     * Add a new `** X.Y.X-dev **` heading to the changelog
     * `git add -A .`
     * `git commit -m "Prepare X.Y.X-dev"`
