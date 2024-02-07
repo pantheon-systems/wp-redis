@@ -25,7 +25,7 @@
 */
 
 if ( defined( 'WP_CLI' ) && WP_CLI && ! class_exists( 'WP_Redis_CLI_Command' ) ) {
-	require_once dirname( __FILE__ ) . '/cli.php';
+	require_once __DIR__ . '/cli.php';
 }
 
 /**

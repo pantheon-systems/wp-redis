@@ -80,7 +80,7 @@ class WP_Redis_CLI_Command {
 		if ( file_exists( $drop_in ) ) {
 			WP_CLI::error( 'Unknown wp-content/object-cache.php already exists.' );
 		}
-		$object_cache = dirname( __FILE__ ) . '/object-cache.php';
+		$object_cache = __DIR__ . '/object-cache.php';
 		$target       = self::get_relative_path( $drop_in, $object_cache );
 		chdir( WP_CONTENT_DIR );
 		// @codingStandardsIgnoreStart
@@ -184,7 +184,7 @@ class WP_Redis_CLI_Command {
 
 		add_filter(
 			'template_include',
-			function( $template ) {
+			function ( $template ) {
 				$display_template = str_replace( dirname( get_template_directory() ) . '/', '', $template );
 				WP_CLI::debug( "Theme template: {$display_template}", 'redis-debug' );
 				return $template;
@@ -240,7 +240,6 @@ class WP_Redis_CLI_Command {
 		}
 		return implode( '/', $rel_path );
 	}
-
 }
 
 WP_CLI::add_command( 'redis', 'WP_Redis_CLI_Command' );
