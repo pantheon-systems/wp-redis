@@ -12,7 +12,7 @@
     "behat/behat": "^3.1",
     "behat/mink-extension": "^2.2",
     "behat/mink-goutte-driver": "^1.2",
-    "pantheon-systems/pantheon-wp-coding-standards": "^1.0",
+    "pantheon-systems/pantheon-wp-coding-standards": "^2.0",
     "pantheon-systems/pantheon-wordpress-upstream-tests": "dev-master",
     "phpunit/phpunit": "^9",
     "yoast/phpunit-polyfills": "^1.0"
