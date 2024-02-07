@@ -1,0 +1,28 @@
+name: Composer Diff
+on:
+  pull_request:
+    paths:
+      - 'composer.lock'
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  composer-diff:
+    name: Composer Diff
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Generate composer diff
+        id: composer_diff
+        uses: IonBazan/composer-diff-action@v1
+      - uses: marocchino/sticky-pull-request-comment@v2
+        if: ${{ steps.composer_diff.outputs.composer_diff_exit_code != 0 }}
+        with:
+          header: composer-diff
+          message: |
+            <summary>Composer Changes</summary>
+
+            ${{ steps.composer_diff.outputs.composer_diff }}
