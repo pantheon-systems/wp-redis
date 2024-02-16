@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fb804dfcc08ed8258ad202b46dbc1d62",
+    "content-hash": "9852be5ffa4bd54669cf9301c3dd7df6",
     "packages": [],
     "packages-dev": [
         {
@@ -1264,16 +1264,16 @@
         },
         {
             "name": "pantheon-systems/wpunit-helpers",
-            "version": "v1.0.1",
+            "version": "v2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pantheon-systems/wpunit-helpers.git",
-                "reference": "683c9eb83a76c5229a40eef2ec1b19162f162a50"
+                "reference": "8f77f209060fbb9178952d0265f53af0ed2517df"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pantheon-systems/wpunit-helpers/zipball/683c9eb83a76c5229a40eef2ec1b19162f162a50",
-                "reference": "683c9eb83a76c5229a40eef2ec1b19162f162a50",
+                "url": "https://api.github.com/repos/pantheon-systems/wpunit-helpers/zipball/8f77f209060fbb9178952d0265f53af0ed2517df",
+                "reference": "8f77f209060fbb9178952d0265f53af0ed2517df",
                 "shasum": ""
             },
             "require": {
@@ -1303,10 +1303,10 @@
             ],
             "description": "Unified scripts for installing and running automated WP Unit Tests.",
             "support": {
-                "issues": "https://github.com/pantheon-systems/Pantheon-WP-Coding-Standards/issues",
-                "source": "https://github.com/pantheon-systems/Pantheon-WP-Coding-Standards/tree/2.0.1"
+                "issues": "https://github.com/pantheon-systems/wpunit-helpers/issues",
+                "source": "https://github.com/pantheon-systems/wpunit-helpers/tree/v2.0.0"
             },
-            "time": "2023-12-12T16:18:18+00:00"
+            "time": "2024-02-13T21:19:22+00:00"
         },
         {
             "name": "phar-io/manifest",
