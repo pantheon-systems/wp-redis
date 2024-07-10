@@ -1545,7 +1545,7 @@ class WP_Object_Cache {
 			}
 		}
 
-		$this->global_prefix = ( $this->multisite || defined( 'CUSTOM_USER_TABLE' ) && defined( 'CUSTOM_USER_META_TABLE' ) ) ? '' : $table_prefix;
+		$this->global_prefix = ( $this->multisite || ( defined( 'CUSTOM_USER_TABLE' ) && defined( 'CUSTOM_USER_META_TABLE' ) ) ) ? '' : $table_prefix;
 
 		// @todo This should be moved to the PHP4 style constructor, PHP5
 		register_shutdown_function( [ $this, '__destruct' ] );
