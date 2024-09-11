@@ -15,7 +15,7 @@
     "pantheon-systems/pantheon-wp-coding-standards": "^2.0",
     "pantheon-systems/pantheon-wordpress-upstream-tests": "dev-master",
     "phpunit/phpunit": "^9",
-    "yoast/phpunit-polyfills": "^2.0",
+    "yoast/phpunit-polyfills": "^3.0",
     "pantheon-systems/wpunit-helpers": "^2.0"
   },
   "scripts": {
