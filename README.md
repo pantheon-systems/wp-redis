@@ -109,6 +109,7 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 ## Changelog ##
 
 ### 1.4.5-dev ###
+* Support Relay in `check_client_dependencies()` correctly [[#471](https://github.com/pantheon-systems/wp-redis/pull/471)] (props @EarthlingDavey)
 
 ### 1.4.4 (November 27, 2023) ###
 * Updates Pantheon WP Coding Standards to 2.0 [[#445](https://github.com/pantheon-systems/wp-redis/pull/445)]
