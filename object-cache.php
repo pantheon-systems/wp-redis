@@ -1245,6 +1245,9 @@ class WP_Object_Cache {
 		$port = 6379;
 		// Default Redis database number.
 		$database = 0;
+		// Default timeout in ms.
+		// I multiplied this by 1000 so we'd have a common measure of ms instead of s and ms, need to make sure this gets divided by 1000.
+		$timeout = 1000;
 
 		if ( empty( $redis_server ) ) {
 			// Attempt to automatically load Pantheon's Redis config from the env.
@@ -1258,6 +1261,7 @@ class WP_Object_Cache {
 					// @phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 					'auth' => ! empty( $_SERVER['CACHE_PASSWORD'] ) ? $_SERVER['CACHE_PASSWORD'] : null,
 					'database' => ! empty( $_SERVER['CACHE_DB'] ) ? intval( $_SERVER['CACHE_DB'] ) : $database,
+					'timeout' => isset( $_SERVER['CACHE_TIMEOUT'] ) ? intval( $_SERVER['CACHE_TIMEOUT'] ) : $timeout,
 				];
 			} else {
 				$redis_server = [
@@ -1277,7 +1281,7 @@ class WP_Object_Cache {
 		$defaults = [
 			'host' => $redis_server['host'],
 			'port' => $port,
-			'timeout' => 1000, // I multiplied this by 1000 so we'd have a common measure of ms instead of s and ms, need to make sure this gets divided by 1000.
+			'timeout' => $timeout,
 			'retry_interval' => 100,
 		];
 		// 1s timeout, 100ms delay between reconnections.
