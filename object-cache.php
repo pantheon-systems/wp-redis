@@ -1226,7 +1226,12 @@ class WP_Object_Cache {
 	 *               not with a message describing the issue.
 	 */
 	public function check_client_dependencies() {
-		if ( ! class_exists( 'Redis' ) ) {
+		$class_to_check = 'Redis';
+		if ( defined( 'WP_REDIS_USE_RELAY' ) && WP_REDIS_USE_RELAY ) {
+			$class_to_check = 'Relay\Relay';
+		}
+
+		if ( ! class_exists( $class_to_check ) ) {
 			return 'Warning! PHPRedis extension is unavailable, which is required by WP Redis object cache.';
 		}
 		return true;
