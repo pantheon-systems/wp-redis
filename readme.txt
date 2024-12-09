@@ -106,6 +106,7 @@ Please report security bugs found in the source code of the WP Redis plugin thro
 == Changelog ==
 
 = 1.4.5-dev =
+* Support Relay in check_client_dependencies() with the WP_REDIS_USE_RELAY constant [[#471](https://github.com/pantheon-systems/wp-redis/pull/471)]
 
 = 1.4.4 (November 27, 2023) =
 * Updates Pantheon WP Coding Standards to 2.0 [[#445](https://github.com/pantheon-systems/wp-redis/pull/445)]
