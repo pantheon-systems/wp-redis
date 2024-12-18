@@ -39,11 +39,9 @@ The behat tests require a Pantheon site with Redis enabled. Once you've created 
     * Push the release branch up.
 1. Open a Pull Request to merge `release_X.Y.Z` into `release`. Your PR should consist of all commits to `main` since the last release, and one commit to update the version number. The PR name should also be `Release X.Y.Z`.
 1. After all tests pass and you have received approval from a [CODEOWNER](./CODEOWNERS), merge the PR into `release`. A merge commit is preferred in this case. _Never_ squash to `release`.
-1. Locally, pull the `release` branch, create a new tag (based on version number from previous steps), and push up. The tag should _only_ be the version number. It _should not_ be prefixed  `v` (i.e. `X.Y.Z`, not `vX.Y.X`).
-    * `git tag X.Y.Z`
-    * `git push --tags`
+1. CI will then tag and draft a [new release](https://github.com/pantheon-systems/wp-redis/releases)
 1. Confirm that the necessary assets are present in the newly created tag, and test on a WP install if desired.
-1. Create a [new release](https://github.com/pantheon-systems/wp-redis/releases/new) using the tag created in the previous steps, naming the release with the new version number, and targeting the tag created in the previous step. Paste the release changelog from the `Changelog` section of [the readme](readme.txt) into the body of the release, including the links to the closed issues if applicable.
+1. Open the release draft, review the changelog, and publish the release when ready.
 1. Wait for the [_Release wp-redis plugin to wp.org_ action](https://github.com/pantheon-systems/wp-redis/actions/workflows/wordpress-plugin-deploy.yml) to finish deploying to the WordPress.org plugin repository. If all goes well, users with SVN commit access for that plugin will receive an emailed diff of changes.
 1. Check WordPress.org: Ensure that the changes are live on [the plugin repository](https://wordpress.org/plugins/wp-redis/). This may take a few minutes.
 1. Following the release, prepare the next dev version with the following steps:
