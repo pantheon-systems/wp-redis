@@ -17,3 +17,7 @@ updates:
     versions:
     - ">= 9.a"
     - "< 10"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: daily
