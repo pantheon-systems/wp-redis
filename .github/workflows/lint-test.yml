@@ -91,6 +91,13 @@ jobs:
             composer update
           fi
           composer install
+      - name: Install SVN if needed
+        run: |
+          if ! command -v svn &> /dev/null; then
+            echo "SVN is not installed. Installing now..."
+            sudo apt-get update
+            sudo apt-get install -y subversion
+          fi
       - name: Run PHPUnit
         run: |
           if [ ${{ matrix.redis_enabled }} = 'true' ]; then
