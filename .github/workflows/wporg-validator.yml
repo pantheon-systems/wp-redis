@@ -8,6 +8,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: WP.org Validator
-        uses: pantheon-systems/action-wporg-validator@1.0.0
+        uses: pantheon-systems/action-wporg-validator@v1.1.5
         with:
           type: plugin
