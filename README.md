@@ -5,7 +5,7 @@
 **Tags:** cache, plugin, redis  
 **Requires at least:** 3.0.1  
 **Tested up to:** 6.7.1  
-**Stable tag:** 1.4.5-dev  
+**Stable tag:** 1.4.5  
 **License:** GPLv2 or later  
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -108,7 +108,7 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 
 ## Changelog ##
 
-### 1.4.5-dev ###
+### 1.4.5 (January 21, 2024) ###
 * Support Relay in `check_client_dependencies()` correctly [[#471](https://github.com/pantheon-systems/wp-redis/pull/471)] (props @EarthlingDavey)
 
 ### 1.4.4 (November 27, 2023) ###
