@@ -255,7 +255,7 @@ function wp_cache_set( $key, $data, $group = '', $expire = WP_REDIS_DEFAULT_EXPI
 }
 
 /**
- * Switch the interal blog id.
+ * Switch the internal blog id.
  *
  * This changes the blog id used to create keys in blog specific groups.
  *
@@ -309,7 +309,7 @@ function wp_cache_add_redis_hash_groups( $groups ) {
  * This function is deprecated. Use wp_cache_switch_to_blog() instead of this
  * function when preparing the cache for a blog switch. For clearing the cache
  * during unit tests, consider using wp_cache_init(). wp_cache_init() is not
- * recommended outside of unit tests as the performance penality for using it is
+ * recommended outside of unit tests as the performance penalty for using it is
  * high.
  *
  * @deprecated 3.5.0
@@ -538,7 +538,7 @@ class WP_Object_Cache {
 
 		$offset = (int) $offset;
 
-		// If this isn't a persistant group, we have to sort this out ourselves, grumble grumble.
+		// If this isn't a persistent group, we have to sort this out ourselves, grumble grumble.
 		if ( ! $this->_should_persist( $group ) ) {
 			$existing = $this->_get_internal( $key, $group );
 			if ( empty( $existing ) || ! is_numeric( $existing ) ) {
@@ -838,7 +838,7 @@ class WP_Object_Cache {
 
 		$offset = (int) $offset;
 
-		// If this isn't a persistant group, we have to sort this out ourselves, grumble grumble.
+		// If this isn't a persistent group, we have to sort this out ourselves, grumble grumble.
 		if ( ! $this->_should_persist( $group ) ) {
 			$existing = $this->_get_internal( $key, $group );
 			if ( empty( $existing ) || ! is_numeric( $existing ) ) {
@@ -993,7 +993,7 @@ class WP_Object_Cache {
 	}
 
 	/**
-	 * Switch the interal blog id.
+	 * Switch the internal blog id.
 	 *
 	 * This changes the blog id used to create keys in blog specific groups.
 	 *
@@ -1226,7 +1226,12 @@ class WP_Object_Cache {
 	 *               not with a message describing the issue.
 	 */
 	public function check_client_dependencies() {
-		if ( ! class_exists( 'Redis' ) ) {
+		$class_to_check = 'Redis';
+		if ( defined( 'WP_REDIS_USE_RELAY' ) && WP_REDIS_USE_RELAY ) {
+			$class_to_check = 'Relay\Relay';
+		}
+
+		if ( ! class_exists( $class_to_check ) ) {
 			return 'Warning! PHPRedis extension is unavailable, which is required by WP Redis object cache.';
 		}
 		return true;
@@ -1237,7 +1242,7 @@ class WP_Object_Cache {
 	 * client.
 	 *
 	 * @param array $redis_server Parameters used to construct a Redis client.
-	 * @return array Final parameters to use to contruct a Redis client with
+	 * @return array Final parameters to use to construct a Redis client with
 	 *               with defaults applied.
 	 */
 	public function build_client_parameters( $redis_server ) {
@@ -1545,7 +1550,7 @@ class WP_Object_Cache {
 			}
 		}
 
-		$this->global_prefix = ( $this->multisite || defined( 'CUSTOM_USER_TABLE' ) && defined( 'CUSTOM_USER_META_TABLE' ) ) ? '' : $table_prefix;
+		$this->global_prefix = ( $this->multisite || ( defined( 'CUSTOM_USER_TABLE' ) && defined( 'CUSTOM_USER_META_TABLE' ) ) ) ? '' : $table_prefix;
 
 		// @todo This should be moved to the PHP4 style constructor, PHP5
 		register_shutdown_function( [ $this, '__destruct' ] );

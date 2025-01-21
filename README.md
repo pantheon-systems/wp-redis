@@ -4,8 +4,8 @@
 **Contributors:** [getpantheon](https://profiles.wordpress.org/getpantheon), [danielbachhuber](https://profiles.wordpress.org/danielbachhuber), [mboynes](https://profiles.wordpress.org/mboynes), [Outlandish Josh](https://profiles.wordpress.org/outlandish-josh) [jspellman](https://profiles.wordpress.org/jspellman/) [jazzs3quence](https://profiles.wordpress.org/jazzs3quence/)  
 **Tags:** cache, plugin, redis  
 **Requires at least:** 3.0.1  
-**Tested up to:** 6.4.1  
-**Stable tag:** 1.4.4  
+**Tested up to:** 6.7.1  
+**Stable tag:** 1.4.5  
 **License:** GPLv2 or later  
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -96,7 +96,7 @@ This plugin is for the internal application object cache. It doesn't have anythi
 
 ### How do I disable the persistent object cache for a bad actor? ###
 
-A page load with 2,000 Redis calls can be 2 full seonds of object cache transactions. If a plugin you're using is erroneously creating a huge number of cache keys, you might be able to mitigate the problem by disabling cache persistency for the plugin's group:
+A page load with 2,000 Redis calls can be 2 full seconds of object cache transactions. If a plugin you're using is erroneously creating a huge number of cache keys, you might be able to mitigate the problem by disabling cache persistency for the plugin's group:
 
     wp_cache_add_non_persistent_groups( array( 'bad-actor' ) );
 
@@ -107,6 +107,9 @@ This declaration means use of `wp_cache_set( 'foo', 'bar', 'bad-actor' );` and `
 There's a known issue with WordPress `alloptions` cache design. Specifically, a race condition between two requests can cause the object cache to have stale values. If you think you might be impacted by this, [review this GitHub issue](https://github.com/pantheon-systems/wp-redis/issues/221) for links to more context, including a workaround.
 
 ## Changelog ##
+
+### 1.4.5 (January 21, 2024) ###
+* Support Relay in `check_client_dependencies()` correctly [[#471](https://github.com/pantheon-systems/wp-redis/pull/471)] (props @EarthlingDavey)
 
 ### 1.4.4 (November 27, 2023) ###
 * Updates Pantheon WP Coding Standards to 2.0 [[#445](https://github.com/pantheon-systems/wp-redis/pull/445)]

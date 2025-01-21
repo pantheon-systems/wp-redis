@@ -2,8 +2,8 @@
 Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh, jspellman, jazzs3quence
 Tags: cache, plugin, redis
 Requires at least: 3.0.1
-Tested up to: 6.4.1
-Stable tag: 1.4.4
+Tested up to: 6.7.1
+Stable tag: 1.4.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -90,7 +90,7 @@ This plugin is for the internal application object cache. It doesn't have anythi
 
 = How do I disable the persistent object cache for a bad actor? =
 
-A page load with 2,000 Redis calls can be 2 full seonds of object cache transactions. If a plugin you're using is erroneously creating a huge number of cache keys, you might be able to mitigate the problem by disabling cache persistency for the plugin's group:
+A page load with 2,000 Redis calls can be 2 full seconds of object cache transactions. If a plugin you're using is erroneously creating a huge number of cache keys, you might be able to mitigate the problem by disabling cache persistency for the plugin's group:
 
     wp_cache_add_non_persistent_groups( array( 'bad-actor' ) );
 
@@ -104,6 +104,9 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 Please report security bugs found in the source code of the WP Redis plugin through the [Patchstack Vulnerability Disclosure Program](https://patchstack.com/database/vdp/wp-redis). The Patchstack team will assist you with verification, CVE assignment, and notify the developers of this plugin.
 
 == Changelog ==
+
+= 1.4.5 (January 21, 2024) =
+* Support Relay in check_client_dependencies() with the WP_REDIS_USE_RELAY constant [[#471](https://github.com/pantheon-systems/wp-redis/pull/471)]
 
 = 1.4.4 (November 27, 2023) =
 * Updates Pantheon WP Coding Standards to 2.0 [[#445](https://github.com/pantheon-systems/wp-redis/pull/445)]

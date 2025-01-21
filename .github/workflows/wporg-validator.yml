@@ -1,0 +1,13 @@
+# On push, run the action-wporg-validator workflow.
+name: WP.org Validator
+on: [push]
+jobs:
+  wporg-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: WP.org Validator
+        uses: pantheon-systems/action-wporg-validator@v1.1.5
+        with:
+          type: plugin

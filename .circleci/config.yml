@@ -46,7 +46,7 @@ jobs:
           echo "GITHUB_TOKEN environment variables missing; assuming unauthenticated build"
           exit 0
         fi
-        echo "Setting GitHub OAuth token with suppressed ouput"
+        echo "Setting GitHub OAuth token with suppressed output"
         {
           composer config -g github-oauth.github.com $GITHUB_TOKEN
         } &> /dev/null
