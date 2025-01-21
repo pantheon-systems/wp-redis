@@ -3,7 +3,7 @@ Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh, jspellman,
 Tags: cache, plugin, redis
 Requires at least: 3.0.1
 Tested up to: 6.7.1
-Stable tag: 1.4.5
+Stable tag: 1.4.6-dev
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -104,6 +104,8 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 Please report security bugs found in the source code of the WP Redis plugin through the [Patchstack Vulnerability Disclosure Program](https://patchstack.com/database/vdp/wp-redis). The Patchstack team will assist you with verification, CVE assignment, and notify the developers of this plugin.
 
 == Changelog ==
+
+= 1.4.6-dev =
 
 = 1.4.5 (January 21, 2024) =
 * Support Relay in check_client_dependencies() with the WP_REDIS_USE_RELAY constant [[#471](https://github.com/pantheon-systems/wp-redis/pull/471)]
