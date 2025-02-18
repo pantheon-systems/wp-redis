@@ -12,7 +12,9 @@ if ( ! defined( 'WP_REDIS_USE_RELAY' ) ) {
 }
 
 // Conditionally run the script if: the correct class exists, and the script has not been disabled.
-if ( class_exists( WP_REDIS_USE_RELAY ? 'Relay\Relay' : 'Redis' ) && ( ! defined( 'WP_REDIS_DISABLED' ) || ! WP_REDIS_DISABLED ) ):
+if ( ! class_exists( WP_REDIS_USE_RELAY ? 'Relay\Relay' : 'Redis' ) && ( defined( 'WP_REDIS_DISABLED' ) && WP_REDIS_DISABLED ) ) {
+	return;
+}
 
 if ( ! defined( 'WP_CACHE_KEY_SALT' ) ) {
 	define( 'WP_CACHE_KEY_SALT', '' );
