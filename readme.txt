@@ -31,11 +31,11 @@ This assumes you have a PHP environment with the [required PhpRedis extension](h
         $redis_server = array(
             'host'     => '127.0.0.1',
             'port'     => 6379,
-            'auth'     => '12345',
+            'auth'     => '12345', // ['user', 'password'] if you use Redis ACL
             'database' => 0, // Optionally use a specific numeric Redis database. Default is 0.
         );
 
-3. If your Redis server is listening through a sockt file instead, set its path on `host` parameter and change the port to `null`:
+3. If your Redis server is listening through a socket file instead, set its path on `host` parameter and change the port to `null`:
 
         $redis_server = array(
             'host'     => '/path/of/redis/socket-file.sock',
