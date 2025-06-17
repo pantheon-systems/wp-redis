@@ -4,7 +4,7 @@ Tags: cache, plugin, redis
 Requires at least: 3.0.1
 Tested up to: 6.8.1
 Requires PHP: 7.4
-Stable tag: 1.4.6-dev
+Stable tag: 1.4.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -106,7 +106,8 @@ Please report security bugs found in the source code of the WP Redis plugin thro
 
 == Changelog ==
 
-= 1.4.6-dev =
+= 1.4.6 (June 17, 2025) =
+* PHP 8.4 compatibility 
 
 = 1.4.5 (January 21, 2024) =
 * Support Relay in check_client_dependencies() with the WP_REDIS_USE_RELAY constant [[#471](https://github.com/pantheon-systems/wp-redis/pull/471)]
