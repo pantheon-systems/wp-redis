@@ -108,7 +108,7 @@ Please report security bugs found in the source code of the WP Redis plugin thro
 
 = 1.4.6 (June 17, 2025) =
 * Bump tested up to version to 6.8.1
-* Add Support for PHP 8.4
+* PHP 8.4 compatibility 
 
 = 1.4.5 (January 21, 2024) =
 * Support Relay in check_client_dependencies() with the WP_REDIS_USE_RELAY constant [[#471](https://github.com/pantheon-systems/wp-redis/pull/471)]
