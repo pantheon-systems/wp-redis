@@ -6,7 +6,7 @@
 **Requires at least:** 3.0.1  
 **Tested up to:** 6.8.1  
 **Requires PHP:** 7.4  
-**Stable tag:** 1.4.6-dev  
+**Stable tag:** 1.4.6  
 **License:** GPLv2 or later  
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -109,7 +109,9 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 
 ## Changelog ##
 
-### 1.4.6 ###
+### 1.4.6 (June 17, 2025) ###
+* Bump tested up to version to 6.8.1
+* Add Support for PHP 8.4
 
 ### 1.4.5 (January 21, 2024) ###
 * Support Relay in `check_client_dependencies()` correctly [[#471](https://github.com/pantheon-systems/wp-redis/pull/471)] (props @EarthlingDavey)
