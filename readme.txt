@@ -1,6 +1,6 @@
 === WP Redis ===
 Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh, jspellman, jazzs3quence
-Tags: cache, plugin, redis
+Tags: cache, object-cache, redis
 Requires at least: 3.0.1
 Tested up to: 6.8.1
 Requires PHP: 7.4
