@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: WP.org Validator
         uses: pantheon-systems/action-wporg-validator@v1.1.5
         with:
