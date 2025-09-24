@@ -1,0 +1,88 @@
+name: Test-Behat
+
+on:
+  push:
+  schedule:
+    # Runs at 00:00 UTC every day, same as "0 0 * * *"
+    - cron: '0 0 * * *'
+
+jobs:
+  test-behat:
+
+    if: |
+      github.event_name == 'push' ||
+      (github.event_name == 'schedule' && github.ref == 'refs/heads/release')
+
+    # Use the latest Ubuntu runner, which is standard for public runners.
+    runs-on: ubuntu-latest
+
+    # This section mimics the 'docker:' block in CircleCI, running all job steps
+    # inside the specified container image.
+    container:
+      image: quay.io/pantheon-public/build-tools-ci:8.x-php8.2
+
+    steps:
+      # Replaces the CircleCI 'checkout' step.
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # This replaces CircleCI's 'restore_cache' and 'save_cache' steps.
+      # It caches the vendor directory based on the hash of the composer.json file.
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      # Replaces 'run: composer install'.
+      - name: Install dependencies
+        run: composer install -n --prefer-dist
+
+      # Generates a password and sets environment variables for subsequent steps.
+      # This replaces the multiple 'run' steps that exported variables to $BASH_ENV.
+      # In GitHub Actions, we use $GITHUB_ENV to make variables available to later steps.
+      - name: Set up environment variables
+        run: |
+          echo "WORDPRESS_ADMIN_PASSWORD=$(openssl rand -hex 8)" >> $GITHUB_ENV
+          echo "TERMINUS_ENV=ci-${{ github.run_id }}" >> $GITHUB_ENV
+          echo "TERMINUS_SITE=wp-redis" >> $GITHUB_ENV
+          echo "SITE_ENV=wp-redis.ci-${{ github.run_id }}" >> $GITHUB_ENV
+          echo "WORDPRESS_ADMIN_USERNAME=pantheon" >> $GITHUB_ENV
+          echo "WORDPRESS_ADMIN_EMAIL=no-reply@getpantheon.com" >> $GITHUB_ENV
+
+      # Equivalent to the SSH config run step in CircleCI.
+      - name: Configure SSH
+        run: echo "StrictHostKeyChecking no" >> "$HOME/.ssh/config"
+
+      # Configures Composer with the GitHub token.
+      # Uses an 'if' condition to check if the secret is available.
+      # The GITHUB_TOKEN is automatically provided by GitHub Actions.
+      - name: Configure GitHub Token for Composer
+        if: secrets.GITHUB_TOKEN != ''
+        run: composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
+
+      # Authenticates with Terminus using a secret.
+      # Your TERMINUS_TOKEN needs to be added as a secret in your GitHub repository settings.
+      - name: Login to Terminus
+        if: secrets.TERMINUS_TOKEN != ''
+        run: terminus auth:login --machine-token=${{ secrets.TERMINUS_TOKEN }}
+        env:
+          TERMINUS_TOKEN: ${{ secrets.TERMINUS_TOKEN }}
+
+      # The following steps are direct translations of the 'run' commands in CircleCI.
+      - name: Validate fixture version
+        run: ./bin/validate-fixture-version.sh
+
+      - name: Prepare Behat tests
+        run: ./bin/behat-prepare.sh
+
+      - name: Run Behat tests
+        run: ./bin/behat-test.sh --strict
+
+      # This step runs always, even if previous steps fail.
+      # This is the equivalent of 'when: always' in CircleCI.
+      - name: Cleanup after tests
+        if: always()
+        run: ./bin/behat-cleanup.sh
