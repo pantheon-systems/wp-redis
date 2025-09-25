@@ -7,7 +7,7 @@ on:
     branches: [ master, main ]
   workflow_dispatch:
   schedule:
-    # Nightly at 00:00 UTC (CircleCI had cron "0 0 * * *" with branch filter=master)
+    # Nightly at 00:00 UTC
     - cron: "0 0 * * *"
 
 jobs:
