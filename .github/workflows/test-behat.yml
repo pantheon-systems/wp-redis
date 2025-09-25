@@ -20,6 +20,7 @@ jobs:
     # inside the specified container image.
     container:
       image: quay.io/pantheon-public/build-tools-ci:8.x-php8.2
+      options: --user root:root
 
     steps:
       # Replaces the CircleCI 'checkout' step.
