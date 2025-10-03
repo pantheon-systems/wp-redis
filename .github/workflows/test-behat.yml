@@ -50,8 +50,8 @@ jobs:
           echo "WORDPRESS_ADMIN_EMAIL=no-reply@getpantheon.com" >> $GITHUB_ENV
 
       # Configures SSH to automatically accept new host keys.
-      - name: Configure SSH
-        run: echo "StrictHostKeyChecking no" >> "$HOME/.ssh/config"
+      #      - name: Configure SSH
+      #        run: echo "StrictHostKeyChecking no" >> "$HOME/.ssh/config"
 
       # Configures Composer with the GitHub token for accessing private repositories.
       # The GITHUB_TOKEN is automatically provided by GitHub Actions.
