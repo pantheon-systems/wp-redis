@@ -40,12 +40,14 @@ jobs:
         run: composer install -n --prefer-dist
 
       # Sets up environment variables that will be available to subsequent steps in the job.
+      # Truncates the environment name to 11 characters to comply with Pantheon's limit.
       - name: Set up environment variables
         run: |
+          ENV_NAME="ci-$(echo ${{ github.run_id }} | cut -c1-8)"
           echo "WORDPRESS_ADMIN_PASSWORD=$(openssl rand -hex 8)" >> $GITHUB_ENV
-          echo "TERMINUS_ENV=ci-${{ github.run_id }}" >> $GITHUB_ENV
+          echo "TERMINUS_ENV=${ENV_NAME}" >> $GITHUB_ENV
           echo "TERMINUS_SITE=wp-redis" >> $GITHUB_ENV
-          echo "SITE_ENV=wp-redis.ci-${{ github.run_id }}" >> $GITHUB_ENV
+          echo "SITE_ENV=wp-redis.${ENV_NAME}" >> $GITHUB_ENV
           echo "WORDPRESS_ADMIN_USERNAME=pantheon" >> $GITHUB_ENV
           echo "WORDPRESS_ADMIN_EMAIL=no-reply@getpantheon.com" >> $GITHUB_ENV
 
@@ -66,6 +68,7 @@ jobs:
       # Authenticates with Pantheon's Terminus CLI using a machine token stored as a secret.
       # This step only runs if the TERMINUS_TOKEN secret is set in the repository.
       - name: Login to Terminus
+        if: ${{ secrets.TERMINUS_TOKEN != '' }}
         run: terminus auth:login --machine-token=$TERMINUS_TOKEN
         env:
           TERMINUS_TOKEN: ${{ secrets.TERMINUS_TOKEN }}
@@ -86,3 +89,4 @@ jobs:
       - name: Cleanup after tests
         if: always()
         run: ./bin/behat-cleanup.sh
+
