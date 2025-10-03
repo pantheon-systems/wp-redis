@@ -66,9 +66,7 @@ jobs:
         run: composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
 
       # Authenticates with Pantheon's Terminus CLI using a machine token stored as a secret.
-      # This step only runs if the TERMINUS_TOKEN secret is set in the repository.
       - name: Login to Terminus
-        if: ${{ secrets.TERMINUS_TOKEN != '' }}
         run: terminus auth:login --machine-token=$TERMINUS_TOKEN
         env:
           TERMINUS_TOKEN: ${{ secrets.TERMINUS_TOKEN }}
@@ -89,3 +87,4 @@ jobs:
       - name: Cleanup after tests
         if: always()
         run: ./bin/behat-cleanup.sh
+
