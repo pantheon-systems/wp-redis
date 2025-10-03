@@ -1,10 +1,7 @@
 name: Test-Behat
 
 on:
-  push:
-    branches: [ master, main ]
   pull_request:
-    branches: [ master, main ]
   workflow_dispatch:
   schedule:
     # Nightly at 00:00 UTC
@@ -12,10 +9,6 @@ on:
 
 jobs:
   test-behat:
-
-    if: |
-      github.event_name == 'push' ||
-      (github.event_name == 'schedule' && github.ref == 'refs/heads/release')
 
     # Use the latest Ubuntu runner, which is standard for public runners.
     runs-on: ubuntu-latest
