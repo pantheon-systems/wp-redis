@@ -50,8 +50,13 @@ jobs:
           echo "WORDPRESS_ADMIN_EMAIL=no-reply@getpantheon.com" >> $GITHUB_ENV
 
       # Configures SSH to automatically accept new host keys.
-      #      - name: Configure SSH
-      #        run: echo "StrictHostKeyChecking no" >> "$HOME/.ssh/config"
+      - name: Force SSH to ignore host keys
+        run: echo "GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" >> $GITHUB_ENV
+
+      - name: Install SSH key
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SITE_OWNER_SSH_PRIVATE_KEY }}
 
       # Configures Composer with the GitHub token for accessing private repositories.
       # The GITHUB_TOKEN is automatically provided by GitHub Actions.
