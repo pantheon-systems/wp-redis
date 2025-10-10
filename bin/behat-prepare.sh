@@ -59,8 +59,8 @@ rm -rf "$PREPARE_DIR"/wp-content/plugins/wp-native-php-sessions/.git
 ###
 # Add the debugging plugin to the environment
 ###
-rm -rf "$PREPARE_DIR"/wp-content/mu-plugins/redis-debug.php
-cp "$BASH_DIR"/fixtures/redis-debug.php "$PREPARE_DIR"/wp-content/mu-plugins/redis-debug.php
+rm -rf "$PREPARE_DIR"/wp-content/mu-plugins/sessions-debug.php
+cp "$BASH_DIR"/fixtures/sessions-debug.php "$PREPARE_DIR"/wp-content/mu-plugins/sessions-debug.php
 
 ###
 # Push files to the environment
@@ -73,7 +73,7 @@ git commit -m "Include WP Native PHP Sessions and its configuration files"
 git push
 
 # Sometimes Pantheon takes a little time to refresh the filesystem
-terminus build:workflow:wait "$TERMINUS_SITE"."$TERMINUS_ENV"
+terminus workflow:wait "$TERMINUS_SITE"."$TERMINUS_ENV"
 
 ###
 # Set up WordPress, theme, and plugins for the test run
