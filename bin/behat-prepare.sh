@@ -6,88 +6,82 @@
 # such that it can be run a second time if a step fails.
 ###
 
-terminus whoami > /dev/null
-if [ $? -ne 0 ]; then
-	echo "Terminus unauthenticated; assuming unauthenticated build"
-	exit 0
-fi
-
 if [ -z "$TERMINUS_SITE" ] || [ -z "$TERMINUS_ENV" ]; then
-	echo "TERMINUS_SITE and TERMINUS_ENV environment variables must be set"
-	exit 1
+  echo "TERMINUS_SITE and TERMINUS_ENV environment variables must be set"
+  exit 1
 fi
 
 if [ -z "$WORDPRESS_ADMIN_USERNAME" ] || [ -z "$WORDPRESS_ADMIN_PASSWORD" ]; then
-	echo "WORDPRESS_ADMIN_USERNAME and WORDPRESS_ADMIN_PASSWORD environment variables must be set"
-	exit 1
+  echo "WORDPRESS_ADMIN_USERNAME and WORDPRESS_ADMIN_PASSWORD environment variables must be set"
+  exit 1
 fi
 
 set -ex
 
 ###
+# Install Composer dependencies, including Behat. This makes the
+# ./vendor/bin/behat executable available for the test runner.
+###
+composer install --no-progress --prefer-dist
+
+###
 # Create a new environment for this particular test run.
 ###
-terminus env:create  $TERMINUS_SITE.dev $TERMINUS_ENV
-terminus env:wipe $SITE_ENV --yes
+terminus env:create "${TERMINUS_SITE}.dev" "$TERMINUS_ENV"
+terminus env:wipe "$SITE_ENV" --yes
 
 ###
 # Get all necessary environment details.
 ###
-PANTHEON_GIT_URL=$(terminus connection:info $SITE_ENV --field=git_url)
+PANTHEON_GIT_URL=$(terminus connection:info "$SITE_ENV" --field=git_url)
 PANTHEON_SITE_URL="$TERMINUS_ENV-$TERMINUS_SITE.pantheonsite.io"
 PREPARE_DIR="/tmp/$TERMINUS_ENV-$TERMINUS_SITE"
 BASH_DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+PHP_VERSION="$(terminus env:info "$SITE_ENV" --field=php_version)"
+echo "PHP Version: $PHP_VERSION"
+
 ###
 # Switch to git mode for pushing the files up
 ###
-terminus connection:set $SITE_ENV git
-rm -rf $PREPARE_DIR
-git clone -b $TERMINUS_ENV $PANTHEON_GIT_URL $PREPARE_DIR
+terminus connection:set "$SITE_ENV" git
+rm -rf "$PREPARE_DIR"
+git clone -b "$TERMINUS_ENV" "$PANTHEON_GIT_URL" "$PREPARE_DIR"
 
 ###
 # Add the copy of this plugin itself to the environment
 ###
-rm -rf $PREPARE_DIR/wp-content/plugins/wp-redis
-rm -rf $PREPARE_DIR/wp-content/object-cache.php
-cd $BASH_DIR/..
-rsync -av --exclude='vendor/' --exclude='node_modules/' --exclude='tests/' ./* $PREPARE_DIR/wp-content/plugins/wp-redis
-rm -rf $PREPARE_DIR/wp-content/plugins/wp-redis/.git
-cp object-cache.php $PREPARE_DIR/wp-content/object-cache.php
-
-PHP_VERSION="$(terminus env:info $SITE_ENV --field=php_version)"
-echo "PHP Version: $PHP_VERSION"
+rm -rf "$PREPARE_DIR"/wp-content/plugins/wp-native-php-sessions
+cd "$BASH_DIR"/..
+rsync -av --exclude='vendor/' --exclude='node_modules/' --exclude='tests/' ./* "$PREPARE_DIR"/wp-content/plugins/wp-native-php-sessions
+rm -rf "$PREPARE_DIR"/wp-content/plugins/wp-native-php-sessions/.git
 
 ###
 # Add the debugging plugin to the environment
 ###
-rm -rf $PREPARE_DIR/wp-content/mu-plugins/redis-debug.php
-cp $BASH_DIR/fixtures/redis-debug.php $PREPARE_DIR/wp-content/mu-plugins/redis-debug.php
+rm -rf "$PREPARE_DIR"/wp-content/mu-plugins/sessions-debug.php
+cp "$BASH_DIR"/fixtures/sessions-debug.php "$PREPARE_DIR"/wp-content/mu-plugins/sessions-debug.php
 
 ###
 # Push files to the environment
 ###
-cd $PREPARE_DIR
+cd "$PREPARE_DIR"
 git add wp-content
-git config user.email "wp-redis@getpantheon.com"
+git config user.email "wp-native-php-sessions@getpantheon.com"
 git config user.name "Pantheon"
-git commit -m "Include WP Redis and its configuration files"
+git commit -m "Include WP Native PHP Sessions and its configuration files"
 git push
 
 # Sometimes Pantheon takes a little time to refresh the filesystem
-terminus build:workflow:wait $TERMINUS_SITE.$TERMINUS_ENV
+terminus build:workflow:wait "$TERMINUS_SITE"."$TERMINUS_ENV"
 
 ###
 # Set up WordPress, theme, and plugins for the test run
 ###
-echo "Installing WordPress..."
 # Silence output so as not to show the password.
 {
-	terminus wp $SITE_ENV -- core install --title=$TERMINUS_ENV-$TERMINUS_SITE --url=$PANTHEON_SITE_URL --admin_user=$WORDPRESS_ADMIN_USERNAME --admin_email=wp-redis@getpantheon.com --admin_password=$WORDPRESS_ADMIN_PASSWORD
+  terminus wp "$SITE_ENV" -- core install --title="$TERMINUS_ENV"-"$TERMINUS_SITE" --url="$PANTHEON_SITE_URL" --admin_user="$WORDPRESS_ADMIN_USERNAME" --admin_email=wp-native-php-sessions@getpantheon.com --admin_password="$WORDPRESS_ADMIN_PASSWORD"
 } &> /dev/null
-
-echo "Flush cache and setup environment..."
-terminus wp $SITE_ENV -- plugin activate wp-redis
-terminus wp $SITE_ENV -- cache flush
-terminus wp $SITE_ENV -- theme activate twentytwentythree
-terminus wp $SITE_ENV -- rewrite structure '/%year%/%monthnum%/%day%/%postname%/'
+terminus wp "$SITE_ENV" -- plugin activate wp-native-php-sessions
+terminus wp "$SITE_ENV" -- theme activate twentytwentythree
+terminus wp "$SITE_ENV" -- rewrite structure '/%year%/%monthnum%/%day%/%postname%/'
