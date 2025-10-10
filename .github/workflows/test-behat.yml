@@ -19,11 +19,6 @@ jobs:
     # Use the latest Ubuntu runner.
     runs-on: ubuntu-latest
 
-    # This runs all job steps inside the specified Docker container image.
-    container:
-      image: quay.io/pantheon-public/build-tools-ci:8.x-php8.2
-      options: --user root:root
-
     steps:
       # Checks out your repository under $GITHUB_WORKSPACE, so your job can access it.
       - name: Checkout code
@@ -39,7 +34,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-composer-
 
-      # Installs project dependencies using Composer.
+
+      - name: Install Terminus
+        uses: pantheon-systems/terminus-github-actions@v1
+        with:
+          pantheon-machine-token: ${{ secrets.TERMINUS_TOKEN }}
+
       - name: Install dependencies
         run: composer install -n --prefer-dist
 
@@ -69,15 +69,13 @@ jobs:
       - name: Configure GitHub Token for Composer
         run: composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
 
-      # Authenticates with Pantheon's Terminus CLI using a machine token stored as a secret.
-      - name: Login to Terminus
-        run: terminus auth:login --machine-token=$TERMINUS_TOKEN
-        env:
-          TERMINUS_TOKEN: ${{ secrets.TERMINUS_TOKEN }}
 
-      # Validates the fixture version by running a script.
       - name: Validate fixture version
-        run: ./bin/validate-fixture-version.sh
+        uses: jazzsequence/action-validate-plugin-version@v1
+        with:
+          branch: ${{ github.head_ref }}
+          dry-run: 'true'
+
 
       # Prepares the environment for Behat tests.
       - name: Prepare Behat tests
