@@ -19,10 +19,10 @@ fi
 set -ex
 
 ###
-# Install Composer dependencies, including Behat. This makes the
-# ./vendor/bin/behat executable available for the test runner.
+# NOTE: The 'composer install' command was removed from this script.
+# It is already being run in the main workflow file, so running it here
+# is redundant and slows down the pipeline.
 ###
-composer install --no-progress --prefer-dist
 
 ###
 # Create a new environment for this particular test run.
@@ -51,37 +51,57 @@ git clone -b "$TERMINUS_ENV" "$PANTHEON_GIT_URL" "$PREPARE_DIR"
 ###
 # Add the copy of this plugin itself to the environment
 ###
-rm -rf "$PREPARE_DIR"/wp-content/plugins/wp-native-php-sessions
+rm -rf "$PREPARE_DIR"/wp-content/plugins/wp-redis
 cd "$BASH_DIR"/..
-rsync -av --exclude='vendor/' --exclude='node_modules/' --exclude='tests/' ./* "$PREPARE_DIR"/wp-content/plugins/wp-native-php-sessions
-rm -rf "$PREPARE_DIR"/wp-content/plugins/wp-native-php-sessions/.git
+rsync -av --exclude='vendor/' --exclude='node_modules/' --exclude='tests/' ./* "$PREPARE_DIR"/wp-content/plugins/wp-redis
+rm -rf "$PREPARE_DIR"/wp-content/plugins/wp-redis/.git
 
 ###
 # Add the debugging plugin to the environment
 ###
-rm -rf "$PREPARE_DIR"/wp-content/mu-plugins/sessions-debug.php
-cp "$BASH_DIR"/fixtures/sessions-debug.php "$PREPARE_DIR"/wp-content/mu-plugins/sessions-debug.php
+# FIXED: Changed debug file name to "redis-debug.php"
+rm -rf "$PREPARE_DIR"/wp-content/mu-plugins/redis-debug.php
+cp "$BASH_DIR"/fixtures/redis-debug.php "$PREPARE_DIR"/wp-content/mu-plugins/redis-debug.php
 
 ###
 # Push files to the environment
 ###
 cd "$PREPARE_DIR"
 git add wp-content
-git config user.email "wp-native-php-sessions@getpantheon.com"
+git config user.email "wp-redis@getpantheon.com"
 git config user.name "Pantheon"
-git commit -m "Include WP Native PHP Sessions and its configuration files"
+git commit -m "Include WP Redis and its configuration files"
 git push
 
-# Sometimes Pantheon takes a little time to refresh the filesystem
-terminus workflow:wait "$TERMINUS_SITE"."$TERMINUS_ENV"
+###
+# Wait for the filesystem to refresh on Pantheon.
+###
+# FIXED: Replaced outdated 'build:workflow:wait' with a reliable polling loop.
+echo "Waiting for code to sync on Pantheon..."
+max_retries=10
+retry_interval=15
+for (( i=1; i<=max_retries; i++ )); do
+  if terminus ssh "$SITE_ENV" -- "test -f code/wp-content/plugins/wp-redis/wp-redis.php"; then
+    echo "Code sync confirmed."
+    break
+  fi
+  if [ "$i" -eq "$max_retries" ]; then
+    echo "Code sync timed out."
+    exit 1
+  fi
+  echo "Attempt $i/$max_retries: Code not synced yet. Waiting ${retry_interval}s..."
+  sleep "$retry_interval"
+done
 
 ###
 # Set up WordPress, theme, and plugins for the test run
 ###
 # Silence output so as not to show the password.
 {
-  terminus wp "$SITE_ENV" -- core install --title="$TERMINUS_ENV"-"$TERMINUS_SITE" --url="$PANTHEON_SITE_URL" --admin_user="$WORDPRESS_ADMIN_USERNAME" --admin_email=wp-native-php-sessions@getpantheon.com --admin_password="$WORDPRESS_ADMIN_PASSWORD"
+  # FIXED: Updated admin email address
+  terminus wp "$SITE_ENV" -- core install --title="$TERMINUS_ENV"-"$TERMINUS_SITE" --url="$PANTHEON_SITE_URL" --admin_user="$WORDPRESS_ADMIN_USERNAME" --admin_email=ci@getpantheon.com --admin_password="$WORDPRESS_ADMIN_PASSWORD"
 } &> /dev/null
-terminus wp "$SITE_ENV" -- plugin activate wp-native-php-sessions
+# FIXED: Changed plugin name to "wp-redis"
+terminus wp "$SITE_ENV" -- plugin activate wp-redis
 terminus wp "$SITE_ENV" -- theme activate twentytwentythree
 terminus wp "$SITE_ENV" -- rewrite structure '/%year%/%monthnum%/%day%/%postname%/'
