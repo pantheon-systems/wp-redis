@@ -69,13 +69,10 @@ jobs:
       - name: Configure GitHub Token for Composer
         run: composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
 
-
       - name: Validate fixture version
         uses: jazzsequence/action-validate-plugin-version@v1
         with:
-          branch: ${{ github.head_ref }}
           dry-run: 'true'
-
 
       # Prepares the environment for Behat tests.
       - name: Prepare Behat tests
