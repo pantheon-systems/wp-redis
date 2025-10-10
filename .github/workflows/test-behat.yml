@@ -36,7 +36,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-composer-
 
-
       - name: Install Terminus
         uses: pantheon-systems/terminus-github-actions@v1
         with:
