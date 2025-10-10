@@ -41,9 +41,6 @@ jobs:
         with:
           pantheon-machine-token: ${{ secrets.TERMINUS_TOKEN }}
 
-      - name: Install dependencies
-        run: composer install -n --prefer-dist
-
       # Sets up environment variables that will be available to subsequent steps in the job.
       # Truncates the environment name to 11 characters to comply with Pantheon's limit.
       - name: Set up environment variables
