@@ -1,0 +1,88 @@
+# Name of the GitHub Actions workflow.
+name: Test-Behat
+
+# Controls when the action will run.
+on:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # Runs nightly at 00:00 UTC.
+    - cron: "0 0 * * *"
+
+permissions:
+  contents: read
+  actions: write
+
+# Defines the jobs to run in the workflow.
+jobs:
+  test-behat:
+    # Use the latest Ubuntu runner.
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks out your repository under $GITHUB_WORKSPACE, so your job can access it.
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      # Caches the vendor directory to speed up subsequent builds.
+      # The cache is invalidated when composer.json changes.
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install Terminus
+        uses: pantheon-systems/terminus-github-actions@v1
+        with:
+          pantheon-machine-token: ${{ secrets.TERMINUS_TOKEN }}
+
+      # Sets up environment variables that will be available to subsequent steps in the job.
+      # Truncates the environment name to 11 characters to comply with Pantheon's limit.
+      - name: Set up environment variables
+        run: |
+          ENV_NAME="ci-$(echo ${{ github.run_id }} | cut -c1-8)"
+          echo "WORDPRESS_ADMIN_PASSWORD=$(openssl rand -hex 8)" >> $GITHUB_ENV
+          echo "TERMINUS_ENV=${ENV_NAME}" >> $GITHUB_ENV
+          echo "TERMINUS_SITE=wp-redis" >> $GITHUB_ENV
+          echo "SITE_ENV=wp-redis.${ENV_NAME}" >> $GITHUB_ENV
+          echo "WORDPRESS_ADMIN_USERNAME=pantheon" >> $GITHUB_ENV
+          echo "WORDPRESS_ADMIN_EMAIL=no-reply@getpantheon.com" >> $GITHUB_ENV
+
+      # Configures SSH to automatically accept new host keys.
+      - name: Force SSH to ignore host keys
+        run: echo "GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" >> $GITHUB_ENV
+
+      - name: Install SSH key
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SITE_OWNER_SSH_PRIVATE_KEY }}
+
+      # Configures Composer with the GitHub token for accessing private repositories.
+      # The GITHUB_TOKEN is automatically provided by GitHub Actions.
+      - name: Configure GitHub Token for Composer
+        run: composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate fixture version
+        uses: jazzsequence/action-validate-plugin-version@v1
+        with:
+          branch: ${{ github.head_ref }}
+          dry-run: 'true'
+
+      # Prepares the environment for Behat tests.
+      - name: Prepare Behat tests
+        run: ./bin/behat-prepare.sh
+
+      # Runs the Behat test suite.
+      - name: Run Behat tests
+        run: ./bin/behat-test.sh --strict
+
+      # This cleanup step runs regardless of whether the preceding steps succeeded or failed.
+      - name: Cleanup after tests
+        if: always()
+        run: ./bin/behat-cleanup.sh
+
