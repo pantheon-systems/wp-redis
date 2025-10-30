@@ -68,7 +68,7 @@ jobs:
         run: composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
 
       - name: Validate fixture version
-        uses: jazzsequence/action-validate-plugin-version@v1
+        uses: jazzsequence/action-validate-plugin-version@v2
         with:
           branch: ${{ github.head_ref }}
           dry-run: 'true'
