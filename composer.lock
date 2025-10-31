@@ -1268,16 +1268,16 @@
         },
         {
             "name": "pantheon-systems/wpunit-helpers",
-            "version": "v2.0.2",
+            "version": "v2.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pantheon-systems/wpunit-helpers.git",
-                "reference": "8e767a2d59abc16b4fc5bedc12e0adbb87554044"
+                "reference": "1f8c7bd39d83f23c3416d7ec46e6fb4ad917d8e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pantheon-systems/wpunit-helpers/zipball/8e767a2d59abc16b4fc5bedc12e0adbb87554044",
-                "reference": "8e767a2d59abc16b4fc5bedc12e0adbb87554044",
+                "url": "https://api.github.com/repos/pantheon-systems/wpunit-helpers/zipball/1f8c7bd39d83f23c3416d7ec46e6fb4ad917d8e0",
+                "reference": "1f8c7bd39d83f23c3416d7ec46e6fb4ad917d8e0",
                 "shasum": ""
             },
             "require": {
@@ -1308,9 +1308,9 @@
             "description": "Unified scripts for installing and running automated WP Unit Tests.",
             "support": {
                 "issues": "https://github.com/pantheon-systems/wpunit-helpers/issues",
-                "source": "https://github.com/pantheon-systems/wpunit-helpers/tree/v2.0.2"
+                "source": "https://github.com/pantheon-systems/wpunit-helpers/tree/v2.0.3"
             },
-            "time": "2025-01-06T18:07:41+00:00"
+            "time": "2025-08-07T16:28:07+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -5772,7 +5772,7 @@
     },
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
-    "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "platform": {},
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
 }
