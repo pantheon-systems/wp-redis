@@ -25,6 +25,12 @@ fi
 set -ex
 
 ###
+# Install Composer dependencies, including Behat. This makes the
+# ./vendor/bin/behat executable available for the test runner.
+###
+composer install --no-progress --prefer-dist
+
+###
 # Create a new environment for this particular test run.
 ###
 terminus env:create  $TERMINUS_SITE.dev $TERMINUS_ENV
@@ -75,7 +81,7 @@ git commit -m "Include WP Redis and its configuration files"
 git push
 
 # Sometimes Pantheon takes a little time to refresh the filesystem
-terminus build:workflow:wait $TERMINUS_SITE.$TERMINUS_ENV
+terminus workflow:wait "${TERMINUS_SITE}.${TERMINUS_ENV}"
 
 ###
 # Set up WordPress, theme, and plugins for the test run
