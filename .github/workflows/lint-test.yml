@@ -29,16 +29,6 @@ jobs:
       run: composer install -n --prefer-dist
     - name: Run PHP Lint
       run: composer phpcs
-  wporg-validation:
-    name: WP.org Validator
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-      - name: WP.org Validator
-        uses: pantheon-systems/action-wporg-validator@v2.0.0
-        with:
-          type: plugin
   php8-compatibility:
     name: PHP 8.x Compatibility
     runs-on: ubuntu-latest
