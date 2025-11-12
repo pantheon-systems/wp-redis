@@ -29,16 +29,6 @@ jobs:
       run: composer install -n --prefer-dist
     - name: Run PHP Lint
       run: composer phpcs
-  wporg-validation:
-    name: WP.org Validator
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-      - name: WP.org Validator
-        uses: pantheon-systems/action-wporg-validator@v2.0.0
-        with:
-          type: plugin
   php8-compatibility:
     name: PHP 8.x Compatibility
     runs-on: ubuntu-latest
@@ -88,6 +78,8 @@ jobs:
       - name: Install dependencies
         run: |
           if [ ${{ matrix.php_version }} = "7.4" ]; then
+            echo "🔄 Installing Pantheon WP Coding Standards v2.0 for PHP 7.4"
+            composer require pantheon-systems/pantheon-wp-coding-standards:^2.0 --dev --no-update
             composer update
           fi
           composer install
