@@ -78,6 +78,8 @@ jobs:
       - name: Install dependencies
         run: |
           if [ ${{ matrix.php_version }} = "7.4" ]; then
+            echo "🔄 Installing Pantheon WP Coding Standards v2.0 for PHP 7.4"
+            composer require pantheon-systems/pantheon-wp-coding-standards:^2.0 --dev --no-update
             composer update
           fi
           composer install
