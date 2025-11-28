@@ -4,7 +4,7 @@
 **Contributors:** [getpantheon](https://profiles.wordpress.org/getpantheon), [danielbachhuber](https://profiles.wordpress.org/danielbachhuber), [mboynes](https://profiles.wordpress.org/mboynes), [Outlandish Josh](https://profiles.wordpress.org/outlandish-josh) [jspellman](https://profiles.wordpress.org/jspellman/) [jazzs3quence](https://profiles.wordpress.org/jazzs3quence/)  
 **Tags:** cache, object-cache, redis  
 **Requires at least:** 3.0.1  
-**Tested up to:** 6.8.1  
+**Tested up to:** 6.9 
 **Requires PHP:** 7.4  
 **Stable tag:** 1.4.7-dev  
 **License:** GPLv2 or later  
