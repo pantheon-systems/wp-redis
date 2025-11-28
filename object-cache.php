@@ -440,6 +440,27 @@ class WP_Object_Cache {
 	public $last_triggered_error = '';
 
 	/**
+	 * The Redis client instance
+	 *
+	 * @var Redis|RedisCluster|Predis\Client|null
+	 */
+	public $redis = null;
+
+	/**
+	 * Error message when Redis cannot connect
+	 *
+	 * @var string
+	 */
+	public $missing_redis_message = '';
+
+	/**
+	 * Global prefix for cache keys
+	 *
+	 * @var string
+	 */
+	public $global_prefix = '';
+
+	/**
 	 * Whether or not to use true cache groups, instead of flattening.
 	 *
 	 * @var bool
@@ -1276,7 +1297,7 @@ class WP_Object_Cache {
 		if ( file_exists( $redis_server['host'] ) && 'socket' === filetype( $redis_server['host'] ) ) { // unix socket connection.
 			// port must be null or socket won't connect.
 			unset( $redis_server['port'] );
-			$port = -1;
+			$port = null;
 		}
 
 		$defaults = [
@@ -1335,10 +1356,8 @@ class WP_Object_Cache {
 				$redis->$method( $client_parameters[ $key ] );
 			} catch ( RedisException $e ) {
 
-				/**
-				 * PhpRedis throws an Exception when it fails a server call.
-				 * To prevent WordPress from fataling, we catch the Exception.
-				 */
+				// PhpRedis throws an Exception when it fails a server call.
+				// To prevent WordPress from fataling, we catch the Exception.
 				throw new Exception( $e->getMessage(), $e->getCode(), $e ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			}
 		}
@@ -1373,10 +1392,8 @@ class WP_Object_Cache {
 				return $retval;
 			} catch ( Exception $e ) {
 				$retry_exception_messages = $this->retry_exception_messages();
-				/**
-				 * PhpRedis throws an Exception when it fails a server call.
-				 * To prevent WordPress from fataling, we catch the Exception.
-				 */
+				// PhpRedis throws an Exception when it fails a server call.
+				// To prevent WordPress from fataling, we catch the Exception.
 				if ( $this->exception_message_matches( $e->getMessage(), $retry_exception_messages ) ) {
 
 					$this->_exception_handler( $e );
