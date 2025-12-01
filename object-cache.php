@@ -1256,13 +1256,15 @@ class WP_Object_Cache {
 			if ( isset( $_SERVER['CACHE_HOST'] ) ) {
 				$redis_server = [
 					// Don't use WP methods to sanitize the host due to plugin loading issues with other caching methods.
-					// @phpcs:ignore WordPressVIPMinimum.Functions.StripTags.StripTagsOneParameter,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-					'host' => strip_tags( $_SERVER['CACHE_HOST'] ),
-					'port' => ! empty( $_SERVER['CACHE_PORT'] ) ? intval( $_SERVER['CACHE_PORT'] ) : $port,
+					// @phpcs:ignore WordPressVIPMinimum.Functions.StripTags.StripTagsOneParameter,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.InputNotValidated
+					'host' => strip_tags( function_exists( 'wp_unslash' ) ? wp_unslash( $_SERVER['CACHE_HOST'] ) : $_SERVER['CACHE_HOST'] ),
+					// @phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated
+					'port' => ! empty( $_SERVER['CACHE_PORT'] ) ? intval( function_exists( 'wp_unslash' ) ? wp_unslash( $_SERVER['CACHE_PORT'] ) : $_SERVER['CACHE_PORT'] ) : $port,
 					// Don't attempt to sanitize passwords as this can break authentication.
-					// @phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-					'auth' => ! empty( $_SERVER['CACHE_PASSWORD'] ) ? $_SERVER['CACHE_PASSWORD'] : null,
-					'database' => ! empty( $_SERVER['CACHE_DB'] ) ? intval( $_SERVER['CACHE_DB'] ) : $database,
+					// @phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.InputNotValidated
+					'auth' => ! empty( $_SERVER['CACHE_PASSWORD'] ) ? ( function_exists( 'wp_unslash' ) ? wp_unslash( $_SERVER['CACHE_PASSWORD'] ) : $_SERVER['CACHE_PASSWORD'] ) : null,
+					// @phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated
+					'database' => ! empty( $_SERVER['CACHE_DB'] ) ? intval( function_exists( 'wp_unslash' ) ? wp_unslash( $_SERVER['CACHE_DB'] ) : $_SERVER['CACHE_DB'] ) : $database,
 				];
 			} else {
 				$redis_server = [
@@ -1402,7 +1404,8 @@ class WP_Object_Cache {
 				$col1  = 'option_name';
 				$col2  = 'option_value';
 			}
-			$wpdb->query( "INSERT IGNORE INTO {$table} ({$col1},{$col2}) VALUES ('wp_redis_do_redis_failback_flush',1)" );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->query( $wpdb->prepare( "INSERT IGNORE INTO {$table} ({$col1},{$col2}) VALUES (%s,%d)", 'wp_redis_do_redis_failback_flush', 1 ) );
 			$this->do_redis_failback_flush = true;
 		}
 
@@ -1544,11 +1547,13 @@ class WP_Object_Cache {
 				$col1  = 'option_name';
 				$col2  = 'option_value';
 			}
-			$this->do_redis_failback_flush = (bool) $wpdb->get_results( "SELECT {$col2} FROM {$table} WHERE {$col1}='wp_redis_do_redis_failback_flush'" );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			$this->do_redis_failback_flush = (bool) $wpdb->get_results( $wpdb->prepare( "SELECT {$col2} FROM {$table} WHERE {$col1}=%s", 'wp_redis_do_redis_failback_flush' ) );
 			if ( $this->is_redis_connected && $this->do_redis_failback_flush ) {
 				$ret = $this->_call_redis( 'flushdb' );
 				if ( $ret ) {
-					$wpdb->query( "DELETE FROM {$table} WHERE {$col1}='wp_redis_do_redis_failback_flush'" );
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+					$wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE {$col1}=%s", 'wp_redis_do_redis_failback_flush' ) );
 					$this->do_redis_failback_flush = false;
 				}
 			}
