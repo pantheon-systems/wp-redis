@@ -47,8 +47,8 @@ function wp_redis_get_info() {
 		if ( isset( $_SERVER['CACHE_HOST'] ) ) {
 			$redis_server = [
 				// Don't use WP methods to sanitize the host due to plugin loading issues with other caching methods.
-				// @phpcs:ignore WordPressVIPMinimum.Functions.StripTags.StripTagsOneParameter,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.InputNotValidated
-				'host' => strip_tags( wp_unslash( $_SERVER['CACHE_HOST'] ) ),
+				// @phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.InputNotValidated
+				'host' => wp_strip_all_tags( wp_unslash( $_SERVER['CACHE_HOST'] ) ),
 				// @phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated
 				'port' => ! empty( $_SERVER['CACHE_PORT'] ) ? intval( wp_unslash( $_SERVER['CACHE_PORT'] ) ) : $port,
 				// Don't attempt to sanitize passwords as this can break authentication.
