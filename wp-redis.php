@@ -6,6 +6,8 @@
  * Version: 1.4.7-dev
  * Author: Pantheon, Josh Koenig, Matthew Boynes, Daniel Bachhuber, Alley Interactive
  * Author URI: https://pantheon.io/
+ * License: GPLv2 or later
+ * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
 
 /*
@@ -45,13 +47,15 @@ function wp_redis_get_info() {
 		if ( isset( $_SERVER['CACHE_HOST'] ) ) {
 			$redis_server = [
 				// Don't use WP methods to sanitize the host due to plugin loading issues with other caching methods.
-				// @phpcs:ignore WordPressVIPMinimum.Functions.StripTags.StripTagsOneParameter,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-				'host' => strip_tags( $_SERVER['CACHE_HOST'] ),
-				'port' => ! empty( $_SERVER['CACHE_PORT'] ) ? intval( $_SERVER['CACHE_PORT'] ) : $port,
+				// @phpcs:ignore WordPressVIPMinimum.Functions.StripTags.StripTagsOneParameter,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.InputNotValidated
+				'host' => strip_tags( wp_unslash( $_SERVER['CACHE_HOST'] ) ),
+				// @phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated
+				'port' => ! empty( $_SERVER['CACHE_PORT'] ) ? intval( wp_unslash( $_SERVER['CACHE_PORT'] ) ) : $port,
 				// Don't attempt to sanitize passwords as this can break authentication.
-				// @phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-				'auth' => ! empty( $_SERVER['CACHE_PASSWORD'] ) ? $_SERVER['CACHE_PASSWORD'] : null,
-				'database' => ! empty( $_SERVER['CACHE_DB'] ) ? intval( $_SERVER['CACHE_DB'] ) : $database,
+				// @phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.InputNotValidated
+				'auth' => ! empty( $_SERVER['CACHE_PASSWORD'] ) ? wp_unslash( $_SERVER['CACHE_PASSWORD'] ) : null,
+				// @phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated
+				'database' => ! empty( $_SERVER['CACHE_DB'] ) ? intval( wp_unslash( $_SERVER['CACHE_DB'] ) ) : $database,
 			];
 		} else {
 			$redis_server = [
