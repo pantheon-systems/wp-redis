@@ -1256,8 +1256,8 @@ class WP_Object_Cache {
 			if ( isset( $_SERVER['CACHE_HOST'] ) ) {
 				$redis_server = [
 					// Don't use WP methods to sanitize the host due to plugin loading issues with other caching methods.
-					// @phpcs:ignore WordPressVIPMinimum.Functions.StripTags.StripTagsOneParameter,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.InputNotValidated
-					'host' => strip_tags( function_exists( 'wp_unslash' ) ? wp_unslash( $_SERVER['CACHE_HOST'] ) : $_SERVER['CACHE_HOST'] ),
+					// @phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.InputNotValidated
+					'host' => ( function_exists( 'wp_strip_all_tags' ) ? wp_strip_all_tags( wp_unslash( $_SERVER['CACHE_HOST'] ) ) : ( function_exists( 'wp_unslash' ) ? wp_unslash( $_SERVER['CACHE_HOST'] ) : $_SERVER['CACHE_HOST'] ) ),
 					// @phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated
 					'port' => ! empty( $_SERVER['CACHE_PORT'] ) ? intval( function_exists( 'wp_unslash' ) ? wp_unslash( $_SERVER['CACHE_PORT'] ) : $_SERVER['CACHE_PORT'] ) : $port,
 					// Don't attempt to sanitize passwords as this can break authentication.
@@ -1404,7 +1404,7 @@ class WP_Object_Cache {
 				$col1  = 'option_name';
 				$col2  = 'option_value';
 			}
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 			$wpdb->query( $wpdb->prepare( "INSERT IGNORE INTO {$table} ({$col1},{$col2}) VALUES (%s,%d)", 'wp_redis_do_redis_failback_flush', 1 ) );
 			$this->do_redis_failback_flush = true;
 		}
@@ -1547,12 +1547,12 @@ class WP_Object_Cache {
 				$col1  = 'option_name';
 				$col2  = 'option_value';
 			}
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 			$this->do_redis_failback_flush = (bool) $wpdb->get_results( $wpdb->prepare( "SELECT {$col2} FROM {$table} WHERE {$col1}=%s", 'wp_redis_do_redis_failback_flush' ) );
 			if ( $this->is_redis_connected && $this->do_redis_failback_flush ) {
 				$ret = $this->_call_redis( 'flushdb' );
 				if ( $ret ) {
-					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 					$wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE {$col1}=%s", 'wp_redis_do_redis_failback_flush' ) );
 					$this->do_redis_failback_flush = false;
 				}
