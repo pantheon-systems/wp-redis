@@ -7,7 +7,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+
+      - name: Create plugin build (exclude dev files)
+        run: |
+          mkdir -p /tmp/wp-redis-build
+          rsync -av --exclude-from='.distignore' ./ /tmp/wp-redis-build/
+          cd /tmp/wp-redis-build
+          ls -la
+
       - name: WP.org Validator
         uses: pantheon-systems/action-wporg-validator@a4e56c641359547609152a5b3702f77625282ff2 # v2.0.0
         with:
           type: plugin
+          path: /tmp/wp-redis-build
