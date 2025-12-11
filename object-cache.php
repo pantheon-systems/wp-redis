@@ -1276,7 +1276,7 @@ class WP_Object_Cache {
 		if ( file_exists( $redis_server['host'] ) && 'socket' === filetype( $redis_server['host'] ) ) { // unix socket connection.
 			// port must be null or socket won't connect.
 			unset( $redis_server['port'] );
-			$port = null;
+			$port = -1;
 		}
 
 		$defaults = [
@@ -1335,8 +1335,10 @@ class WP_Object_Cache {
 				$redis->$method( $client_parameters[ $key ] );
 			} catch ( RedisException $e ) {
 
-				// PhpRedis throws an Exception when it fails a server call.
-				// To prevent WordPress from fataling, we catch the Exception.
+				/**
+				 * PhpRedis throws an Exception when it fails a server call.
+				 * To prevent WordPress from fataling, we catch the Exception.
+				 */
 				throw new Exception( $e->getMessage(), $e->getCode(), $e ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			}
 		}
@@ -1371,8 +1373,10 @@ class WP_Object_Cache {
 				return $retval;
 			} catch ( Exception $e ) {
 				$retry_exception_messages = $this->retry_exception_messages();
-				// PhpRedis throws an Exception when it fails a server call.
-				// To prevent WordPress from fataling, we catch the Exception.
+				/**
+				 * PhpRedis throws an Exception when it fails a server call.
+				 * To prevent WordPress from fataling, we catch the Exception.
+				 */
 				if ( $this->exception_message_matches( $e->getMessage(), $retry_exception_messages ) ) {
 
 					$this->_exception_handler( $e );

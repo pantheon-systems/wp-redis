@@ -2,13 +2,13 @@
 [![Actively Maintained](https://img.shields.io/badge/Pantheon-Actively_Maintained-yellow?logo=pantheon&color=FFDC28)](https://pantheon.io/docs/oss-support-levels#actively-maintained)
 
 **Contributors:** [getpantheon](https://profiles.wordpress.org/getpantheon), [danielbachhuber](https://profiles.wordpress.org/danielbachhuber), [mboynes](https://profiles.wordpress.org/mboynes), [Outlandish Josh](https://profiles.wordpress.org/outlandish-josh) [jspellman](https://profiles.wordpress.org/jspellman/) [jazzs3quence](https://profiles.wordpress.org/jazzs3quence/)  
-**Tags:** cache, plugin, redis  
+**Tags:** cache, object-cache, redis  
 **Requires at least:** 3.0.1  
-**Tested up to:** 6.8.1  
+**Tested up to:** 6.9  
 **Requires PHP:** 7.4  
-**Stable tag:** 1.4.6  
+**Stable tag:** 1.4.7  
 **License:** GPLv2 or later  
-**License URI:** http://www.gnu.org/licenses/gpl-2.0.html
+**License URI:** http://www.gnu.org/licenses/gpl-2.0.html  
 
 Back your WP Object Cache with Redis, a high-performance in-memory storage backend.
 
@@ -108,6 +108,9 @@ This declaration means use of `wp_cache_set( 'foo', 'bar', 'bad-actor' );` and `
 There's a known issue with WordPress `alloptions` cache design. Specifically, a race condition between two requests can cause the object cache to have stale values. If you think you might be impacted by this, [review this GitHub issue](https://github.com/pantheon-systems/wp-redis/issues/221) for links to more context, including a workaround.
 
 ## Changelog ##
+
+### 1.4.7 (December 2, 2025) ###
+* WordPress 6.9 compatibility [[#524](https://github.com/pantheon-systems/wp-redis/pull/524)]
 
 ### 1.4.6 (June 17, 2025) ###
 * PHP 8.4 compatibility
