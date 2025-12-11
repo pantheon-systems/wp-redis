@@ -7,6 +7,108 @@
 **Tested up to:** 6.9  
 **Requires PHP:** 7.4  
 **Stable tag:** 1.4.8-dev  
+**License:** GPLv2 or later  
+**License URI:** http://www.gnu.org/licenses/gpl-2.0.html  
+
+Back your WP Object Cache with Redis, a high-performance in-memory storage backend.
+
+## Description ##
+
+[![CircleCI](https://circleci.com/gh/pantheon-systems/wp-redis/tree/release.svg?style=svg)](https://circleci.com/gh/pantheon-systems/wp-redis/tree/release)
+
+For sites concerned with high traffic, speed for logged-in users, or dynamic pageloads, a high-speed and persistent object cache is a must. You also need something that can scale across multiple instances of your application, so using local file caches or APC are out.
+
+Redis is a great answer, and one we bundle on the Pantheon platform. This is our plugin for integrating with the cache, but you can use it on any self-hosted WordPress site if you have Redis. Install from [WordPress.org](https://wordpress.org/plugins/wp-redis/) or [Github](https://github.com/pantheon-systems/wp-redis).
+
+It's important to note that a persistent object cache isn't a panacea - a page load with 2,000 Redis calls can be 2 full seconds of object cache transactions. Make sure you use the object cache wisely: keep to a sensible number of keys, don't store a huge amount of data on each key, and avoid stampeding frontend writes and deletes.
+
+Go forth and make awesome! And, once you've built something great, [send us feature requests (or bug reports)](https://github.com/pantheon-systems/wp-redis/issues). Take a look at the wiki for [useful code snippets and other tips](https://github.com/pantheon-systems/wp-redis/wiki).
+
+## Installation ##
+
+This assumes you have a PHP environment with the [required PhpRedis extension](https://github.com/phpredis/phpredis) and a working Redis server (e.g. Pantheon). WP Redis also works with Predis via [humanmade/wp-redis-predis-client](https://github.com/humanmade/wp-redis-predis-client).
+
+1. Install `object-cache.php` to `wp-content/object-cache.php` with a symlink or by copying the file.
+2. If you're not running on Pantheon, edit wp-config.php to add your cache credentials, e.g.:
+
+        $redis_server = array(
+            'host'     => '127.0.0.1',
+            'port'     => 6379,
+            'auth'     => '12345', // ['user', 'password'] if you use Redis ACL
+            'database' => 0, // Optionally use a specific numeric Redis database. Default is 0.
+        );
+
+3. If your Redis server is listening through a sockt file instead, set its path on `host` parameter and change the port to `null`:
+
+        $redis_server = array(
+            'host'     => '/path/of/redis/socket-file.sock',
+            'port'     => null,
+            'auth'     => '12345',
+            'database' => 0, // Optionally use a specific numeric Redis database. Default is 0.
+        );
+
+4. Engage thrusters: you are now backing WP's Object Cache with Redis.
+5. (Optional) To use the `wp redis` WP-CLI commands, activate the WP Redis plugin. No activation is necessary if you're solely using the object cache drop-in.
+6. (Optional) To use the same Redis server with multiple, discreet WordPress installs, you can use the `WP_CACHE_KEY_SALT` constant to define a unique salt for each install.
+7. (Optional) To use true cache groups, with the ability to delete all keys for a given group, register groups with `wp_cache_add_redis_hash_groups()`, or define the `WP_REDIS_USE_CACHE_GROUPS` constant to `true` to enable with all groups. However, when enabled, the expiration value is not respected because expiration on group keys isn't a feature [supported by Redis](https://github.com/redis/redis/issues/6620).
+8. (Optional) On an existing site previously using WordPress' transient cache, use WP-CLI to delete all (`%_transient_%`) transients from the options table: `wp transient delete-all`. WP Redis assumes responsibility for the transient cache.
+9. (Optional) To use [Relay](https://relaycache.com) instead of PhpRedis as the client define the `WP_REDIS_USE_RELAY` constant to `true`. For support requests, please use [Relay's GitHub discussions](https://github.com/cachewerk/relay/discussions).
+
+## WP-CLI Commands ##
+
+This plugin implements a variety of [WP-CLI](https://wp-cli.org) commands. All commands are grouped into the `wp redis` namespace.
+
+    $ wp help redis
+
+    NAME
+
+      wp redis
+
+    SYNOPSIS
+
+      wp redis <command>
+
+    SUBCOMMANDS
+
+      cli         Launch redis-cli using Redis configuration for WordPress
+      debug       Debug object cache hit / miss ratio for any page URL.
+      enable      Enable WP Redis by creating the symlink for object-cache.php
+      info        Provide details on the Redis connection.
+
+Use `wp help redis <command>` to learn more about each command.
+
+## Contributing ##
+
+See [CONTRIBUTING.md](https://github.com/pantheon-systems/wp-redis/blob/default/CONTRIBUTING.md) for information on contributing.
+
+## Security Policy ##
+### Reporting Security Bugs
+Please report security bugs found in the WP Redis plugin's source code through the [Patchstack Vulnerability Disclosure Program](https://patchstack.com/database/vdp/wp-redis). The Patchstack team will assist you with verification, CVE assignment, and notify the developers of this plugin.
+
+## Frequently Asked Questions ##
+
+### Why would I want to use this plugin? ###
+
+If you are concerned with the speed of your site, backing it with a high-performance, persistent object cache can have a huge impact. It takes load off your database, and is faster for loading all the data objects WordPress needs to run.
+
+### How does this work with other caching plugins? ###
+
+This plugin is for the internal application object cache. It doesn't have anything to do with page caches. On Pantheon you do not need additional page caching, but if you are self-hosted you can use your favorite page cache plugins in conjunction with WP Redis.
+
+### How do I disable the persistent object cache for a bad actor? ###
+
+A page load with 2,000 Redis calls can be 2 full seconds of object cache transactions. If a plugin you're using is erroneously creating a huge number of cache keys, you might be able to mitigate the problem by disabling cache persistency for the plugin's group:
+
+    wp_cache_add_non_persistent_groups( array( 'bad-actor' ) );
+
+This declaration means use of `wp_cache_set( 'foo', 'bar', 'bad-actor' );` and `wp_cache_get( 'foo', 'bad-actor' );` will not use Redis, and instead fall back to WordPress' default runtime object cache.
+
+### Why does the object cache sometimes get out of sync with the database? ###
+
+There's a known issue with WordPress `alloptions` cache design. Specifically, a race condition between two requests can cause the object cache to have stale values. If you think you might be impacted by this, [review this GitHub issue](https://github.com/pantheon-systems/wp-redis/issues/221) for links to more context, including a workaround.
+
+## Changelog ##
+
 ### 1.4.8-dev ###
 
 ### 1.4.7 (December 2, 2025) ###
