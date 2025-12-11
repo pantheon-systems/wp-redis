@@ -4,7 +4,7 @@ Tags: cache, object-cache, redis
 Requires at least: 3.0.1
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.4.7
+Stable tag: 1.4.8-dev
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -104,7 +104,9 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 = Where do I report security bugs found in this plugin? =
 Please report security bugs found in the source code of the WP Redis plugin through the [Patchstack Vulnerability Disclosure Program](https://patchstack.com/database/vdp/wp-redis). The Patchstack team will assist you with verification, CVE assignment, and notify the developers of this plugin.
 
-== Changelog ==
+== Changeling ==
+
+= 1.4.8-dev =
 
 = 1.4.7 (December 2, 2025) =
 * WordPress 6.9 compatibility [[#524](https://github.com/pantheon-systems/wp-redis/pull/524)]
