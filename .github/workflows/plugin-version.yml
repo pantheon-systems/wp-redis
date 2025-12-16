@@ -12,8 +12,8 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Validate Plugin Version
-        uses: jazzsequence/action-validate-plugin-version@33b0e43e436229825afc8427b19829a0c9aea498 # v2.0.0
+        uses: jazzsequence/action-validate-plugin-version@v2
