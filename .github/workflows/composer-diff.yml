@@ -17,8 +17,8 @@ jobs:
           fetch-depth: 0
       - name: Generate composer diff
         id: composer_diff
-        uses: IonBazan/composer-diff-action@v1.2.0
-      - uses: marocchino/sticky-pull-request-comment@v2.9.4
+        uses: IonBazan/composer-diff-action@v1
+      - uses: marocchino/sticky-pull-request-comment@v2
         if: ${{ steps.composer_diff.outputs.composer_diff_exit_code != 0 }}
         with:
           header: composer-diff
