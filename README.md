@@ -6,7 +6,7 @@
 **Requires at least:** 3.0.1  
 **Tested up to:** 6.9  
 **Requires PHP:** 7.4  
-**Stable tag:** 1.4.7-dev  
+**Stable tag:** 1.4.8-dev  
 **License:** GPLv2 or later  
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -109,8 +109,10 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 
 ## Changelog ##
 
-### 1.4.7-dev ###
+### 1.4.8-dev ###
 
+### 1.4.7 (December 2, 2025) ###
+* WordPress 6.9 compatibility [[#524](https://github.com/pantheon-systems/wp-redis/pull/524)]
 
 ### 1.4.6 (June 17, 2025) ###
 * PHP 8.4 compatibility
