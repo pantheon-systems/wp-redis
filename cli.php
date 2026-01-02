@@ -3,6 +3,10 @@
  * Various WP Redis CLI utility commands.
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Main WP Redis CLI command class.
  */
@@ -18,10 +22,10 @@ class WP_Redis_CLI_Command {
 			// Attempt to automatically load Pantheon's Redis config from the env.
 			if ( isset( $_SERVER['CACHE_HOST'] ) && isset( $_SERVER['CACHE_PORT'] ) && isset( $_SERVER['CACHE_PASSWORD'] ) && isset( $_SERVER['CACHE_DB'] ) ) {
 				$redis_server = [
-					'host' => sanitize_text_field( $_SERVER['CACHE_HOST'] ),
-					'port' => sanitize_text_field( $_SERVER['CACHE_PORT'] ),
-					'auth' => sanitize_text_field( $_SERVER['CACHE_PASSWORD'] ),
-					'database' => sanitize_text_field( $_SERVER['CACHE_DB'] ),
+					'host' => sanitize_text_field( wp_unslash( $_SERVER['CACHE_HOST'] ) ),
+					'port' => sanitize_text_field( wp_unslash( $_SERVER['CACHE_PORT'] ) ),
+					'auth' => sanitize_text_field( wp_unslash( $_SERVER['CACHE_PASSWORD'] ) ),
+					'database' => sanitize_text_field( wp_unslash( $_SERVER['CACHE_DB'] ) ),
 				];
 			} else {
 				$redis_server = [

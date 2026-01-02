@@ -1,13 +1,48 @@
 # On push, run the action-wporg-validator workflow.
 name: WP.org Validator
-on: [push]
+on: # rebuild any PRs and main branch changes
+  pull_request:
+  push:
+    branches:
+    - main
+
+permissions:
+  contents: read
+
 jobs:
-  wporg-validation:
+  validate:
+    name: Validate Plugin
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-      - name: WP.org Validator
-        uses: pantheon-systems/action-wporg-validator@v2.0.0
-        with:
-          type: plugin
+    - name: Checkout
+      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+    - name: Setup PHP 8.4
+      uses: shivammathur/setup-php@20529878ed81ef8e78ddf08b480401e6101a850f # v2.35.3
+      with:
+        php-version: "8.4"
+        extensions: mysqli
+        tools: composer,wp-cli
+
+    - name: Cache Composer dependencies
+      uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+      with:
+        path: |
+            ~/.composer/cache
+            vendor
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+            ${{ runner.os }}-composer-
+
+    - name: Install dependencies
+      run: composer install --no-dev --no-interaction --no-progress --prefer-dist --no-scripts --no-ansi
+
+    - name: Create Dist Archive for wp.org validation
+      run: |
+        wp package install wp-cli/dist-archive-command
+        wp dist-archive . --plugin-dirname=wp-redis --filename-format=wp-redis-dist
+        unzip ../wp-redis-dist.zip
+
+    - name: Run plugin check
+      uses: wordpress/plugin-check-action@70f38272b2beee386e973f319591baa2fc7dff16 # 1.1.2
+      with:
+        build-dir: wp-redis
