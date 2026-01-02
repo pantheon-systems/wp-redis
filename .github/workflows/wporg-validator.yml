@@ -6,15 +6,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
-
+        uses: actions/checkout@v6
       - name: Create plugin build (exclude dev files)
         run: |
           mkdir -p /tmp/wp-redis
           rsync -av --exclude-from='.distignore' ./ /tmp/wp-redis/
           cd /tmp/wp-redis
           ls -la
-
       - name: WP.org Validator
         uses: pantheon-systems/action-wporg-validator@v2.0.0
         with:

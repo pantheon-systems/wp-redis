@@ -7,16 +7,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - uses: pantheon-systems/validate-readme-spacing@v1
   lint:
     name: PHPCS Linting
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
     - name: Cache dependencies
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ~/vendor
         key: test-lint-dependencies-{{ checksum "composer.json" }}
@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - uses: pantheon-systems/phpcompatibility-action@dev
         with:
           paths: ${{ github.workspace }}/*.php
@@ -55,7 +55,7 @@ jobs:
         ports:
           - 6379:6379
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -68,7 +68,7 @@ jobs:
           sudo apt-get install -y redis-tools
           redis-cli -h localhost ping
       - name: Cache dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/vendor
           key: test-dependencies-{{ checksum "composer.json" }}
