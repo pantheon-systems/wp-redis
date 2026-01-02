@@ -1,3 +1,4 @@
+# On push, run the action-wporg-validator workflow.
 name: WP.org Validator
 on: # rebuild any PRs and main branch changes
   pull_request:
@@ -33,10 +34,7 @@ jobs:
             ${{ runner.os }}-composer-
 
     - name: Install dependencies
-      run: |
-        composer install --no-dev --no-interaction --no-progress --prefer-dist --no-scripts --no-ansi
-        npm ci
-        npm run build
+      run: composer install --no-dev --no-interaction --no-progress --prefer-dist --no-scripts --no-ansi
 
     - name: Create Dist Archive for wp.org validation
       run: |
