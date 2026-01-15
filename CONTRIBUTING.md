@@ -47,7 +47,7 @@ The behat tests require a Pantheon site with Redis enabled. Once you've created 
 1. After merging to the `release` branch, a draft Release will be automatically created by the [build-tag-release workflow] (https://github.com/pantheon-systems/wp-redis/actions/workflows/build-tag-release.yml). This draft release will be automatically pre-filled with release notes. 
 1. Confirm that the necessary assets are present in the newly created tag, and test on a WP install if desired. 
 1. Review the release notes, making any necessary changes, and publish the release. 
-1. Wait for the [Release pantheon-hud plugin to wp.org action](https://github.com/pantheon-systems/wp-redis/actions/workflows/wordpress-plugin-deploy.yml) to finish deploying to the WordPress.org plugin repository.
+1. Wait for the [Release plugin to wp.org action](https://github.com/pantheon-systems/wp-redis/actions/workflows/wordpress-plugin-deploy.yml) to finish deploying to the WordPress.org plugin repository.
 1. If all goes well, users with SVN commit access for that plugin will receive an email with a diff of the changes. 
 1. Check WordPress.org: Ensure that the changes are live on the plugin repository. This may take a few minutes.
 1. Following the release, prepare the next dev version with the following steps:
