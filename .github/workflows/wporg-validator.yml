@@ -43,6 +43,6 @@ jobs:
         unzip ../wp-redis-dist.zip
 
     - name: Run plugin check
-      uses: wordpress/plugin-check-action@70f38272b2beee386e973f319591baa2fc7dff16 # 1.1.2
+      uses: wordpress/plugin-check-action@6f5a57e173c065a394b78688f75df543e4011902 # 1.1.5
       with:
         build-dir: wp-redis
