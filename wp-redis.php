@@ -109,3 +109,23 @@ function wp_redis_get_info() {
 		'redis_database'    => $database,
 	];
 }
+
+if ( defined( 'WP_REDIS_OBJECT_CACHE' )) {
+	add_filter( 'debug_information', 'wp_redis_add_health_check_info' );
+}
+
+function wp_redis_add_health_check_info( $debug_info ) {
+	$redis_info = wp_redis_get_info() ;
+	$debug_info['wp_redis'] = array(
+		'label' => 'Redis Info',
+		'fields' => array(
+			'status'	=> array( 'label' => 'Status', 'value' => $redis_info['status'] . " to " . $redis_info['redis_host'] . ":" . $redis_info['redis_port'] ),
+			'uptime'	=> array( 'label' => 'Uptime', 'value' => $redis_info['uptime'] ),
+			'used_memory'	=> array( 'label' => 'Used memory', 'value' => $redis_info['used_memory'] ),
+			'key_count'	=> array( 'label' => 'Keys', 'value' => $redis_info['key_count'] ),
+			'hit_rate'	=> array( 'label' => 'Hit Ratio', 'value' => $redis_info['lifetime_hitrate'] ),
+			'inst_ops'	=> array( 'label' => 'Ops/Second', 'value' => $redis_info['instantaneous_ops'] )
+		)
+	);
+	return $debug_info;
+}
