@@ -22,14 +22,14 @@ jobs:
     steps:
       # Checks out your repository under $GITHUB_WORKSPACE, so your job can access it.
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
 
       # Caches the vendor directory to speed up subsequent builds.
       # The cache is invalidated when composer.json changes.
       - name: Cache dependencies
-        uses: actions/cache@v5.0.2
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         with:
           path: vendor
           key: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
@@ -37,7 +37,7 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install Terminus
-        uses: pantheon-systems/terminus-github-actions@v1
+        uses: pantheon-systems/terminus-github-actions@8e024bd89ff46ed2aa4e0663c6b54c87a94344f8 # v1.2.7
         with:
           pantheon-machine-token: ${{ secrets.TERMINUS_TOKEN }}
 
@@ -58,7 +58,7 @@ jobs:
         run: echo "GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" >> $GITHUB_ENV
 
       - name: Install SSH key
-        uses: webfactory/ssh-agent@v0.9.1
+        uses: webfactory/ssh-agent@a6f90b1f127823b31d4d4a8d96047790581349bd # v0.9.1
         with:
           ssh-private-key: ${{ secrets.SITE_OWNER_SSH_PRIVATE_KEY }}
 
@@ -68,7 +68,7 @@ jobs:
         run: composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
 
       - name: Validate fixture version
-        uses: jazzsequence/action-validate-plugin-version@v2
+        uses: jazzsequence/action-validate-plugin-version@6b8b403af6e9eefde9c36c0d342b717d5952b518 # v2.0.1
         with:
           branch: ${{ github.head_ref }}
           dry-run: 'true'
