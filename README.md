@@ -110,6 +110,7 @@ There's a known issue with WordPress `alloptions` cache design. Specifically, a 
 ## Changelog ##
 
 ### 1.4.8-dev ###
+* PHP 8.5 compatibility
 
 ### 1.4.7 (December 2, 2025) ###
 * WordPress 6.9 compatibility [[#524](https://github.com/pantheon-systems/wp-redis/pull/524)]
