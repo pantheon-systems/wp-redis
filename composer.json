@@ -14,7 +14,7 @@
     "behat/mink-goutte-driver": "^1.2",
     "pantheon-systems/pantheon-wp-coding-standards": "^3.0",
     "pantheon-systems/pantheon-wordpress-upstream-tests": "dev-master",
-    "phpunit/phpunit": "^9",
+    "phpunit/phpunit": "^12",
     "yoast/phpunit-polyfills": "^4.0",
     "pantheon-systems/wpunit-helpers": "^2.0"
   },
