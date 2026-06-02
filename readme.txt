@@ -107,6 +107,7 @@ Please report security bugs found in the source code of the WP Redis plugin thro
 == Changelog ==
 
 = 1.4.8-dev =
+* PHP 8.5 compatibility
 
 = 1.4.7 (December 2, 2025) =
 * WordPress 6.9 compatibility [[#524](https://github.com/pantheon-systems/wp-redis/pull/524)]
