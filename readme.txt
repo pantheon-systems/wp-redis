@@ -1,5 +1,5 @@
 === WP Redis ===
-Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh, jspellman, jazzs3quence
+Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh, jspellman, jazzs3quence, anaispantheor, metasim
 Tags: cache, object-cache, redis
 Requires at least: 3.0.1
 Tested up to: 6.9
@@ -107,7 +107,7 @@ Please report security bugs found in the source code of the WP Redis plugin thro
 == Changelog ==
 
 = 1.4.8-dev =
-* PHP 8.5 compatibility
+* PHP 8.5 compatibility [[#551](https://github.com/pantheon-systems/wp-redis/pull/551)]
 
 = 1.4.7 (December 2, 2025) =
 * WordPress 6.9 compatibility [[#524](https://github.com/pantheon-systems/wp-redis/pull/524)]
