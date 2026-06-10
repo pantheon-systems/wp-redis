@@ -60,7 +60,7 @@ jobs:
       - name: Install SSH key
         uses: webfactory/ssh-agent@a6f90b1f127823b31d4d4a8d96047790581349bd # v0.9.1
         with:
-          ssh-private-key: ${{ secrets.SITE_OWNER_SSH_PRIVATE_KEY }}
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       # Configures Composer with the GitHub token for accessing private repositories.
       # The GITHUB_TOKEN is automatically provided by GitHub Actions.
