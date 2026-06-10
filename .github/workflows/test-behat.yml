@@ -48,8 +48,8 @@ jobs:
           ENV_NAME="ci-$(echo ${{ github.run_id }} | cut -c1-8)"
           echo "WORDPRESS_ADMIN_PASSWORD=$(openssl rand -hex 8)" >> $GITHUB_ENV
           echo "TERMINUS_ENV=${ENV_NAME}" >> $GITHUB_ENV
-          echo "TERMINUS_SITE=wp-redis" >> $GITHUB_ENV
-          echo "SITE_ENV=wp-redis.${ENV_NAME}" >> $GITHUB_ENV
+          echo "TERMINUS_SITE=${{ vars.TERMINUS_SITE }}" >> $GITHUB_ENV
+          echo "SITE_ENV=${{ vars.TERMINUS_SITE }}.${ENV_NAME}" >> $GITHUB_ENV
           echo "WORDPRESS_ADMIN_USERNAME=pantheon" >> $GITHUB_ENV
           echo "WORDPRESS_ADMIN_EMAIL=no-reply@getpantheon.com" >> $GITHUB_ENV
 
