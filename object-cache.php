@@ -444,6 +444,20 @@ class WP_Object_Cache {
 	public $last_triggered_error = '';
 
 	/**
+	 * The Redis client instance
+	 *
+	 * @var Redis|Relay\Relay
+	 */
+	public $redis;
+
+	/**
+	 * Message describing why Redis is unavailable
+	 *
+	 * @var string
+	 */
+	public $missing_redis_message = '';
+
+	/**
 	 * Whether or not to use true cache groups, instead of flattening.
 	 *
 	 * @var bool
