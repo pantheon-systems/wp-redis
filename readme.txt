@@ -4,7 +4,7 @@ Tags: cache, object-cache, redis
 Requires at least: 3.0.1
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.4.8-dev
+Stable tag: 1.4.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -106,7 +106,7 @@ Please report security bugs found in the source code of the WP Redis plugin thro
 
 == Changelog ==
 
-= 1.4.8-dev =
+= 1.4.8 (24 June 2026) =
 * PHP 8.5 compatibility [[#551](https://github.com/pantheon-systems/wp-redis/pull/551)]
 
 = 1.4.7 (December 2, 2025) =
