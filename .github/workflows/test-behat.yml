@@ -62,10 +62,10 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SITE_OWNER_SSH_PRIVATE_KEY }}
 
-      # Configures Composer with the GitHub token for accessing private repositories.
-      # The GITHUB_TOKEN is automatically provided by GitHub Actions.
       - name: Configure GitHub Token for Composer
-        run: composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: composer config -g github-oauth.github.com "$GH_TOKEN"
 
       - name: Validate fixture version
         uses: jazzsequence/action-validate-plugin-version@6b8b403af6e9eefde9c36c0d342b717d5952b518 # v2.0.1
