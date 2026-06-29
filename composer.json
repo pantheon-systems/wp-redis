@@ -35,6 +35,16 @@
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true,
       "pantheon-systems/wpunit-helpers": true
+    },
+    "audit": {
+      "ignore": {
+        "PKSA-z3gr-8qht-p93v": "Dev-only: phpunit/phpunit (test runner). No prod exposure. SITE-5206.",
+        "PKSA-5r1g-c7b7-y1zg": "Dev-only: symfony/dom-crawler via behat test deps. No prod exposure. SITE-5206.",
+        "PKSA-dwsq-ppd2-mb1x": "Dev-only: symfony/polyfill-intl-idn via behat test deps. No prod exposure. SITE-5206.",
+        "PKSA-v5yj-8nmz-sk2q": "Dev-only: symfony/yaml via behat test deps. No prod exposure. SITE-5206.",
+        "PKSA-ft77-7h5f-p3r6": "Dev-only: symfony/yaml via behat test deps. No prod exposure. SITE-5206.",
+        "PKSA-b14r-zh1d-vdrc": "Dev-only: symfony/yaml via behat test deps. No prod exposure. SITE-5206."
+      }
     }
   },
   "autoload": {
