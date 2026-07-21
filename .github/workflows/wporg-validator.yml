@@ -1,6 +1,5 @@
-# On push, run the action-wporg-validator workflow.
 name: WP.org Validator
-on: # rebuild any PRs and main branch changes
+on:
   pull_request:
   push:
     branches:
@@ -37,8 +36,11 @@ jobs:
       run: composer install --no-dev --no-interaction --no-progress --prefer-dist --no-scripts --no-ansi
 
     - name: Create Dist Archive for wp.org validation
+      env:
+        COMPOSER_AUTH: '{"github-oauth": {}}'
       run: |
-        wp package install wp-cli/dist-archive-command
+        rm -f ~/.composer/auth.json
+        wp package install wp-cli/dist-archive-command:v3.1.0
         wp dist-archive . --plugin-dirname=wp-redis --filename-format=wp-redis-dist
         unzip ../wp-redis-dist.zip
 
