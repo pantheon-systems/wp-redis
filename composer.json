@@ -13,7 +13,7 @@
     "friends-of-behat/mink-extension": "^2.7",
     "behat/mink-browserkit-driver": "^2.1",
     "pantheon-systems/pantheon-wp-coding-standards": "^3.0",
-    "pantheon-systems/pantheon-wordpress-upstream-tests": "dev-master",
+    "pantheon-systems/pantheon-wordpress-upstream-tests": "dev-fix/replace-goutte-with-browserkit-driver",
     "phpunit/phpunit": "^9",
     "yoast/phpunit-polyfills": "^4.0",
     "pantheon-systems/wpunit-helpers": "^2.0"
