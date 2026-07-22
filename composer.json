@@ -10,8 +10,8 @@
   ],
   "require-dev": {
     "behat/behat": "^3.1",
-    "behat/mink-extension": "^2.2",
-    "behat/mink-goutte-driver": "^2.0",
+    "friends-of-behat/mink-extension": "^2.7",
+    "behat/mink-browserkit-driver": "^2.1",
     "pantheon-systems/pantheon-wp-coding-standards": "^3.0",
     "pantheon-systems/pantheon-wordpress-upstream-tests": "dev-master",
     "phpunit/phpunit": "^9",
