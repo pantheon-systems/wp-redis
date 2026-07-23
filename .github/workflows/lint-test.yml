@@ -1,6 +1,10 @@
 # On push, run the action-wporg-validator workflow.
 name: Linting & Test
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 jobs:
   validate-readme-spacing:
     name: Validate README Spacing
