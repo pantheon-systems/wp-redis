@@ -1,8 +1,8 @@
 === WP Redis ===
 Contributors: getpantheon, danielbachhuber, mboynes, Outlandish Josh, jspellman, jazzs3quence, anaispantheor, metasim
 Tags: cache, object-cache, redis
-Requires at least: 3.0.1
-Tested up to: 6.9
+Requires at least: 6.5
+Tested up to: 7.0
 Requires PHP: 7.4
 Stable tag: 1.4.8-dev
 License: GPLv2 or later
