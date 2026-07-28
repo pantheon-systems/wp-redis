@@ -43,7 +43,22 @@
         "PKSA-dwsq-ppd2-mb1x": "Dev-only: symfony/polyfill-intl-idn via behat test deps. No prod exposure. SITE-5206.",
         "PKSA-v5yj-8nmz-sk2q": "Dev-only: symfony/yaml via behat test deps. No prod exposure. SITE-5206.",
         "PKSA-ft77-7h5f-p3r6": "Dev-only: symfony/yaml via behat test deps. No prod exposure. SITE-5206.",
-        "PKSA-b14r-zh1d-vdrc": "Dev-only: symfony/yaml via behat test deps. No prod exposure. SITE-5206."
+        "PKSA-b14r-zh1d-vdrc": "Dev-only: symfony/yaml via behat test deps. No prod exposure. SITE-5206.",
+        "PKSA-rkkf-636k-qjb3": "Dev-only: symfony/process via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
+        "PKSA-wws7-mr54-jsny": "Dev-only: symfony/process via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
+        "PKSA-fy2t-3c5f-827y": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
+        "PKSA-qxvb-2bpp-dnk6": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
+        "PKSA-bbs6-q5q9-f3t4": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
+        "PKSA-bcdd-5xc7-gwfb": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
+        "PKSA-pwsk-hy21-4gby": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
+        "PKSA-93qv-9n9h-6k6p": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
+        "PKSA-k22t-f949-t9g6": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
+        "PKSA-yfw5-9gnj-n2c7": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
+        "PKSA-k1b4-kshy-xgbh": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
+        "PKSA-2z36-j4q9-rsfy": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
+        "PKSA-fvw5-9t6n-nwvr": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
+        "PKSA-6d8m-6kgw-18zr": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
+        "PKSA-stmn-hvzq-wph6": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced."
       }
     }
   },
