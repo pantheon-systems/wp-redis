@@ -43,7 +43,9 @@
         "PKSA-dwsq-ppd2-mb1x": "Dev-only: symfony/polyfill-intl-idn via behat test deps. No prod exposure. SITE-5206.",
         "PKSA-v5yj-8nmz-sk2q": "Dev-only: symfony/yaml via behat test deps. No prod exposure. SITE-5206.",
         "PKSA-ft77-7h5f-p3r6": "Dev-only: symfony/yaml via behat test deps. No prod exposure. SITE-5206.",
-        "PKSA-b14r-zh1d-vdrc": "Dev-only: symfony/yaml via behat test deps. No prod exposure. SITE-5206."
+        "PKSA-b14r-zh1d-vdrc": "Dev-only: symfony/yaml via behat test deps. No prod exposure. SITE-5206.",
+        "PKSA-bcdd-5xc7-gwfb": "Dev-only: guzzlehttp/guzzle via behat test deps (fabpot/goutte pins ^6, no 6.x patch exists). No prod exposure. VUL-24493.",
+        "PKSA-vznr-tgp9-fd7d": "Dev-only: guzzlehttp/psr7 via behat test deps (guzzle 6 pins psr7 ^1.9, no 1.x patch exists). No prod exposure. VUL-25208."
       }
     }
   },
