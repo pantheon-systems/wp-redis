@@ -49,7 +49,7 @@
         "PKSA-fy2t-3c5f-827y": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
         "PKSA-qxvb-2bpp-dnk6": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
         "PKSA-bbs6-q5q9-f3t4": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
-        "PKSA-bcdd-5xc7-gwfb": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
+        "PKSA-bcdd-5xc7-gwfb": "Dev-only: guzzlehttp/guzzle via behat test deps (fabpot/goutte pins ^6, no 6.x patch exists). No prod exposure. VUL-24493. SITE-5995; remove when goutte driver replaced.",
         "PKSA-pwsk-hy21-4gby": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
         "PKSA-93qv-9n9h-6k6p": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
         "PKSA-k22t-f949-t9g6": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
@@ -58,7 +58,8 @@
         "PKSA-2z36-j4q9-rsfy": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
         "PKSA-fvw5-9t6n-nwvr": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
         "PKSA-6d8m-6kgw-18zr": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
-        "PKSA-stmn-hvzq-wph6": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced."
+        "PKSA-stmn-hvzq-wph6": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
+        "PKSA-vznr-tgp9-fd7d": "Dev-only: guzzlehttp/psr7 via behat test deps (guzzle 6 pins psr7 ^1.9, no 1.x patch exists). No prod exposure. VUL-25208."
       }
     }
   },
