@@ -52,8 +52,24 @@ class WpRedisFeatureContext extends RawMinkContext implements Context
             echo sprintf("  line %d: %s", $e->line, trim($e->message)) . "\n";
         }
 
+        // Ask Mink itself which node it resolves for the "submit" locator, rather
+        // than guessing with a hand-written xpath.
+        $page = $this->getSession()->getPage();
+        $matched = $page->findAll('named', ['button', 'submit']);
+        echo "Mink matched " . count($matched) . " node(s) for locator 'submit':\n";
+        foreach ($matched as $j => $el) {
+            echo sprintf(
+                "  <%s> id=%s name=%s value=%s xpath=%s\n",
+                $el->getTagName(),
+                $el->getAttribute('id') ?: '-',
+                $el->getAttribute('name') ?: '-',
+                $el->getAttribute('value') ?: '-',
+                $el->getXpath()
+            );
+        }
+
         $xpath = new \DOMXPath($dom);
-        foreach ($xpath->query('//input[@type="submit"] | //button[@type="submit"]') as $i => $node) {
+        foreach ($xpath->query('//input[@type="submit"] | //button[@type="submit"] | //*[@role="button"] | //button') as $i => $node) {
             $chain = [];
             for ($p = $node->parentNode; $p && $p->nodeName !== '#document'; $p = $p->parentNode) {
                 $chain[] = $p->nodeName . ($p->getAttribute('id') ? '#' . $p->getAttribute('id') : '');
