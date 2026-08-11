@@ -23,31 +23,80 @@ class WpRedisFeatureContext extends RawMinkContext implements Context
     }
 
     /**
-     * Presses a button located inside a specific element.
+     * TEMPORARY DEBUG: reproduce the driver's own resolution of a button press.
      *
-     * Needed on wp-admin pages under the browserkit driver. Mink's named
-     * "button" selector is a union that also matches <button> elements and
-     * anything with role="button", and the driver resolves that union with
-     * getNode(0) -- the first match in document order. The admin sidebar's
-     * <button id="collapse-button"> (Collapse Menu) appears before the page
-     * content, so it wins, and because it has no form ancestor the driver
-     * throws "The selected node does not have a form ancestor."
+     * Mink resolves exactly one correct node for this locator and that node has
+     * a form ancestor, yet press() throws "does not have a form ancestor". This
+     * dumps the driver's view: the XPath it is handed, how many nodes IT
+     * resolves from that XPath, and the ancestor chain of getNode(0) -- which
+     * is what Crawler::form() actually operates on.
      *
-     * The goutte driver did not hit this, which is why these steps passed
-     * before the driver swap.
-     *
-     * Scoping the lookup to the settings form excludes the sidebar button.
-     *
-     * @When I press :button in the :element element
+     * @Then debug press :locator
      */
-    public function pressButtonInElement($button, $element)
+    public function debugPress($locator)
     {
-        $scope = $this->getSession()->getPage()->find('css', $element);
+        $page = $this->getSession()->getPage();
+        $driver = $this->getSession()->getDriver();
 
-        if (null === $scope) {
-            throw new \Exception(sprintf('Element "%s" not found on the page.', $element));
+        $button = $page->findButton($locator);
+        if (null === $button) {
+            echo "=== DEBUG: findButton('$locator') returned NULL ===\n";
+            return;
         }
 
-        $scope->pressButton($button);
+        $xpath = $button->getXpath();
+        echo "=== DEBUG PRESS '$locator' ===\n";
+        echo "Mink element xpath (this is what gets handed to the driver):\n";
+        echo "  " . preg_replace('/\s+/', ' ', $xpath) . "\n";
+
+        // Re-run that exact XPath through the same crawler the driver uses.
+        $ref = new \ReflectionClass($driver);
+        try {
+            $m = $ref->getMethod('getCrawler');
+            $m->setAccessible(true);
+            $crawler = $m->invoke($driver);
+
+            $filtered = $crawler->filterXPath($xpath);
+            echo "driver filterXPath() node count: " . count($filtered) . "\n";
+
+            foreach ($filtered as $i => $n) {
+                $chain = [];
+                for ($p = $n->parentNode; $p && $p->nodeName !== '#document'; $p = $p->parentNode) {
+                    $chain[] = $p->nodeName . ($p instanceof \DOMElement && $p->getAttribute('id') ? '#' . $p->getAttribute('id') : '');
+                }
+                $hasForm = in_array('form', array_map(function ($s) {
+                    return explode('#', $s)[0];
+                }, $chain), true);
+                printf(
+                    "  [%d] <%s> id=%s name=%s value=%s form_ancestor=%s\n       chain: %s\n",
+                    $i,
+                    $n->nodeName,
+                    $n instanceof \DOMElement ? ($n->getAttribute('id') ?: '-') : '-',
+                    $n instanceof \DOMElement ? ($n->getAttribute('name') ?: '-') : '-',
+                    $n instanceof \DOMElement ? ($n->getAttribute('value') ?: '-') : '-',
+                    $hasForm ? 'YES' : 'NO',
+                    implode(' > ', array_slice($chain, 0, 7))
+                );
+            }
+
+            // This is the exact call that throws inside the driver.
+            try {
+                $form = $filtered->form();
+                echo "Crawler::form() OK -> action=" . $form->getUri() . " method=" . $form->getMethod() . "\n";
+            } catch (\Throwable $e) {
+                echo "Crawler::form() THREW: " . get_class($e) . ": " . $e->getMessage() . "\n";
+            }
+        } catch (\Throwable $e) {
+            echo "reflection failed: " . $e->getMessage() . "\n";
+        }
+
+        // And the real press, to confirm the same failure.
+        try {
+            $button->press();
+            echo "press() OK\n";
+        } catch (\Throwable $e) {
+            echo "press() THREW: " . get_class($e) . ": " . $e->getMessage() . "\n";
+        }
+        echo "=== END DEBUG PRESS ===\n";
     }
 }
