@@ -135,6 +135,30 @@ class WpRedisFeatureContext extends RawMinkContext implements Context
                     }
                 }
                 echo "still-open at button: " . implode(' > ', $stack) . "\n";
+                // Compare div balance INSIDE the site-icon block on this page
+                // against the same block on a stock WP install.
+                $iconStart = strpos($raw, 'id="site-icon-preview"');
+                $iconEnd   = strpos($raw, 'site_icon_hidden_field');
+                if ($iconStart !== false && $iconEnd !== false && $iconEnd > $iconStart) {
+                    $blk = substr($raw, $iconStart, $iconEnd - $iconStart);
+                    printf(
+                        "site-icon block: <div>=%d </div>=%d delta=%d\n",
+                        preg_match_all('/<div\b/i', $blk),
+                        substr_count($blk, '</div>'),
+                        substr_count($blk, '</div>') - preg_match_all('/<div\b/i', $blk)
+                    );
+                }
+                // And the balance between the form tag and the site-icon block,
+                // i.e. everything Pantheon/plugins inject ahead of it.
+                if ($iconStart !== false && $formPos !== false && $iconStart > $formPos) {
+                    $pre = substr($raw, $formPos, $iconStart - $formPos);
+                    printf(
+                        "form..site-icon: <div>=%d </div>=%d delta=%d\n",
+                        preg_match_all('/<div\b/i', $pre),
+                        substr_count($pre, '</div>'),
+                        substr_count($pre, '</div>') - preg_match_all('/<div\b/i', $pre)
+                    );
+                }
             }
         } catch (\Throwable $e) {
             echo "form dump failed: " . $e->getMessage() . "\n";
