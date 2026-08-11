@@ -90,6 +90,42 @@ class WpRedisFeatureContext extends RawMinkContext implements Context
             echo "reflection failed: " . $e->getMessage() . "\n";
         }
 
+        // Dump every <form> the driver's crawler sees, plus the raw markup
+        // around the settings form, so we can see WHY the form tag is absent
+        // from the parsed tree on this page but present on profile.php.
+        try {
+            $m2 = $ref->getMethod('getCrawler');
+            $m2->setAccessible(true);
+            $cr = $m2->invoke($driver);
+            $forms = $cr->filterXPath('//form');
+            echo "forms in parsed tree: " . count($forms) . "\n";
+            foreach ($forms as $i => $f) {
+                echo sprintf(
+                    "  form[%d] id=%s action=%s parent=%s\n",
+                    $i,
+                    $f->getAttribute('id') ?: '-',
+                    $f->getAttribute('action') ?: '-',
+                    $f->parentNode->nodeName . ($f->parentNode instanceof \DOMElement && $f->parentNode->getAttribute('id') ? '#' . $f->parentNode->getAttribute('id') : '')
+                );
+            }
+            $raw = $this->getSession()->getPage()->getContent();
+            $pos = strpos($raw, 'action="options.php"');
+            if ($pos !== false) {
+                // Look BACKWARDS for the nearest preceding <form to see if one is left open.
+                $before = substr($raw, 0, $pos);
+                $lastForm = strripos($before, '<form');
+                $lastClose = strripos($before, '</form>');
+                echo "nearest preceding <form at $lastForm, nearest preceding </form> at $lastClose\n";
+                echo "=> an unclosed form precedes the settings form: " . (($lastForm !== false && ($lastClose === false || $lastForm > $lastClose)) ? 'YES' : 'NO') . "\n";
+                if ($lastForm !== false) {
+                    echo "--- markup at that preceding <form ---\n";
+                    echo substr($raw, $lastForm, 400) . "\n";
+                }
+            }
+        } catch (\Throwable $e) {
+            echo "form dump failed: " . $e->getMessage() . "\n";
+        }
+
         // And the real press, to confirm the same failure.
         try {
             $button->press();
