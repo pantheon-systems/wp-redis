@@ -13,8 +13,7 @@ Feature: Load WordPress
 
     When I go to "/wp-admin/options-general.php"
     And I fill in "blogname" with "Pantheon WordPress Site"
-    Then debug form structure
-    And I press "submit"
+    And I press "submit" in the ".wrap form" element
     When I wait "1" second
     Then print current URL
     And I should see "Settings saved."
