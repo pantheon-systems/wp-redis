@@ -109,18 +109,32 @@ class WpRedisFeatureContext extends RawMinkContext implements Context
                 );
             }
             $raw = $this->getSession()->getPage()->getContent();
-            $pos = strpos($raw, 'action="options.php"');
-            if ($pos !== false) {
-                // Look BACKWARDS for the nearest preceding <form to see if one is left open.
-                $before = substr($raw, 0, $pos);
-                $lastForm = strripos($before, '<form');
-                $lastClose = strripos($before, '</form>');
-                echo "nearest preceding <form at $lastForm, nearest preceding </form> at $lastClose\n";
-                echo "=> an unclosed form precedes the settings form: " . (($lastForm !== false && ($lastClose === false || $lastForm > $lastClose)) ? 'YES' : 'NO') . "\n";
-                if ($lastForm !== false) {
-                    echo "--- markup at that preceding <form ---\n";
-                    echo substr($raw, $lastForm, 400) . "\n";
+            $formPos = strpos($raw, 'action="options.php"');
+            $btnPos  = strpos($raw, 'id="submit"');
+            echo "raw: form tag at $formPos, submit button at $btnPos\n";
+            if ($formPos !== false && $btnPos !== false && $btnPos > $formPos) {
+                $between = substr($raw, $formPos, $btnPos - $formPos);
+                echo "bytes between: " . strlen($between) . "\n";
+                echo "</form> count between: " . substr_count($between, '</form>') . "\n";
+                echo "<form count between: " . substr_count(strtolower($between), '<form') . "\n";
+                // Tag-balance scan: which element closes without being open?
+                preg_match_all('/<(\/?)([a-z0-9]+)[^>]*>/i', $between, $m, PREG_OFFSET_CAPTURE);
+                $stack = []; $void = ['input','br','img','hr','meta','link','source','track','area','base','col','embed','param','wbr'];
+                foreach ($m[0] as $k => $tag) {
+                    $close = $m[1][$k][0] === '/';
+                    $name  = strtolower($m[2][$k][0]);
+                    if (in_array($name, $void, true)) { continue; }
+                    if (!$close) { $stack[] = $name; continue; }
+                    if (!in_array($name, $stack, true)) {
+                        echo "STRAY CLOSE </$name> at offset " . ($formPos + $tag[1]) . "\n";
+                        echo "  context: " . preg_replace('/\s+/', ' ', substr($raw, max(0, $formPos + $tag[1] - 220), 300)) . "\n";
+                        continue;
+                    }
+                    while (($pop = array_pop($stack)) !== null && $pop !== $name) {
+                        echo "IMPLICITLY CLOSED <$pop> by </$name> at offset " . ($formPos + $tag[1]) . "\n";
+                    }
                 }
+                echo "still-open at button: " . implode(' > ', $stack) . "\n";
             }
         } catch (\Throwable $e) {
             echo "form dump failed: " . $e->getMessage() . "\n";
