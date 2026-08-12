@@ -11,13 +11,9 @@ Feature: Load WordPress
 
     Given I log in as an admin
 
-    When I go to "/wp-admin/profile.php"
-    Then debug press "submit"
-
     When I go to "/wp-admin/options-general.php"
     And I fill in "blogname" with "Pantheon WordPress Site"
-    Then debug press "submit"
-    And I press "submit"
+    And I submit the ".wrap form" form
     When I wait "1" second
     Then print current URL
     And I should see "Settings saved."
