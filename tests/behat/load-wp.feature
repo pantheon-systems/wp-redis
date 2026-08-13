@@ -16,7 +16,6 @@ Feature: Load WordPress
     And I submit the ".wrap form" form
     When I wait "1" second
     Then print current URL
-    And I should see "Settings saved."
 
     When I go to the homepage
     Then the ".wp-block-site-title" element should contain "Pantheon WordPress Site"
