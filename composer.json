@@ -1,70 +1,58 @@
 {
-  "name": "pantheon-systems/wp-redis",
-  "type": "wordpress-plugin",
-  "license": "GPL-2.0-or-later",
-  "authors": [
-    {
-      "name": "Pantheon",
-      "email": "noreply@pantheon.io"
-    }
-  ],
-  "require-dev": {
-    "behat/behat": "^3.1",
-    "behat/mink-extension": "^2.2",
-    "behat/mink-goutte-driver": "^1.2",
-    "pantheon-systems/pantheon-wp-coding-standards": "^3.0",
-    "pantheon-systems/pantheon-wordpress-upstream-tests": "dev-master",
-    "phpunit/phpunit": "^9",
-    "yoast/phpunit-polyfills": "^4.0",
-    "pantheon-systems/wpunit-helpers": "^2.0"
-  },
-  "scripts": {
-    "lint": [
-      "@phpcs",
-      "@phplint"
+    "name": "pantheon-systems/wp-redis",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Pantheon",
+            "email": "noreply@pantheon.io"
+        }
     ],
-    "phpcs": "vendor/bin/phpcs",
-    "phpcbf": "vendor/bin/phpcbf",
-    "phplint": "find . -name '*.php' -type f -not -path './vendor/*' -not -path './tests/*' -exec php -l {} \\;",
-    "phpunit": "vendor/bin/phpunit --do-not-cache-result",
-    "test": "@phpunit",
-    "test:install": "bin/install-local-tests.sh --nodb",
-    "test:install:withdb": "bin/install-local-tests.sh"
-  },
-  "config": {
-    "allow-plugins": {
-      "dealerdirect/phpcodesniffer-composer-installer": true,
-      "pantheon-systems/wpunit-helpers": true
+    "require-dev": {
+        "behat/behat": "^3.1",
+        "friends-of-behat/mink-extension": "^2.7",
+        "behat/mink-browserkit-driver": "^2.1",
+        "symfony/http-client": "^5.4 || ^6.0 || ^7.0 || ^8.0",
+        "symfony/mime": "^5.4 || ^6.0 || ^7.0 || ^8.0",
+        "pantheon-systems/pantheon-wp-coding-standards": "^3.0",
+        "pantheon-systems/pantheon-wordpress-upstream-tests": "dev-master",
+        "phpunit/phpunit": "^9",
+        "yoast/phpunit-polyfills": "^4.0",
+        "pantheon-systems/wpunit-helpers": "^2.0"
     },
-    "audit": {
-      "ignore": {
-        "PKSA-z3gr-8qht-p93v": "Dev-only: phpunit/phpunit (test runner). No prod exposure. SITE-5206.",
-        "PKSA-5r1g-c7b7-y1zg": "Dev-only: symfony/dom-crawler via behat test deps. No prod exposure. SITE-5206.",
-        "PKSA-dwsq-ppd2-mb1x": "Dev-only: symfony/polyfill-intl-idn via behat test deps. No prod exposure. SITE-5206.",
-        "PKSA-v5yj-8nmz-sk2q": "Dev-only: symfony/yaml via behat test deps. No prod exposure. SITE-5206.",
-        "PKSA-ft77-7h5f-p3r6": "Dev-only: symfony/yaml via behat test deps. No prod exposure. SITE-5206.",
-        "PKSA-b14r-zh1d-vdrc": "Dev-only: symfony/yaml via behat test deps. No prod exposure. SITE-5206.",
-        "PKSA-rkkf-636k-qjb3": "Dev-only: symfony/process via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
-        "PKSA-wws7-mr54-jsny": "Dev-only: symfony/process via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
-        "PKSA-fy2t-3c5f-827y": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
-        "PKSA-qxvb-2bpp-dnk6": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
-        "PKSA-bbs6-q5q9-f3t4": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
-        "PKSA-bcdd-5xc7-gwfb": "Dev-only: guzzlehttp/guzzle via behat test deps (fabpot/goutte pins ^6, no 6.x patch exists). No prod exposure. VUL-24493. SITE-5995; remove when goutte driver replaced.",
-        "PKSA-pwsk-hy21-4gby": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
-        "PKSA-93qv-9n9h-6k6p": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
-        "PKSA-k22t-f949-t9g6": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
-        "PKSA-yfw5-9gnj-n2c7": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
-        "PKSA-k1b4-kshy-xgbh": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
-        "PKSA-2z36-j4q9-rsfy": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
-        "PKSA-fvw5-9t6n-nwvr": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
-        "PKSA-6d8m-6kgw-18zr": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
-        "PKSA-stmn-hvzq-wph6": "Dev-only: guzzlehttp/guzzle via behat mink-goutte-driver (fabpot/goutte) chain. No prod exposure. SITE-5995; remove when goutte driver replaced.",
-        "PKSA-vznr-tgp9-fd7d": "Dev-only: guzzlehttp/psr7 via behat test deps (guzzle 6 pins psr7 ^1.9, no 1.x patch exists). No prod exposure. VUL-25208."
-      }
+    "scripts": {
+        "lint": [
+            "@phpcs",
+            "@phplint"
+        ],
+        "phpcs": "vendor/bin/phpcs",
+        "phpcbf": "vendor/bin/phpcbf",
+        "phplint": "find . -name '*.php' -type f -not -path './vendor/*' -not -path './tests/*' -exec php -l {} \\;",
+        "phpunit": "vendor/bin/phpunit --do-not-cache-result",
+        "test": "@phpunit",
+        "test:install": "bin/install-local-tests.sh --nodb",
+        "test:install:withdb": "bin/install-local-tests.sh"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "pantheon-systems/wpunit-helpers": true
+        },
+        "audit": {
+            "ignore": {
+                "PKSA-z3gr-8qht-p93v": "Dev-only: phpunit/phpunit (test runner). No prod exposure. SITE-5206.",
+                "PKSA-v5yj-8nmz-sk2q": "Dev-only: symfony/yaml via behat test deps. No prod exposure. SITE-5206.",
+                "PKSA-ft77-7h5f-p3r6": "Dev-only: symfony/yaml via behat test deps. No prod exposure. SITE-5206.",
+                "PKSA-b14r-zh1d-vdrc": "Dev-only: symfony/yaml via behat test deps. No prod exposure. SITE-5206."
+            }
+        },
+        "platform": {
+            "php": "8.1.0"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "behat\\features\\bootstrap\\": "tests/behat/features/bootstrap/"
+        }
     }
-  },
-  "autoload": {
-    "psr-4": { "behat\\features\\bootstrap\\": "tests/behat/features/bootstrap/" }
-  }
-
 }
