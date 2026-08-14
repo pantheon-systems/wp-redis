@@ -62,11 +62,6 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Configure GitHub Token for Composer
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: composer config -g github-oauth.github.com "$GH_TOKEN"
-
       - name: Validate fixture version
         uses: jazzsequence/action-validate-plugin-version@6b8b403af6e9eefde9c36c0d342b717d5952b518 # v2.0.1
         with:
