@@ -52,6 +52,9 @@ jobs:
     services:
       mariadb:
         image: mariadb:${{ (matrix.php_version == '7.4') && '10.5' || '10.6' }}
+        # Newer MariaDB images require a password setting to start; empty root is fine here since this container is ephemeral, unexposed, and holds no real data.
+        env:
+          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: true
       redis:
         image: redis:6.2
         ports:
