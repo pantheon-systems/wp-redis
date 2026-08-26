@@ -8,6 +8,11 @@ updates:
       day: tuesday
     target-branch: "main"
     open-pull-requests-limit: 99
+    groups:
+      composer-minor-patch:
+        update-types:
+        - minor
+        - patch
     ignore:
     - dependency-name: phpunit/phpunit
       versions:
@@ -21,3 +26,7 @@ updates:
     directory: "/"
     schedule:
       interval: daily
+    groups:
+      github-actions:
+        patterns:
+          - "*"
