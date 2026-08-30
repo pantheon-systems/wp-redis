@@ -14,16 +14,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
     - name: Setup PHP 8.4
-      uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1
+      uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2
       with:
         php-version: "8.4"
         extensions: mysqli
         tools: composer,wp-cli
 
     - name: Cache Composer dependencies
-      uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7
+      uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
       with:
         path: |
             ~/.composer/cache
