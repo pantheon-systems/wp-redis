@@ -1,0 +1,134 @@
+name: Playwright BDD Tests
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * *'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # Filtering lives here rather than in paths-ignore: a workflow skipped by
+  # paths-ignore posts no status at all, which leaves a required check pending
+  # forever. A skipped job still posts one.
+  changes:
+    name: Detect relevant changes
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.filter.outputs.run }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Decide whether the suite needs to run
+        id: filter
+        env:
+          IGNORE_FILE: .github/playwright-ignore.txt
+        run: |
+          if [ "${{ github.event_name }}" != 'pull_request' ]; then
+            echo 'run=true' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          IGNORED="^($(grep -vE '^\s*(#|$)' "$IGNORE_FILE" | paste -sd '|' -))$"
+          changed=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")
+          # No diff means something is off; run rather than hide a real change.
+          if [ -z "$changed" ] || printf '%s\n' "$changed" | grep -qvE "$IGNORED"; then
+            echo 'run=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'run=false' >> "$GITHUB_OUTPUT"
+            echo 'Only ignored files changed.'
+          fi
+
+  playwright-bdd:
+    needs: changes
+    if: needs.changes.outputs.run == 'true'
+    name: Playwright BDD Tests
+    runs-on: ubuntu-latest
+
+    env:
+      TERMINUS_SITE: ${{ vars.TERMINUS_SITE }}
+      WORDPRESS_ADMIN_USERNAME: pantheon
+      IS_FORK: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
+
+    steps:
+      # Fail rather than skip: a skipped job satisfies a required check.
+      - name: Block fork pull requests
+        if: env.IS_FORK == 'true'
+        run: echo "::error::Forks cannot reach the Terminus and SSH secrets. Push this branch to the repo and run the suite there before merging." && exit 1
+
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '20'
+
+      - name: Install Terminus
+        uses: pantheon-systems/terminus-github-actions@8e024bd89ff46ed2aa4e0663c6b54c87a94344f8 # v1.2.7
+        with:
+          pantheon-machine-token: ${{ secrets.TERMINUS_TOKEN }}
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@e83874834305fe9a4a2997156cb26c5de65a8555 # v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          log-public-key: true
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          printf "Host *\n  StrictHostKeyChecking no\n  UserKnownHostsFile=/dev/null\n" > ~/.ssh/config
+
+      - name: Set Environment Variables
+        run: |
+          PASSWORD=$(openssl rand -hex 8)
+          echo "::add-mask::$PASSWORD"
+          echo "WORDPRESS_ADMIN_PASSWORD=$PASSWORD" >> $GITHUB_ENV
+          echo "TERMINUS_ENV=ci-${{ github.run_number }}" >> $GITHUB_ENV
+          echo "WORDPRESS_ADMIN_EMAIL=no-reply@getpantheon.com" >> $GITHUB_ENV
+
+      - name: Validate Readme Version
+        uses: jazzsequence/action-validate-plugin-version@6b8b403af6e9eefde9c36c0d342b717d5952b518 # v2.0.1
+        with:
+          branch: ${{ github.head_ref }}
+          dry-run: 'true'
+
+      - name: Prepare Test Environment
+        run: ./bin/e2e-prepare.sh
+
+      - name: Install Node dependencies
+        working-directory: tests/playwright
+        run: npm ci
+
+      - name: Install Chrome
+        working-directory: tests/playwright
+        run: npx playwright install --with-deps chrome
+
+      - name: Run Playwright BDD tests
+        working-directory: tests/playwright
+        env:
+          WP_URL: ${{ env.WP_URL }}
+          WP_USER: ${{ env.WORDPRESS_ADMIN_USERNAME }}
+          WP_PASSWORD: ${{ env.WORDPRESS_ADMIN_PASSWORD }}
+          HEADLESS: 'true'
+        run: npm test
+
+      - name: Upload test results
+        if: always() && env.IS_FORK != 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: playwright-test-results
+          path: |
+            tests/playwright/test-results/
+            tests/playwright/playwright-report/
+
+      - name: Cleanup Test Environment
+        if: always() && env.IS_FORK != 'true'
+        run: ./bin/e2e-cleanup.sh
