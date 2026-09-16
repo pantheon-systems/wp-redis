@@ -43,10 +43,14 @@ Then('I should not see {string}', async ({ page }, text: string) => {
   await expect(page.locator('body')).not.toContainText(text);
 });
 
+// Behat's Mink step of the same name checks the element's HTML, not its
+// rendered text (its own docs example asserts on a style="..." attribute).
 Then('the {string} element should contain {string}', async ({ page }, selector: string, text: string) => {
-  await expect(page.locator(selector)).toContainText(text);
+  const html = await page.locator(selector).innerHTML();
+  expect(html).toContain(text);
 });
 
 Then('the {string} element should not contain {string}', async ({ page }, selector: string, text: string) => {
-  await expect(page.locator(selector)).not.toContainText(text);
+  const html = await page.locator(selector).innerHTML();
+  expect(html).not.toContain(text);
 });
