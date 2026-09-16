@@ -9,7 +9,13 @@ updates:
     target-branch: "main"
     open-pull-requests-limit: 99
     groups:
+      composer-security:
+        applies-to: security-updates
+        update-types:
+        - minor
+        - patch
       composer-minor-patch:
+        applies-to: version-updates
         update-types:
         - minor
         - patch
@@ -27,6 +33,13 @@ updates:
     schedule:
       interval: daily
     groups:
-      github-actions:
-        patterns:
-          - "*"
+      github-actions-security:
+        applies-to: security-updates
+        update-types:
+        - minor
+        - patch
+      github-actions-minor-patch:
+        applies-to: version-updates
+        update-types:
+        - minor
+        - patch
