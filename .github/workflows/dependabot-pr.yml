@@ -1,0 +1,54 @@
+name: Rename Dependabot PRs
+
+on:
+  pull_request_target:
+    types: [opened, reopened, edited]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  rename:
+    name: Rename
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Rename by update type
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          set -euo pipefail
+
+          # Stops the `edited` event the rename triggers from looping.
+          case "$PR_TITLE" in
+            "Security update:"*|"Composer minor:"*|"GitHub Actions minor:"*|"Major update:"*)
+              exit 0
+              ;;
+          esac
+
+          case "$PR_TITLE" in
+            *-security\ group*)                  prefix="Security update" ;;
+            *composer-minor-patch\ group*)        prefix="Composer minor" ;;
+            *github-actions-minor-patch\ group*)  prefix="GitHub Actions minor" ;;
+            # Minor and patch are always grouped, so ungrouped means major.
+            *) prefix="Major update" ;;
+          esac
+
+          case "$PR_TITLE" in
+            *\ group*)
+              summary="$(printf '%s' "$PR_TITLE" | sed -n 's/.*with \([0-9]* update[s]*\).*/\1/p')"
+              ;;
+            *)
+              summary="$(printf '%s' "${PR_TITLE#*: bump }" | sed 's/ from / /')"
+              ;;
+          esac
+
+          if [ -z "$summary" ]; then
+            echo "Could not read a summary out of: $PR_TITLE"
+            exit 1
+          fi
+
+          gh pr edit "$PR_URL" --title "${prefix}: ${summary}"
