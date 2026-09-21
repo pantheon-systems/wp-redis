@@ -37,18 +37,17 @@ jobs:
             *) prefix="Major update" ;;
           esac
 
-          case "$PR_TITLE" in
-            *\ group*)
-              summary="$(printf '%s' "$PR_TITLE" | sed -n 's/.*with \([0-9]* update[s]*\).*/\1/p')"
-              ;;
-            *)
-              summary="$(printf '%s' "${PR_TITLE#*: bump }" | sed 's/ from / /')"
-              ;;
-          esac
+          # Dependabot writes "with N updates" only when a group batches two or more.
+          summary="$(printf '%s' "$PR_TITLE" | sed -n 's/.*with \([0-9]* update[s]*\).*/\1/p')"
 
           if [ -z "$summary" ]; then
-            echo "Could not read a summary out of: $PR_TITLE"
-            exit 1
+            summary="$(printf '%s' "$PR_TITLE" \
+              | sed -E 's/^[^:]*: //; s/^[Bb]ump //; s/ in the [^ ]+ group.*$//; s/ from / /')"
+          fi
+
+          if [ -z "$summary" ]; then
+            echo "::notice::Title left as it is, no summary could be read out of: $PR_TITLE"
+            exit 0
           fi
 
           gh pr edit "$PR_URL" --title "${prefix}: ${summary}"
