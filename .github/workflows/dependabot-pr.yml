@@ -15,39 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Rename by update type
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
-        run: |
-          set -euo pipefail
-
-          # Stops the `edited` event the rename triggers from looping.
-          case "$PR_TITLE" in
-            "Security update:"*|"Composer minor:"*|"GitHub Actions minor:"*|"Major update:"*)
-              exit 0
-              ;;
-          esac
-
-          case "$PR_TITLE" in
-            *-security\ group*)                  prefix="Security update" ;;
-            *composer-minor-patch\ group*)        prefix="Composer minor" ;;
-            *github-actions-minor-patch\ group*)  prefix="GitHub Actions minor" ;;
-            # Minor and patch are always grouped, so ungrouped means major.
-            *) prefix="Major update" ;;
-          esac
-
-          # Dependabot writes "with N updates" only when a group batches two or more.
-          summary="$(printf '%s' "$PR_TITLE" | sed -n 's/.*with \([0-9]* update[s]*\).*/\1/p')"
-
-          if [ -z "$summary" ]; then
-            summary="$(printf '%s' "$PR_TITLE" \
-              | sed -E 's/^[^:]*: //; s/^[Bb]ump //; s/ in the [^ ]+ group.*$//; s/ from / /')"
-          fi
-
-          if [ -z "$summary" ]; then
-            echo "::notice::Title left as it is, no summary could be read out of: $PR_TITLE"
-            exit 0
-          fi
-
-          gh pr edit "$PR_URL" --title "${prefix}: ${summary}"
+        # TODO(SITE-5827): placeholder ref, pin to a main SHA once
+        # pantheon-systems/plugin-release-actions#40 is merged and tagged.
+        uses: pantheon-systems/plugin-release-actions/rename-dependabot-pr@main
+        with:
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
