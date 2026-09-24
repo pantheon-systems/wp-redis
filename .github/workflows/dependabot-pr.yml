@@ -15,8 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Rename by update type
-        # TODO(SITE-5827): placeholder ref, pin to a main SHA once
-        # pantheon-systems/plugin-release-actions#40 is merged and tagged.
-        uses: pantheon-systems/plugin-release-actions/rename-dependabot-pr@main
+        uses: pantheon-systems/plugin-release-actions/rename-dependabot-pr@ec0ee6ce8ee49452580d6bfe906ac47bc8527269 # v0.5.7
         with:
           gh_token: ${{ secrets.GITHUB_TOKEN }}
