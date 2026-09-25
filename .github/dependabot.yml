@@ -28,6 +28,25 @@ updates:
       versions:
       - ">= 9.a"
       - "< 10"
+  - package-ecosystem: npm
+    directory: "/tests/playwright"
+    schedule:
+      interval: weekly
+      timezone: America/Los_Angeles
+      day: tuesday
+    target-branch: "main"
+    open-pull-requests-limit: 99
+    groups:
+      # These three must move together; a version mismatch breaks playwright-bdd's loader.
+      playwright:
+        patterns:
+        - "@playwright/test"
+        - playwright
+        - playwright-bdd
+      e2e-minor-patch:
+        update-types:
+        - minor
+        - patch
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
