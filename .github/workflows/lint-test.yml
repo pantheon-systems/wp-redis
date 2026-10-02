@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
-      - uses: pantheon-systems/validate-readme-spacing@229ea162621009cf8e09bf2beba405017150130e # v1.0.5
+      - uses: pantheon-systems/validate-readme-spacing@13c5e619ef5fc39632292f1f5261ab31d1904208 # v1.0.6
   lint:
     name: PHPCS Linting
     runs-on: ubuntu-latest
