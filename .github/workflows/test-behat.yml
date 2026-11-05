@@ -22,14 +22,14 @@ jobs:
     steps:
       # Checks out your repository under $GITHUB_WORKSPACE, so your job can access it.
       - name: Checkout code
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
 
       # Caches the vendor directory to speed up subsequent builds.
       # The cache is invalidated when composer.json changes.
       - name: Cache dependencies
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: vendor
           key: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
@@ -37,7 +37,7 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install Terminus
-        uses: pantheon-systems/terminus-github-actions@8e024bd89ff46ed2aa4e0663c6b54c87a94344f8 # v1.2.7
+        uses: pantheon-systems/terminus-github-actions@34305c662bb28fb2935aa5556cab46643a0c5170 # v1.2.11
         with:
           pantheon-machine-token: ${{ secrets.TERMINUS_TOKEN }}
 
@@ -48,8 +48,8 @@ jobs:
           ENV_NAME="ci-$(echo ${{ github.run_id }} | cut -c1-8)"
           echo "WORDPRESS_ADMIN_PASSWORD=$(openssl rand -hex 8)" >> $GITHUB_ENV
           echo "TERMINUS_ENV=${ENV_NAME}" >> $GITHUB_ENV
-          echo "TERMINUS_SITE=wp-redis" >> $GITHUB_ENV
-          echo "SITE_ENV=wp-redis.${ENV_NAME}" >> $GITHUB_ENV
+          echo "TERMINUS_SITE=${{ vars.TERMINUS_SITE }}" >> $GITHUB_ENV
+          echo "SITE_ENV=${{ vars.TERMINUS_SITE }}.${ENV_NAME}" >> $GITHUB_ENV
           echo "WORDPRESS_ADMIN_USERNAME=pantheon" >> $GITHUB_ENV
           echo "WORDPRESS_ADMIN_EMAIL=no-reply@getpantheon.com" >> $GITHUB_ENV
 
@@ -58,17 +58,12 @@ jobs:
         run: echo "GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" >> $GITHUB_ENV
 
       - name: Install SSH key
-        uses: webfactory/ssh-agent@a6f90b1f127823b31d4d4a8d96047790581349bd # v0.9.1
+        uses: webfactory/ssh-agent@e83874834305fe9a4a2997156cb26c5de65a8555 # v0.10.0
         with:
-          ssh-private-key: ${{ secrets.SITE_OWNER_SSH_PRIVATE_KEY }}
-
-      # Configures Composer with the GitHub token for accessing private repositories.
-      # The GITHUB_TOKEN is automatically provided by GitHub Actions.
-      - name: Configure GitHub Token for Composer
-        run: composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Validate fixture version
-        uses: jazzsequence/action-validate-plugin-version@33b0e43e436229825afc8427b19829a0c9aea498 # v2.0.0
+        uses: jazzsequence/action-validate-plugin-version@399a44121bf9c1a3cd75c8b34f1a6e610d1a1225 # v2.0.3
         with:
           branch: ${{ github.head_ref }}
           dry-run: 'true'

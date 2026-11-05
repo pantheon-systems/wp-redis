@@ -1,0 +1,21 @@
+name: Draft Release PR
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  draft-release:
+    name: Draft Release PR
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - name: Create Draft Release PR
+        uses: pantheon-systems/plugin-release-actions/release-pr@ec0ee6ce8ee49452580d6bfe906ac47bc8527269 # v0.5.7
+        with:
+          gh_token: ${{ github.token }}
+          readme_md: README.md

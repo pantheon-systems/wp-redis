@@ -1,13 +1,50 @@
-# On push, run the action-wporg-validator workflow.
 name: WP.org Validator
-on: [push]
+on:
+  pull_request:
+  push:
+    branches:
+    - main
+
+permissions:
+  contents: read
+
 jobs:
-  wporg-validation:
+  validate:
+    name: Validate Plugin
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
-      - name: WP.org Validator
-        uses: pantheon-systems/action-wporg-validator@a4e56c641359547609152a5b3702f77625282ff2 # v2.0.0
-        with:
-          type: plugin
+    - name: Checkout
+      uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+    - name: Setup PHP 8.4
+      uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+      with:
+        php-version: "8.4"
+        extensions: mysqli
+        tools: composer,wp-cli
+
+    - name: Cache Composer dependencies
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+      with:
+        path: |
+            ~/.composer/cache
+            vendor
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+            ${{ runner.os }}-composer-
+
+    - name: Install dependencies
+      run: composer install --no-dev --no-interaction --no-progress --prefer-dist --no-scripts --no-ansi
+
+    - name: Create Dist Archive for wp.org validation
+      env:
+        COMPOSER_AUTH: '{"github-oauth": {}}'
+      run: |
+        rm -f ~/.composer/auth.json
+        wp package install wp-cli/dist-archive-command:v3.1.0
+        wp dist-archive . --plugin-dirname=wp-redis --filename-format=wp-redis-dist
+        unzip ../wp-redis-dist.zip
+
+    - name: Run plugin check
+      uses: wordpress/plugin-check-action@10857da14b6c2246d15402b3e69f777edcf8c12e
+      with:
+        build-dir: wp-redis

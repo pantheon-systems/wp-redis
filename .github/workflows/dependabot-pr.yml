@@ -1,0 +1,20 @@
+name: Rename Dependabot PRs
+
+on:
+  pull_request_target:
+    types: [opened, reopened, edited]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  rename:
+    name: Rename
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Rename by update type
+        uses: pantheon-systems/plugin-release-actions/rename-dependabot-pr@ec0ee6ce8ee49452580d6bfe906ac47bc8527269 # v0.5.7
+        with:
+          gh_token: ${{ secrets.GITHUB_TOKEN }}

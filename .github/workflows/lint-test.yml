@@ -1,28 +1,30 @@
 # On push, run the action-wporg-validator workflow.
 name: Linting & Test
 on: [push]
+permissions:
+  contents: read
 jobs:
   validate-readme-spacing:
     name: Validate README Spacing
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
-      - uses: pantheon-systems/validate-readme-spacing@229ea162621009cf8e09bf2beba405017150130e # v1.0.5
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: pantheon-systems/validate-readme-spacing@13c5e619ef5fc39632292f1f5261ab31d1904208 # v1.0.6
   lint:
     name: PHPCS Linting
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
     - name: Cache dependencies
-      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ~/vendor
         key: test-lint-dependencies-{{ checksum "composer.json" }}
         restore-keys: test-lint-dependencies-{{ checksum "composer.json" }}
     - name: Setup PHP
-      uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # v2
+      uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
       with:
         php-version: 8.3
     - name: Install dependencies
@@ -34,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       - uses: pantheon-systems/phpcompatibility-action@bd72eb001d4fb9817c9d6e1a157a71e287f3ff80 # dev 2023-10-04T16:54:18Z
         with:
           paths: ${{ github.workspace }}/*.php
@@ -45,19 +47,22 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php_version: [7.4, 8.2, 8.3, 8.4]
+        php_version: [7.4, 8.2, 8.3, 8.4, 8.5]
         redis_enabled: [true, false]
     services:
       mariadb:
         image: mariadb:${{ (matrix.php_version == '7.4') && '10.5' || '10.6' }}
+        # Newer MariaDB images require a password setting to start; empty root is fine here since this container is ephemeral, unexposed, and holds no real data.
+        env:
+          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: true
       redis:
         image: redis:6.2
         ports:
           - 6379:6379
     steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       - name: Setup PHP
-        uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # v2
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: ${{ matrix.php_version }}
           extensions: mysqli, zip, imagick, redis
@@ -68,7 +73,7 @@ jobs:
           sudo apt-get install -y redis-tools
           redis-cli -h localhost ping
       - name: Cache dependencies
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/vendor
           key: test-dependencies-{{ checksum "composer.json" }}
