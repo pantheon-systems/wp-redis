@@ -37,7 +37,7 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install Terminus
-        uses: pantheon-systems/terminus-github-actions@34305c662bb28fb2935aa5556cab46643a0c5170 # v1.2.11
+        uses: pantheon-systems/terminus-github-actions@26fc7c754c80fd1c9fe2d6d3ae77528a15033b6f # v1.2.13
         with:
           pantheon-machine-token: ${{ secrets.TERMINUS_TOKEN }}
 
