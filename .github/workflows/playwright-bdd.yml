@@ -49,7 +49,8 @@ jobs:
     needs: changes
     if: needs.changes.outputs.run == 'true'
     name: Playwright BDD Tests
-    runs-on: ubuntu-latest
+    # Pinned: ubuntu-latest is now 26.04, which this Playwright version cannot install browsers on.
+    runs-on: ubuntu-24.04
 
     env:
       TERMINUS_SITE: ${{ vars.TERMINUS_SITE }}
