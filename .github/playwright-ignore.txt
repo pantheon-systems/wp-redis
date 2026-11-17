@@ -1,0 +1,28 @@
+# Paths that do not affect the Playwright BDD suite. One extended regex per
+# line, anchored against the full path; blank lines and # comments are ignored.
+# Read by the "Detect relevant changes" job in .github/workflows/playwright-bdd.yml.
+\.editorconfig
+\.gitattributes
+\.gitignore
+CONTRIBUTING\.md
+LICENSE
+phpcs\.xml\.dist
+phpunit\.xml\.dist
+README\.md
+readme\.txt
+\.wordpress-org/.*
+tests/phpunit/.*
+tests/behat/.*
+behat\.yml
+bin/behat-.*\.sh
+\.github/CODEOWNERS
+\.github/dependabot\.yml
+\.github/workflows/build-tag-release\.yml
+\.github/workflows/composer-diff\.yml
+\.github/workflows/dependabot-pr\.yml
+\.github/workflows/lint-test\.yml
+\.github/workflows/plugin-version\.yml
+\.github/workflows/release-pr\.yml
+\.github/workflows/test-behat\.yml
+\.github/workflows/wordpress-plugin-deploy\.yml
+\.github/workflows/wporg-validator\.yml
