@@ -96,11 +96,22 @@ jobs:
           echo "TERMINUS_ENV=pw-${{ github.run_number }}" >> $GITHUB_ENV
           echo "WORDPRESS_ADMIN_EMAIL=no-reply@getpantheon.com" >> $GITHUB_ENV
 
-      - name: Validate fixture version
-        uses: jazzsequence/action-validate-plugin-version@399a44121bf9c1a3cd75c8b34f1a6e610d1a1225 # v2.0.3
+      # validate-fixture-version applies updates with a Terminus option (--site)
+      # that Terminus 4 removed, so bring the fixture up to date first.
+      - name: Apply upstream updates to the fixture
+        run: |
+          SITE_ENV="${TERMINUS_SITE}.dev"
+          if terminus upstream:updates:list "$SITE_ENV" --format=list | grep -q .; then
+            terminus upstream:updates:apply "$SITE_ENV" --accept-upstream --updatedb
+            terminus workflow:wait "$SITE_ENV" --max=300
+          else
+            echo "Fixture is up to date."
+          fi
+
+      - name: Validate Fixture Version
+        uses: pantheon-systems/plugin-release-actions/validate-fixture-version@c4a1a8aac520bf6682efee843cd0f8fda8442793 # main
         with:
-          branch: ${{ github.head_ref }}
-          dry-run: 'true'
+          terminus_site: ${{ env.TERMINUS_SITE }}
 
       - name: Prepare Test Environment
         run: ./bin/e2e-prepare.sh
