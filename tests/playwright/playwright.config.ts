@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { defineConfig, devices } from '@playwright/test';
 import { defineBddConfig } from 'playwright-bdd';
-import { AUTH_FILE, BROWSER_UA } from './constants';
+import { AUTH_FILE } from './constants';
 
 if (!process.env.WP_URL) {
   throw new Error('WP_URL is not set. In CI bin/e2e-prepare.sh writes it; locally, set it in tests/playwright/.env.');
@@ -47,7 +47,6 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         channel: 'chrome',
         viewport: { width: 1920, height: 1080 },
-        ...BROWSER_UA,
       },
     },
     {
@@ -58,7 +57,6 @@ export default defineConfig({
         channel: 'chrome',
         viewport: { width: 1920, height: 1080 },
         storageState: AUTH_FILE,
-        ...BROWSER_UA,
       },
     },
   ],

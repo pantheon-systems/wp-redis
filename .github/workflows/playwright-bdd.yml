@@ -132,19 +132,10 @@ jobs:
           WP_USER: ${{ env.WORDPRESS_ADMIN_USERNAME }}
           WP_PASSWORD: ${{ env.WORDPRESS_ADMIN_PASSWORD }}
           HEADLESS: 'true'
-          CI_UA: ${{ secrets.CI_UA }}
         run: npm test
 
-      - name: Redact the allowlisted User-Agent from artifacts
-        id: redact
-        if: always() && env.IS_FORK != 'true'
-        working-directory: tests/playwright
-        env:
-          CI_UA: ${{ secrets.CI_UA }}
-        run: "$GITHUB_WORKSPACE/bin/redact-artifacts.sh"
-
       - name: Upload test results
-        if: always() && env.IS_FORK != 'true' && steps.redact.outcome == 'success'
+        if: always() && env.IS_FORK != 'true'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: playwright-test-results
