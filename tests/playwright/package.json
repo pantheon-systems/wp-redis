@@ -11,7 +11,7 @@
     "test:report": "playwright show-report"
   },
   "dependencies": {
-    "cms-bdd": "git+https://github.com/pantheon-systems/cms-bdd.git#c1a4bdc901bce45dcbf9db75d21455ac040119fd",
+    "cms-bdd": "git+https://github.com/pantheon-systems/cms-bdd.git#f65ae86a1fdcd1a34f439ac64d31bd5399aa3e65",
     "dotenv": "^17.4.2"
   },
   "devDependencies": {
